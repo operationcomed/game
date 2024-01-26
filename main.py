@@ -4,6 +4,7 @@ from direct.task import Task
 from direct.actor.Actor import Actor
 from direct.interval.IntervalGlobal import Sequence
 from direct.gui.OnscreenText import OnscreenText
+from direct.filter.CommonFilters import CommonFilters
 from panda3d.core import *
 
 # function shorthand
@@ -14,10 +15,11 @@ GROUND_POS = 3
 
 # antialiasing
 loadPrcFileData("", "framebuffer-multisample 1")
-loadPrcFileData("", "multisamples 16")
+loadPrcFileData("", "multisamples 4")
 
 # window title
 loadPrcFileData("", "window-title game of the year 2024")
+loadPrcFileData("", "default-fov 60")
 
 class game(ShowBase):
 
@@ -41,17 +43,15 @@ class game(ShowBase):
 		self.render.setShaderAuto()
 
 		# camera
-		self.camLens.setFocalLength(1)
-
 		self.camLens.setNearFar(1, 1000)
 
 		# lights and shadows
 		alight = AmbientLight("alight1")
 		alnp = self.render.attachNewNode(alight)
-		alight.setColor((.25, .25, .25, .1))
+		alight.setColor((.35, .5, .7, 1))
 
 		slight = Spotlight('slight')
-		slight.setColor((100, 100, 100, 1))
+		slight.setColor((125, 110, 100, 1))
 		lens = PerspectiveLens()
 		slight.setLens(lens)
 		slnp = self.render.attachNewNode(slight)
@@ -67,6 +67,8 @@ class game(ShowBase):
 
 		self.render.setLight(slnp)
 		self.render.setLight(alnp)
+
+		self.setBackgroundColor(144/255, 195/255, 249/255)
 
 		# tentative pandas
 		self.pandaActor = Actor("models/panda-model", {"walk": "models/panda-walk4"})
@@ -112,6 +114,17 @@ class game(ShowBase):
 		self.textNodePath.setScale(0.07)
 		self.textNodePath.setPos(-1.2, 0, 0.8)
 		coordinateText.setShadow(0.15, 0.15)
+		
+		# filters 
+		filters = CommonFilters(self.win, self.cam)
+		filters.setAmbientOcclusion()
+		filters.setBloom(intensity=0.1)
+
+		# fog
+		fog = Fog("Fog Name")
+		fog.setColor(0.1, 0.15, 0.175)
+		fog.setExpDensity(0.01)
+		self.render.setFog(fog)
 
 	# basic player movement
 	def moveTask(self, task):
@@ -141,7 +154,14 @@ class game(ShowBase):
 			self.win.movePointer(0, props.getXSize() // 2, props.getYSize() // 2)
 			mouse_x = self.mouseWatcherNode.getMouseX() * sensitivity
 			mouse_y = self.mouseWatcherNode.getMouseY() * sensitivity
-			self.camera.setHpr(rot_x-mouse_x, rot_y+mouse_y, 0)
+
+			# prevent camera from going upside down
+			if (rot_y+mouse_y > 90):
+				self.camera.setHpr(rot_x-mouse_x, 90, 0)
+			elif (rot_y+mouse_y < -90):
+				self.camera.setHpr(rot_x-mouse_x, -90, 0)
+			else:
+				self.camera.setHpr(rot_x-mouse_x, rot_y+mouse_y, 0)
 
 		posX = self.camera.getX()
 		posY = self.camera.getY()

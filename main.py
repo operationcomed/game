@@ -50,12 +50,18 @@ class game(ShowBase):
 		alnp = self.render.attachNewNode(alight)
 		alight.setColor((.35, .5, .7, 1))
 
-		slight = Spotlight('slight')
-		slight.setColor((125, 110, 100, 1))
-		lens = PerspectiveLens()
-		slight.setLens(lens)
-		slnp = self.render.attachNewNode(slight)
-		slnp.setPos(0, -15, 2)
+		self.slight = Spotlight('slight')
+		self.slight.setColor((125, 110, 100, 1))
+		self.lens = PerspectiveLens()
+		self.slight.setLens(self.lens)
+		self.slnp = self.render.attachNewNode(self.slight)
+		self.slnp.node().setShadowCaster(True, 2048, 2048)
+		self.slnp.setPos(0, -6, 15)
+		self.slnp.setHpr(0, -30, 0)
+		self.lens.setNearFar(1, 1000000)
+
+		self.render.setLight(self.slnp)
+		self.render.setLight(alnp)
 
 		# tentative scene
 		self.scene = self.loader.loadModel("models/environment")
@@ -63,10 +69,7 @@ class game(ShowBase):
 		self.scene.reparentTo(self.render)
 
 		self.scene.setScale(0.125, 0.125, 0.125)
-		self.scene.setPos(-8, 42, 0)
-
-		self.render.setLight(slnp)
-		self.render.setLight(alnp)
+		self.scene.setPos(-8, 32, 0)
 
 		self.setBackgroundColor(144/255, 195/255, 249/255)
 
@@ -78,15 +81,22 @@ class game(ShowBase):
 		self.pandaActor.setPos(0, 10, 0)
 		self.pandaActor.loop("walk")
 
-		# this panda is u ;) baby panda
-		global pandaActor2
-		pandaActor2 = Actor("models/panda-model", {"walk": "models/panda-walk4"})
+		self.sunActor = Actor("models/smiley")
 
-		pandaActor2.setScale(0.0025, 0.0025, 0.0025)
-		pandaActor2.reparentTo(self.camera)
-		pandaActor2.setPos(0, 5, -2)
-		pandaActor2.setHpr(180, 0, 0)
-		pandaActor2.loop("walk")
+		self.sunActor.reparentTo(self.slnp)
+		self.sunActor.setColor(600, 450, 1)
+
+		# remove the shader for the sun because the sun shouldnt have a shadow
+		self.sunActor.setShaderOff()
+
+		# this panda is u ;) baby panda
+		self.pandaActor2 = Actor("models/panda-model", {"walk": "models/panda-walk4"})
+
+		self.pandaActor2.setScale(0.00125, 0.00125, 0.00125)
+		self.pandaActor2.reparentTo(self.render)
+		self.pandaActor2.setPos(0, 5, 0)
+		self.pandaActor2.setHpr(180, 0, 0)
+		self.pandaActor2.loop("walk")
 
 		# tasks
 		self.taskMgr.add(self.moveTask, "moveTask")
@@ -107,13 +117,19 @@ class game(ShowBase):
 		self.textNodePath.setPos(-1.2, 0, -0.85)
 		escText.setShadow(0.15, 0.15)
 
-		global coordinateText
-		coordinateText = TextNode('ctext')
-		coordinateText.setText("X:0 Y:0 Z:0")
-		self.textNodePath = aspect2d.attachNewNode(coordinateText)
+		self.coordinateText = TextNode('ctext')
+		self.coordinateText.setText("X:0 Y:0 Z:0")
+		self.textNodePath = aspect2d.attachNewNode(self.coordinateText)
 		self.textNodePath.setScale(0.07)
 		self.textNodePath.setPos(-1.2, 0, 0.8)
-		coordinateText.setShadow(0.15, 0.15)
+		self.coordinateText.setShadow(0.15, 0.15)
+
+		self.escapeText = TextNode('efschool')
+		self.escapeText.setText("Escape from MSU")
+		self.textNodePath = aspect2d.attachNewNode(self.escapeText)
+		self.textNodePath.setScale(0.07)
+		self.textNodePath.setPos(0.6, 0, 0.9)
+		self.escapeText.setShadow(0.15, 0.15)
 		
 		# filters 
 		filters = CommonFilters(self.win, self.cam)
@@ -148,7 +164,7 @@ class game(ShowBase):
 			# hides cursor
 			props.setCursorHidden(True)
 			self.win.requestProperties(props)
-			props = base.win.getProperties()
+			props = self.win.getProperties()
 
 			# limits cursor to the middle
 			self.win.movePointer(0, props.getXSize() // 2, props.getYSize() // 2)
@@ -182,8 +198,8 @@ class game(ShowBase):
 			self.accelY -= 0.05 * sin(rot_x * (pi/180))
 			self.accelX -= 0.05 * cos(rot_x * (pi/180))
 		# jumping
-		if (button_down(KB.space()) and posZ < GROUND_POS + 0.5):
-			self.accelZ += 0.1
+		if (button_down(KB.space()) and posZ < GROUND_POS + 0.1):
+			self.accelZ += 0.25
 
 		# deceleration bcoz of gravity
 		self.accelZ -= 0.01
@@ -207,18 +223,21 @@ class game(ShowBase):
 			posZ = GROUND_POS
 			self.accelZ = 0
 
-		
 		self.camera.setPos(posX, posY, posZ)
-		
-		# don't rotate the panda
-		pandaActor2.setP(rot_y)
+		# panda
+		self.pandaActor2.setPos(posX - 2 * sin(rot_x * (pi/180)), posY + 2 * cos(rot_x * (pi/180)), posZ-2)
+		self.pandaActor2.setHpr(rot_x+180, 0, 0)
+
 		return Task.cont
 	
 	def coordinateTask(self, task):
 		posX = round(self.camera.getX())
 		posY = round(self.camera.getY())
 		posZ = round(self.camera.getZ())
-		coordinateText.setText("X:" + str(posX) + " Y:" + str(posY) + "  Z:" + str(posZ))
+		self.coordinateText.setText("X:" + str(posX) + " Y:" + str(posY) + "  Z:" + str(posZ))
+
+		if (abs(posX) > 80 or abs(posY) > 30):
+			self.escapeText.setText("YOU HAVE ESCAPED\nfrom msu!")
 		return Task.cont
 app = game()
 app.run()

@@ -92,9 +92,8 @@ class game(ShowBase):
 		# this panda is u ;) baby panda
 		self.pandaActor2 = Actor("models/panda-model", {"walk": "models/panda-walk4"})
 
-		self.pandaActor2.setScale(0.00125, 0.00125, 0.00125)
+		self.pandaActor2.setScale(0.0025, 0.0025, 0.0025)
 		self.pandaActor2.reparentTo(self.render)
-		self.pandaActor2.setPos(0, 5, 0)
 		self.pandaActor2.setHpr(180, 0, 0)
 		self.pandaActor2.loop("walk")
 
@@ -153,7 +152,7 @@ class game(ShowBase):
 		rot_y = self.camera.getP()
 		rot_z = self.camera.getR()
 
-		sensitivity = 20
+		sensitivity = 30
 		
 		props = WindowProperties()
 		if (button_down(KB.escape())):
@@ -225,7 +224,7 @@ class game(ShowBase):
 
 		self.camera.setPos(posX, posY, posZ)
 		# panda
-		self.pandaActor2.setPos(posX - 2 * sin(rot_x * (pi/180)), posY + 2 * cos(rot_x * (pi/180)), posZ-2)
+		self.pandaActor2.setPos(posX - 2 * sin(rot_x * (pi/180)), posY + 2 * cos(rot_x * (pi/180)), posZ-3)
 		self.pandaActor2.setHpr(rot_x+180, 0, 0)
 
 		return Task.cont

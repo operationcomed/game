@@ -5,7 +5,9 @@ from direct.actor.Actor import Actor
 from direct.interval.IntervalGlobal import Sequence
 from direct.gui.OnscreenText import OnscreenText
 from direct.filter.CommonFilters import CommonFilters
+from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import *
+from direct.gui.DirectGui import *
 import time
 import gametext
 
@@ -35,7 +37,6 @@ class Game(ShowBase):
 	game_text = gametext.game_text
 	def __init__(self):
 		ShowBase.__init__(self)
-
 		# antialiasing
 		self.render.setAntialias(AntialiasAttrib.MAuto)
 		
@@ -44,21 +45,10 @@ class Game(ShowBase):
 		# camera
 		self.camLens.setNearFar(1, 1000)
 
-		# tentative scene
-		
-		self.textNodePath = aspect2d.attachNewNode(self.game_text.ctlText)
-		self.textNodePath.setScale(0.07)
-		self.textNodePath.setPos(-1.2, 0, 0.9)
-
-		self.textNodePath = aspect2d.attachNewNode(self.game_text.escText)
-		self.textNodePath.setScale(0.07)
-		self.textNodePath.setPos(-1.2, 0, -0.85)
-
-		self.taskMgr.add(self.startTask, "startTask")
+		#self.taskMgr.add(self.startTask, "startTask")
+		self.mainMenu()
 	
 	def loadScene(self):
-
-		self.taskMgr.remove("startTask")
 
 		self.disable_mouse()
 
@@ -240,10 +230,64 @@ class Game(ShowBase):
 
 		return Task.cont
 
-	
-	def startTask(self, task):
-		button_down = self.mouseWatcherNode.is_button_down
-		if (button_down(KB_BUTTON('n'))):
-			print("yipee")
-			self.loadScene()
+	def mainMenu(self):
+		self.scaleFactor = 2.5
+		self.scaleFactorLogo = 0.25
+		self.cm = CardMaker('card')
+		self.card = self.aspect2d.attachNewNode(self.cm.generate())
+		self.logo = self.aspect2d.attachNewNode(self.cm.generate())
+		self.card.setScale((16/9)*self.scaleFactor, 1, 1*self.scaleFactor)
+		self.logo.setScale((130/55)*self.scaleFactorLogo, 1, 1*self.scaleFactorLogo)
+
+		self.tex = self.loader.loadTexture('msu.png')
+		self.card.setTexture(self.tex)
+		self.tex = self.loader.loadTexture('logo.png')
+		self.logo.setTexture(self.tex)
+
+		# these are the centers of the images
+		self.background_x = (-16/18)*self.scaleFactor
+		self.background_y = -0.5*self.scaleFactor
+		self.logo_x = (-130/110)*self.scaleFactorLogo
+		self.logo_y = -0.5*self.scaleFactorLogo
+
+		self.card.setPos(self.background_x, 0, self.background_y)
+		self.logo.setPos(self.logo_x - 0.7, 0, self.logo_y + 0.5)
+
+		# but'ns
+		self.startGameButton = DirectButton(text="Start Game", command=self.initGame)
+		self.settingsButton = DirectButton(text="Settings")
+		self.exitGameButton = DirectButton(text="Exit", command=self.exitGame)
+
+		self.startGameButton.setPos(-0.7, 0, 0.1)
+		self.settingsButton.setPos(-0.7, 0, -0.2)
+		self.exitGameButton.setPos(-0.7, 0, -0.5)
+
+		self.menuItems = [self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo]
+
+		buttonList = [self.startGameButton, self.settingsButton, self.exitGameButton]
+		buttonScale = 0.15
+
+		# laziness will consume
+		for button in buttonList:
+			button.setScale(buttonScale)
+
+		self.taskMgr.add(self.moveBackground, "moveBackground")
+		
+	def moveBackground(self, task):
+		sensitivity = 0.05
+		self.background_move_x = self.background_x
+		self.background_move_y = self.background_y
+		if (self.mouseWatcherNode.hasMouse()):
+			self.background_move_x += (-self.mouseWatcherNode.getMouseX() * sensitivity)
+			self.background_move_y += (-self.mouseWatcherNode.getMouseY() * sensitivity)
+			self.card.setPos(self.background_move_x, 0, self.background_move_y)
 		return Task.cont
+	
+	def initGame(self):
+		for node in self.menuItems:
+			node.removeNode()
+		self.taskMgr.remove("moveBackground")
+		self.loadScene()
+
+	def exitGame(self):
+		exit()

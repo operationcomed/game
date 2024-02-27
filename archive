@@ -7,6 +7,7 @@ from direct.gui.OnscreenText import OnscreenText
 from direct.filter.CommonFilters import CommonFilters
 from panda3d.core import *
 import time
+import scene
 import gametext
 
 # function shorthand
@@ -23,7 +24,7 @@ loadPrcFileData("", "multisamples 4")
 loadPrcFileData("", "window-title game of the year 2024")
 loadPrcFileData("", "default-fov 60")
 
-class Game(ShowBase):
+class game(ShowBase):
 
 	accelZ = 0
 	#accelZCap = 1
@@ -32,34 +33,11 @@ class Game(ShowBase):
 	#accelXCap = 0.4
 	accelY = 0
 	#accelYCap = 0.4
-	game_text = gametext.game_text
+
 	def __init__(self):
 		ShowBase.__init__(self)
 
-		# antialiasing
-		self.render.setAntialias(AntialiasAttrib.MAuto)
-		
-		self.render.setShaderAuto()
-
-		# camera
-		self.camLens.setNearFar(1, 1000)
-
-		# tentative scene
-		
-		self.textNodePath = aspect2d.attachNewNode(self.game_text.ctlText)
-		self.textNodePath.setScale(0.07)
-		self.textNodePath.setPos(-1.2, 0, 0.9)
-
-		self.textNodePath = aspect2d.attachNewNode(self.game_text.escText)
-		self.textNodePath.setScale(0.07)
-		self.textNodePath.setPos(-1.2, 0, -0.85)
-
-		self.taskMgr.add(self.startTask, "startTask")
-	
-	def loadScene(self):
-
-		self.taskMgr.remove("startTask")
-
+		# disable panda3d default mouse input
 		self.disable_mouse()
 
 		# antialiasing
@@ -207,9 +185,9 @@ class Game(ShowBase):
 			self.accelZ += 0.25
 		# misc
 		if (button_down(KB_BUTTON('m'))):
-			gametext.Text.hideText(self.game_text)
+			gametext.text.hideText(self.game_text)
 		if (button_down(KB_BUTTON('n'))):
-			gametext.Text.showText(self.game_text)
+			gametext.text.showText(self.game_text)
 
 		# deceleration bcoz of gravity
 		self.accelZ -= 0.01
@@ -239,11 +217,19 @@ class Game(ShowBase):
 		self.pandaActor2.setHpr(rot_x+180, 0, 0)
 
 		return Task.cont
-
 	
-	def startTask(self, task):
-		button_down = self.mouseWatcherNode.is_button_down
-		if (button_down(KB_BUTTON('n'))):
-			print("yipee")
-			self.loadScene()
-		return Task.cont
+	#def coordinateTask(self, task):
+	#	posX = round(self.camera.getX())
+	#	posY = round(self.camera.getY())
+	#	posZ = round(self.camera.getZ())
+
+	#	# this doesn't work bcoz of the wonders of object oriented programming clashing with my 11 PM self
+	#	if (gametext.text.SHOW_TEXT):
+	#		gametext.text.coordinateText.setText("X:" + str(posX) + " Y:" + str(posY) + "  Z:" + str(posZ))
+	#	else:
+	#		gametext.text.coordinateText.setText("")
+
+	#	if (abs(posX) > 80 or abs(posY) > 30):
+	#		gametext.text.escapeText.setText("YOU HAVE ESCAPED\nfrom msu!")
+	#		mainmenu.background.destroy()
+	#	return Task.cont

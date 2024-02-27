@@ -8,5 +8,5 @@ from direct.filter.CommonFilters import CommonFilters
 from panda3d.core import *
 import game
 
-app = game.game()
+app = game.Game()
 app.run()

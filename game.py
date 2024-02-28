@@ -105,7 +105,7 @@ class Game(ShowBase):
 		self.sunActor.setShaderOff()
 
 		# this panda is u ;) baby panda
-		self.pandaActor2 = Actor("models/panda-model", {"walk": "models/panda-walk4"})
+		self.pandaActor2 = Actor()
 
 		self.pandaActor2.setScale(0.0025, 0.0025, 0.0025)
 		self.pandaActor2.reparentTo(self.render)
@@ -232,12 +232,13 @@ class Game(ShowBase):
 
 	def mainMenu(self):
 		self.scaleFactor = 2.5
-		self.scaleFactorLogo = 0.25
+		self.scaleFactorLogo = 0.35
+		x_offset = -0.6
 		self.cm = CardMaker('card')
 		self.card = self.aspect2d.attachNewNode(self.cm.generate())
 		self.logo = self.aspect2d.attachNewNode(self.cm.generate())
 		self.card.setScale((16/9)*self.scaleFactor, 1, 1*self.scaleFactor)
-		self.logo.setScale((130/55)*self.scaleFactorLogo, 1, 1*self.scaleFactorLogo)
+		self.logo.setScale((746/168)*self.scaleFactorLogo, 1, 1*self.scaleFactorLogo)
 
 		self.tex = self.loader.loadTexture('msu.png')
 		self.card.setTexture(self.tex)
@@ -247,20 +248,21 @@ class Game(ShowBase):
 		# these are the centers of the images
 		self.background_x = (-16/18)*self.scaleFactor
 		self.background_y = -0.5*self.scaleFactor
-		self.logo_x = (-130/110)*self.scaleFactorLogo
+		self.logo_x = (-746/168/2)*self.scaleFactorLogo
 		self.logo_y = -0.5*self.scaleFactorLogo
 
 		self.card.setPos(self.background_x, 0, self.background_y)
-		self.logo.setPos(self.logo_x - 0.7, 0, self.logo_y + 0.5)
+		self.logo.setPos(self.logo_x + x_offset, 0, self.logo_y + 0.5)
+		self.logo.setTransparency(TransparencyAttrib.MAlpha)
 
 		# but'ns
 		self.startGameButton = DirectButton(text="Start Game", command=self.initGame)
 		self.settingsButton = DirectButton(text="Settings")
 		self.exitGameButton = DirectButton(text="Exit", command=self.exitGame)
 
-		self.startGameButton.setPos(-0.7, 0, 0.1)
-		self.settingsButton.setPos(-0.7, 0, -0.2)
-		self.exitGameButton.setPos(-0.7, 0, -0.5)
+		self.startGameButton.setPos(x_offset, 0, 0.1)
+		self.settingsButton.setPos(x_offset, 0, -0.2)
+		self.exitGameButton.setPos(x_offset, 0, -0.5)
 
 		self.menuItems = [self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo]
 

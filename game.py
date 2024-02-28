@@ -36,6 +36,8 @@ class Game(ShowBase):
 	accelY = 0
 	#accelYCap = 0.4
 	game_text = gametext.game_text
+	
+	
 	def __init__(self):
 		ShowBase.__init__(self)
 		# antialiasing
@@ -235,9 +237,11 @@ class Game(ShowBase):
 		self.music = self.loader.loadSfx("main_menu.mp3")
 		self.music.setLoop(True)
 		self.music.play()
+
 		self.scaleFactor = 2.5
 		self.scaleFactorLogo = 0.35
 		x_offset = -0.6
+		
 		self.cm = CardMaker('card')
 		self.card = self.aspect2d.attachNewNode(self.cm.generate())
 		self.logo = self.aspect2d.attachNewNode(self.cm.generate())
@@ -260,7 +264,11 @@ class Game(ShowBase):
 		self.logo.setTransparency(TransparencyAttrib.MAlpha)
 
 		# but'ns
-		self.startGameButton = DirectButton(text="Start Game", command=self.initGame)
+		playTexture = (self.loader.loadTexture("buttons/play_normal.png"), self.loader.loadTexture("buttons/play_normal.png"), self.loader.loadTexture("buttons/play_hover.png"), self.loader.loadTexture("buttons/play_normal.png"))
+		self.startGameButton = DirectButton(command=self.initGame, frameTexture=playTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		self.startGameButton.setTransparency(True)
+		self.startGameButton.setSx(482/226)
+
 		self.settingsButton = DirectButton(text="Settings")
 		self.exitGameButton = DirectButton(text="Exit", command=self.exitGame)
 
@@ -270,14 +278,19 @@ class Game(ShowBase):
 
 		self.menuItems = [self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo]
 
-		buttonList = [self.startGameButton, self.settingsButton, self.exitGameButton]
-		buttonScale = 0.15
+		self.buttonList = [self.startGameButton, self.settingsButton, self.exitGameButton]
+		self.buttonScale = 0.15
 
 		# laziness will consume
-		for button in buttonList:
-			button.setScale(buttonScale)
+		for button in self.buttonList:
+			button.setScale(button.getSx()*self.buttonScale, self.buttonScale, self.buttonScale)
 
-		self.taskMgr.add(self.moveBackground, "moveBackground")
+		self.startGameButton.scale = self.startGameButton.getScale()
+		self.settingsButton.scale = self.settingsButton.getScale()
+		self.exitGameButton.scale = self.exitGameButton.getScale()
+
+		self.taskMgr.add(self.moveBackground, "mainMenu")
+		self.taskMgr.add(self.hoverEffect, "mainMenu")
 		
 	def moveBackground(self, task):
 		sensitivity = 0.05
@@ -289,10 +302,19 @@ class Game(ShowBase):
 			self.card.setPos(self.background_move_x, 0, self.background_move_y)
 		return Task.cont
 	
+	buttonHoverScale = 1.2
+	def hoverEffect(self, task):
+		for button in self.buttonList:
+			if (button.node().getState() == 2):
+				button.setScale(self.buttonHoverScale*button.scale[0], self.buttonHoverScale*button.scale[1], self.buttonHoverScale*button.scale[2])
+			else:
+				button.setScale(button.scale)
+		return Task.cont
+	
 	def initGame(self):
 		for node in self.menuItems:
 			node.removeNode()
-		self.taskMgr.remove("moveBackground")
+		self.taskMgr.remove("mainMenu")
 		self.loadScene()
 
 	def exitGame(self):

@@ -22,8 +22,9 @@ GROUND_POS = 3
 loadPrcFileData("", "framebuffer-multisample 1")
 loadPrcFileData("", "multisamples 4")
 
-# window title
-loadPrcFileData("", "window-title game of the year 2024")
+# window
+loadPrcFileData("", "window-title Escape MSU")
+loadPrcFileData('', 'win-size 1024 720') 
 loadPrcFileData("", "default-fov 60")
 
 class Game(ShowBase):
@@ -61,12 +62,12 @@ class Game(ShowBase):
 		self.render.setShaderAuto()
 
 		# camera
-		self.camLens.setNearFar(1, 1000)
+		self.camLens.setNearFar(1, 10000)
 
 		# lights and shadows
 		alight = AmbientLight("alight1")
 		alnp = self.render.attachNewNode(alight)
-		alight.setColor((.35, .5, .7, 1))
+		alight.setColor((.35, .45, .5, 1))
 
 		self.slight = Spotlight('slight')
 		self.slight.setColor((125, 110, 100, 1))
@@ -74,20 +75,20 @@ class Game(ShowBase):
 		self.slight.setLens(self.lens)
 		self.slnp = self.render.attachNewNode(self.slight)
 		self.slnp.node().setShadowCaster(True, 2048, 2048)
-		self.slnp.setPos(0, -6, 15)
-		self.slnp.setHpr(0, -30, 0)
+		self.slnp.setPos(0, -15, 15)
+		self.slnp.setHpr(0, -10, 0)
 		self.lens.setNearFar(1, 1000000)
 
 		self.render.setLight(self.slnp)
 		self.render.setLight(alnp)
 
 		# tentative scene
-		self.scene = self.loader.loadModel("models/environment")
+		self.scene = self.loader.loadModel("msu_tri.glb")
 
 		self.scene.reparentTo(self.render)
 
-		self.scene.setScale(0.125, 0.125, 0.125)
-		self.scene.setPos(-8, 32, 0)
+		self.scene.setScale(0.4, 0.4, 0.4)
+		self.scene.setPos(0, 128, 6.1)
 
 		self.setBackgroundColor(144/255, 195/255, 249/255)
 
@@ -125,10 +126,10 @@ class Game(ShowBase):
 		filters.setBloom(intensity=0.1)
 
 		# fog
-		fog = Fog("Fog Name")
-		fog.setColor(0.1, 0.15, 0.175)
-		fog.setExpDensity(0.01)
-		self.render.setFog(fog)
+		#fog = Fog("Fog Name")
+		#fog.setColor(0.1, 0.15, 0.175)
+		#fog.setExpDensity(0.001)
+		#self.render.setFog(fog)
 
 		# text
 		
@@ -248,7 +249,7 @@ class Game(ShowBase):
 		self.card.setScale((16/9)*self.scaleFactor, 1, 1*self.scaleFactor)
 		self.logo.setScale((746/168)*self.scaleFactorLogo, 1, 1*self.scaleFactorLogo)
 
-		self.tex = self.loader.loadTexture('msu.png')
+		self.tex = self.loader.loadTexture('background.png')
 		self.card.setTexture(self.tex)
 		self.tex = self.loader.loadTexture('logo.png')
 		self.logo.setTexture(self.tex)
@@ -263,18 +264,23 @@ class Game(ShowBase):
 		self.logo.setPos(self.logo_x + x_offset, 0, self.logo_y + 0.5)
 		self.logo.setTransparency(TransparencyAttrib.MAlpha)
 
-		# but'ns
+		# buttons
 		playTexture = (self.loader.loadTexture("buttons/play_normal.png"), self.loader.loadTexture("buttons/play_normal.png"), self.loader.loadTexture("buttons/play_hover.png"), self.loader.loadTexture("buttons/play_normal.png"))
 		self.startGameButton = DirectButton(command=self.initGame, frameTexture=playTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		self.startGameButton.setTransparency(True)
 		self.startGameButton.setSx(482/226)
 
+		# unused for the time being
 		self.settingsButton = DirectButton(text="Settings")
-		self.exitGameButton = DirectButton(text="Exit", command=self.exitGame)
+
+		exitGameTexture = (self.loader.loadTexture("buttons/exit_normal.png"), self.loader.loadTexture("buttons/exit_normal.png"), self.loader.loadTexture("buttons/exit_hover.png"), self.loader.loadTexture("buttons/exit_normal.png"))
+		self.exitGameButton = DirectButton(command=self.exitGame, frameTexture=exitGameTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		self.exitGameButton.setTransparency(True)
+		self.exitGameButton.setSx(482/226)
 
 		self.startGameButton.setPos(x_offset, 0, 0.1)
 		self.settingsButton.setPos(x_offset, 0, -0.2)
-		self.exitGameButton.setPos(x_offset, 0, -0.5)
+		self.exitGameButton.setPos(x_offset, 0, -0.3) # -0.5 with settings button
 
 		self.menuItems = [self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo]
 
@@ -286,7 +292,9 @@ class Game(ShowBase):
 			button.setScale(button.getSx()*self.buttonScale, self.buttonScale, self.buttonScale)
 
 		self.startGameButton.scale = self.startGameButton.getScale()
-		self.settingsButton.scale = self.settingsButton.getScale()
+		# hide non-functional settings button
+		self.settingsButton.setScale(0, 0, 0)
+		#self.settingsButton.scale = self.settingsButton.getScale()
 		self.exitGameButton.scale = self.exitGameButton.getScale()
 
 		self.taskMgr.add(self.moveBackground, "mainMenu")
@@ -297,14 +305,17 @@ class Game(ShowBase):
 		self.background_move_x = self.background_x
 		self.background_move_y = self.background_y
 		if (self.mouseWatcherNode.hasMouse()):
-			self.background_move_x += (-self.mouseWatcherNode.getMouseX() * sensitivity)
-			self.background_move_y += (-self.mouseWatcherNode.getMouseY() * sensitivity)
+			self.background_move_x += (self.mouseWatcherNode.getMouseX() * sensitivity)
+			self.background_move_y += (self.mouseWatcherNode.getMouseY() * sensitivity)
 			self.card.setPos(self.background_move_x, 0, self.background_move_y)
 		return Task.cont
 	
 	buttonHoverScale = 1.2
 	def hoverEffect(self, task):
 		for button in self.buttonList:
+			# fix for settings
+			if (button == self.settingsButton):
+				continue
 			if (button.node().getState() == 2):
 				button.setScale(self.buttonHoverScale*button.scale[0], self.buttonHoverScale*button.scale[1], self.buttonHoverScale*button.scale[2])
 			else:

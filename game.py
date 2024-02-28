@@ -1,4 +1,5 @@
 from direct.showbase.ShowBase import ShowBase
+from direct.showbase import Audio3DManager
 from math import pi, sin, cos
 from direct.task import Task
 from direct.actor.Actor import Actor
@@ -49,7 +50,7 @@ class Game(ShowBase):
 		self.mainMenu()
 	
 	def loadScene(self):
-
+		self.music.stop()
 		self.disable_mouse()
 
 		# antialiasing
@@ -231,6 +232,9 @@ class Game(ShowBase):
 		return Task.cont
 
 	def mainMenu(self):
+		self.music = self.loader.loadSfx("main_menu.mp3")
+		self.music.setLoop(True)
+		self.music.play()
 		self.scaleFactor = 2.5
 		self.scaleFactorLogo = 0.35
 		x_offset = -0.6

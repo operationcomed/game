@@ -73,13 +73,22 @@ class Game(ShowBase):
 		self.slight.setColor((125, 110, 100, 1))
 		self.lens = PerspectiveLens()
 		self.slight.setLens(self.lens)
+		self.slightopp = Spotlight('slight')
+		self.slightopp.setColor((125, 110, 100, 1))
+		self.lensopp = PerspectiveLens()
+		self.slightopp.setLens(self.lens)
 		self.slnp = self.render.attachNewNode(self.slight)
+		self.slnpopp = self.render.attachNewNode(self.slightopp)
 		self.slnp.node().setShadowCaster(True, 2048, 2048)
 		self.slnp.setPos(0, -15, 15)
 		self.slnp.setHpr(0, -10, 0)
+		self.slnpopp.node().setShadowCaster(True, 2048, 2048)
+		self.slnpopp.setPos(0, 15, 15)
+		self.slnpopp.setHpr(0, 190, 0)
 		self.lens.setNearFar(1, 1000000)
 
 		self.render.setLight(self.slnp)
+		self.render.setLight(self.slnpopp)
 		self.render.setLight(alnp)
 
 		# tentative scene
@@ -184,6 +193,8 @@ class Game(ShowBase):
 		posZ = self.camera.getZ()
 		self.speed = 0.05
 
+		if (button_down(KB.shift())):
+			self.speed = 1
 		# movement with smooth acceleration
 		# hala may math ew
 		if (button_down(KB_BUTTON('w'))):
@@ -280,13 +291,19 @@ class Game(ShowBase):
 		self.exitGameButton.setTransparency(True)
 		self.exitGameButton.setSx(482/226)
 
+		muteTexture = (self.loader.loadTexture("buttons/exit_normal.png"), self.loader.loadTexture("buttons/exit_normal.png"), self.loader.loadTexture("buttons/exit_hover.png"), self.loader.loadTexture("buttons/exit_normal.png"))
+		self.muteButton = DirectButton(command=self.mute, frameTexture=muteTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		self.muteButton.setTransparency(True)
+		self.muteButton.setSx(1)
+
 		self.startGameButton.setPos(x_offset, 0, 0.1)
 		self.settingsButton.setPos(x_offset, 0, -0.2)
 		self.exitGameButton.setPos(x_offset, 0, -0.3) # -0.5 with settings button
+		self.muteButton.setPos(0.9, 0, -0.6)
 
-		self.menuItems = [self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo]
+		self.menuItems = [self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton]
 
-		self.buttonList = [self.startGameButton, self.settingsButton, self.exitGameButton]
+		self.buttonList = [self.startGameButton, self.settingsButton, self.exitGameButton, self.muteButton]
 		self.buttonScale = 0.15
 
 		# laziness will consume
@@ -316,13 +333,22 @@ class Game(ShowBase):
 	def hoverEffect(self, task):
 		for button in self.buttonList:
 			# fix for settings
-			if (button == self.settingsButton):
+			if (button == self.settingsButton or button == self.muteButton):
 				continue
 			if (button.node().getState() == 2):
 				button.setScale(self.buttonHoverScale*button.scale[0], self.buttonHoverScale*button.scale[1], self.buttonHoverScale*button.scale[2])
 			else:
 				button.setScale(button.scale)
 		return Task.cont
+	
+	def mute(self):
+		if (self.musicActive):
+			self.music.setVolume(0)
+		else:
+			self.music.setVolume(1)
+		self.musicActive = not self.musicActive
+		print(self.musicActive)
+
 	
 	def initGame(self):
 		for node in self.menuItems:

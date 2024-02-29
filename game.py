@@ -89,6 +89,7 @@ class Game(ShowBase):
 
 		self.scene.setScale(0.4, 0.4, 0.4)
 		self.scene.setPos(0, 128, 6.1)
+		self.scene.setHpr(0, 90, 0)
 
 		self.setBackgroundColor(144/255, 195/255, 249/255)
 
@@ -181,21 +182,22 @@ class Game(ShowBase):
 		posX = self.camera.getX()
 		posY = self.camera.getY()
 		posZ = self.camera.getZ()
+		self.speed = 0.05
 
 		# movement with smooth acceleration
 		# hala may math ew
 		if (button_down(KB_BUTTON('w'))):
-			self.accelY += 0.05 * cos(rot_x * (pi/180))
-			self.accelX -= 0.05 * sin(rot_x * (pi/180))
+			self.accelY += self.speed * cos(rot_x * (pi/180))
+			self.accelX -= self.speed * sin(rot_x * (pi/180))
 		if (button_down(KB_BUTTON('s'))):
-			self.accelY -= 0.05 * cos(rot_x * (pi/180))
-			self.accelX += 0.05 * sin(rot_x * (pi/180))
+			self.accelY -= self.speed * cos(rot_x * (pi/180))
+			self.accelX += self.speed * sin(rot_x * (pi/180))
 		if (button_down(KB_BUTTON('d'))):
-			self.accelY += 0.05 * sin(rot_x * (pi/180))
-			self.accelX += 0.05 * cos(rot_x * (pi/180))
+			self.accelY += self.speed * sin(rot_x * (pi/180))
+			self.accelX += self.speed * cos(rot_x * (pi/180))
 		if (button_down(KB_BUTTON('a'))):
-			self.accelY -= 0.05 * sin(rot_x * (pi/180))
-			self.accelX -= 0.05 * cos(rot_x * (pi/180))
+			self.accelY -= self.speed * sin(rot_x * (pi/180))
+			self.accelX -= self.speed * cos(rot_x * (pi/180))
 		# jumping
 		if (button_down(KB.space()) and posZ < GROUND_POS + 0.1):
 			self.accelZ += 0.25

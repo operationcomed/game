@@ -132,7 +132,7 @@ class Game(ShowBase):
 		self.cTrav = CollisionTraverser()
 		self.pusher = CollisionHandlerPusher()
 		colliderNode = CollisionNode("player")
-		colliderNode.addSolid(CollisionTube(0, 0, -700, 0, 200, 200, 200))
+		colliderNode.addSolid(CollisionTube(0, 0, -800, 0, 200, 200, 200))
 		self.collider = self.pandaActor2.attachNewNode(colliderNode)
 		self.pusher.addCollider(self.collider, self.pandaActor2)
 		self.cTrav.addCollider(self.collider, self.pusher)
@@ -146,7 +146,7 @@ class Game(ShowBase):
 		# filters 
 		filters = CommonFilters(self.win, self.cam)
 		filters.setAmbientOcclusion()
-		filters.setBloom(intensity=0.1)
+		#filters.setBloom(intensity=0.1)
 
 		# fog
 		#fog = Fog("Fog Name")

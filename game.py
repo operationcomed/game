@@ -132,7 +132,7 @@ class Game(ShowBase):
 		self.cTrav = CollisionTraverser()
 		self.pusher = CollisionHandlerPusher()
 		colliderNode = CollisionNode("player")
-		colliderNode.addSolid(CollisionTube(0, 0, -600, 0, 200, 200, 200))
+		colliderNode.addSolid(CollisionTube(0, 0, -700, 0, 200, 200, 200))
 		self.collider = self.pandaActor2.attachNewNode(colliderNode)
 		self.pusher.addCollider(self.collider, self.pandaActor2)
 		self.cTrav.addCollider(self.collider, self.pusher)
@@ -307,8 +307,10 @@ class Game(ShowBase):
 		self.exitGameButton.setTransparency(True)
 		self.exitGameButton.setSx(482/226)
 
-		muteTexture = (self.loader.loadTexture("buttons/exit_normal.png"), self.loader.loadTexture("buttons/exit_normal.png"), self.loader.loadTexture("buttons/exit_hover.png"), self.loader.loadTexture("buttons/exit_normal.png"))
-		self.muteButton = DirectButton(command=self.mute, frameTexture=muteTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		
+		self.muteTexture = (self.loader.loadTexture("buttons/mute.png"), self.loader.loadTexture("buttons/mute.png"), self.loader.loadTexture("buttons/mute.png"), self.loader.loadTexture("buttons/mute.png"))
+		self.unmuteTexture = (self.loader.loadTexture("buttons/unmute.png"), self.loader.loadTexture("buttons/unmute.png"), self.loader.loadTexture("buttons/unmute.png"), self.loader.loadTexture("buttons/unmute.png"))
+		self.muteButton = DirectButton(command=self.mute, frameTexture=self.muteTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		self.muteButton.setTransparency(True)
 		self.muteButton.setSx(1)
 
@@ -331,6 +333,7 @@ class Game(ShowBase):
 		self.settingsButton.setScale(0, 0, 0)
 		#self.settingsButton.scale = self.settingsButton.getScale()
 		self.exitGameButton.scale = self.exitGameButton.getScale()
+		self.muteButton.scale = self.muteButton.getScale()
 
 		self.taskMgr.add(self.moveBackground, "mainMenu")
 		self.taskMgr.add(self.hoverEffect, "mainMenu")
@@ -349,7 +352,7 @@ class Game(ShowBase):
 	def hoverEffect(self, task):
 		for button in self.buttonList:
 			# fix for settings
-			if (button == self.settingsButton or button == self.muteButton):
+			if (button == self.settingsButton):
 				continue
 			if (button.node().getState() == 2):
 				button.setScale(self.buttonHoverScale*button.scale[0], self.buttonHoverScale*button.scale[1], self.buttonHoverScale*button.scale[2])
@@ -360,8 +363,10 @@ class Game(ShowBase):
 	def mute(self):
 		if (self.musicActive):
 			self.music.setVolume(0)
+			self.muteButton["frameTexture"] = self.unmuteTexture
 		else:
 			self.music.setVolume(0.75)
+			self.muteButton["frameTexture"] = self.muteTexture
 		self.musicActive = not self.musicActive
 		print(self.musicActive)
 

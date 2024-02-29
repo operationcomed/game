@@ -16,7 +16,7 @@ import gametext
 KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
 # tentative jumping solution
-GROUND_POS = 3
+GROUND_POS = 2.5
 
 # antialiasing
 loadPrcFileData("", "framebuffer-multisample 1")
@@ -100,6 +100,8 @@ class Game(ShowBase):
 		self.scene.setPos(0, 128, 6.1)
 		self.scene.setHpr(0, 90, 0)
 
+		self.scene.setCollideMask(BitMask32.bit(0))
+
 		self.setBackgroundColor(144/255, 195/255, 249/255)
 
 		# tentative pandas
@@ -125,6 +127,17 @@ class Game(ShowBase):
 		self.pandaActor2.reparentTo(self.render)
 		self.pandaActor2.setHpr(180, 0, 0)
 		self.pandaActor2.loop("walk")
+
+		# https://arsthaumaturgis.github.io/Panda3DTutorial.io/tutorial/tut_lesson06.html
+		self.cTrav = CollisionTraverser()
+		self.pusher = CollisionHandlerPusher()
+		colliderNode = CollisionNode("player")
+		colliderNode.addSolid(CollisionTube(0, 0, -600, 0, 200, 200, 200))
+		self.collider = self.pandaActor2.attachNewNode(colliderNode)
+		self.pusher.addCollider(self.collider, self.pandaActor2)
+		self.cTrav.addCollider(self.collider, self.pusher)
+		
+		self.collider.show()
 
 		# tasks
 		self.taskMgr.add(self.moveTask, "moveTask")
@@ -188,13 +201,18 @@ class Game(ShowBase):
 			else:
 				self.camera.setHpr(rot_x-mouse_x, rot_y+mouse_y, 0)
 
-		posX = self.camera.getX()
-		posY = self.camera.getY()
-		posZ = self.camera.getZ()
-		self.speed = 0.05
+		posX = self.pandaActor2.getX()
+		posY = self.pandaActor2.getY()
+		posZ = self.pandaActor2.getZ()
+		self.speed = 0.5
 
 		if (button_down(KB.shift())):
-			self.speed = 1
+			self.speed = 2
+
+		# primitive ground collision checking
+		if (posZ < GROUND_POS):
+			posZ = GROUND_POS
+			self.accelZ = 0
 		# movement with smooth acceleration
 		# hala may math ew
 		if (button_down(KB_BUTTON('w'))):
@@ -211,7 +229,10 @@ class Game(ShowBase):
 			self.accelX -= self.speed * cos(rot_x * (pi/180))
 		# jumping
 		if (button_down(KB.space()) and posZ < GROUND_POS + 0.1):
-			self.accelZ += 0.25
+			if (self.accelZ < 0):
+				self.accelZ = 0
+			self.accelZ += 1
+
 		# misc
 		if (button_down(KB_BUTTON('m'))):
 			gametext.Text.hideText(self.game_text)
@@ -219,7 +240,7 @@ class Game(ShowBase):
 			gametext.Text.showText(self.game_text)
 
 		# deceleration bcoz of gravity
-		self.accelZ -= 0.01
+		self.accelZ -= 0.1
 		# deceleration bcoz of friction
 		self.accelY *= 0.8
 		self.accelX *= 0.8
@@ -228,27 +249,22 @@ class Game(ShowBase):
 		posZ += self.accelZ
 		posY += self.accelY
 		posX += self.accelX
+		print(posZ, GROUND_POS)
 
 		# the speed is faster when you're going diagonally since we apply the acceleration like a square instead of a circle (?)
 		if ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.04):
 			while ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.04): 
 				self.accelY *= 0.9
 				self.accelX *= 0.9
-
-		# primitive ground collision checking
-		if (posZ < GROUND_POS):
-			posZ = GROUND_POS
-			self.accelZ = 0
-
-		self.camera.setPos(posX, posY, posZ)
 		# panda
-		self.pandaActor2.setPos(posX - 2 * sin(rot_x * (pi/180)), posY + 2 * cos(rot_x * (pi/180)), posZ-3)
-		self.pandaActor2.setHpr(rot_x+180, 0, 0)
+		self.pandaActor2.setPos(posX, posY, posZ)
+		self.camera.setPos(posX, posY, posZ)
 
 		return Task.cont
 
 	def mainMenu(self):
 		self.music = self.loader.loadSfx("main_menu.mp3")
+		self.music.setVolume(0.75)
 		self.music.setLoop(True)
 		self.music.play()
 
@@ -345,7 +361,7 @@ class Game(ShowBase):
 		if (self.musicActive):
 			self.music.setVolume(0)
 		else:
-			self.music.setVolume(1)
+			self.music.setVolume(0.75)
 		self.musicActive = not self.musicActive
 		print(self.musicActive)
 

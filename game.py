@@ -9,6 +9,7 @@ from direct.filter.CommonFilters import CommonFilters
 from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import *
 from direct.gui.DirectGui import *
+from panda3d.physics import ActorNode, ForceNode, LinearVectorForce, PhysicsCollisionHandler
 import time
 import gametext
 
@@ -16,7 +17,7 @@ import gametext
 KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
 # tentative jumping solution
-GROUND_POS = 3.5
+#GROUND_POS = 2
 
 # antialiasing
 loadPrcFileData("", "framebuffer-multisample 1")
@@ -24,8 +25,10 @@ loadPrcFileData("", "multisamples 4")
 
 # window
 loadPrcFileData("", "window-title Escape MSU")
-loadPrcFileData('', 'win-size 1024 720') 
+loadPrcFileData("", 'win-size 1024 720') 
 loadPrcFileData("", "default-fov 60")
+
+loadPrcFileData("", "shadow-cube-map-filter true")
 
 class Game(ShowBase):
 
@@ -39,7 +42,6 @@ class Game(ShowBase):
 	game_text = gametext.game_text
 	
 	scene_rot = 0
-	gravity = 0.01
 	
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -98,12 +100,13 @@ class Game(ShowBase):
 
 		self.scene.reparentTo(self.render)
 
-		self.scene.setScale(0.4, 0.4, 0.4)
-		self.scene.setPos(0, 128, 6.1)
+		self.scene.setScale(2.25, 2.25, 2.25)
+		self.scene.setPos(0, 128, 6.8)
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
 		self.scene.setHpr(0, 0, 0)
 
 		self.scene.setCollideMask(BitMask32.bit(0))
+		self.enableParticles()
 
 		self.setBackgroundColor(144/255, 195/255, 249/255)
 
@@ -123,24 +126,40 @@ class Game(ShowBase):
 		# remove the shader for the sun because the sun shouldnt have a shadow
 		self.sunActor.setShaderOff()
 
-		# this panda is u ;) baby panda
-		self.pandaActor2 = Actor()
+		# player + physics
+		self.playerCharacter = Actor()
 
-		self.pandaActor2.setScale(0.0025, 0.0025, 0.0025)
-		self.pandaActor2.reparentTo(self.render)
-		self.pandaActor2.setHpr(180, 0, 0)
-		self.pandaActor2.loop("walk")
+		self.playerPhysics = ActorNode("player-physics")
+		self.ppnp = self.render.attachNewNode(self.playerPhysics)
+		self.physicsMgr.attachPhysicalNode(self.playerPhysics)
+		self.colliderNode = self.ppnp.attachNewNode(CollisionNode('colNode'))
+		self.colliderNode.node().addSolid(CollisionTube(0, 0, 0, 0, 1, 2.4, 1))
+
+		self.gravity = ForceNode("gravity")
+		self.gnp = self.render.attachNewNode(self.gravity)
+		self.gravity_amt = LinearVectorForce(0, 0, -10)
+		self.gravity.addForce(self.gravity_amt)
+		self.physicsMgr.addLinearForce(self.gravity_amt)
+		self.playerPhysics.getPhysicsObject().setMass(45)
+
+		#self.jumpForce = ForceNode("jump-force")
+		#self.jfn = self.playerCharacter.attachNewNode(self.jumpForce)
+		## behold, camelWhoAte_a_snake case
+		#self.jumpForce_amt = LinearVectorForce(0,0,0)
+		#self.jumpForce.addForce(self.jumpForce_amt)
+		#self.physicsMgr.addLinearForce(self.jumpForce_amt)
+
+		self.playerCharacter.reparentTo(self.ppnp)
+		#self.ppnp.reparentTo(self.camera)
+		self.playerCharacter.loop("walk")
 
 		# https://arsthaumaturgis.github.io/Panda3DTutorial.io/tutorial/tut_lesson06.html
 		self.cTrav = CollisionTraverser()
-		self.pusher = CollisionHandlerPusher()
-		colliderNode = CollisionNode("player")
-		colliderNode.addSolid(CollisionTube(0, 0, -1000, 0, 200, 200, 200))
-		self.collider = self.pandaActor2.attachNewNode(colliderNode)
-		self.pusher.addCollider(self.collider, self.pandaActor2)
-		self.cTrav.addCollider(self.collider, self.pusher)
+		self.pusher = PhysicsCollisionHandler()
+		self.pusher.addCollider(self.colliderNode, self.ppnp)
+		self.cTrav.addCollider(self.colliderNode, self.pusher)
 		
-		self.collider.show()
+		self.colliderNode.show()
 
 		# tasks
 		self.taskMgr.add(self.moveTask, "moveTask")
@@ -205,18 +224,17 @@ class Game(ShowBase):
 			else:
 				self.camera.setHpr(rot_x-mouse_x, rot_y+mouse_y, 0)
 
-		posX = self.pandaActor2.getX()
-		posY = self.pandaActor2.getY()
-		posZ = self.pandaActor2.getZ()
+		posX = self.ppnp.getX()
+		posY = self.ppnp.getY()
 
 		self.speed = 0.05
 		if (button_down(KB.shift())):
 			self.speed = 2
 
 		# primitive ground collision checking
-		if (posZ < GROUND_POS):
-			posZ = GROUND_POS
-			self.accelZ = 0
+		#if (posZ < GROUND_POS):
+		#	posZ = GROUND_POS
+		#	self.accelZ = 0
 		# movement with smooth acceleration
 		# hala may math ew
 		if (button_down(KB_BUTTON('w'))):
@@ -232,10 +250,9 @@ class Game(ShowBase):
 			self.accelY -= self.speed * sin(rot_x * (pi/180))
 			self.accelX -= self.speed * cos(rot_x * (pi/180))
 		# jumping
-		if (button_down(KB.space()) and posZ < GROUND_POS + 0.1):
-			if (self.accelZ < 0):
-				self.accelZ = 0
-			self.accelZ += 1
+		if (button_down(KB.space())):
+			self.ppnp.setZ(self.ppnp.getZ()+1)
+
 		# misc
 		if (button_down(KB_BUTTON('m'))):
 			gametext.Text.hideText(self.game_text)
@@ -251,13 +268,12 @@ class Game(ShowBase):
 			self.timer = 10
 		self.timer -= 1
 		# deceleration bcoz of gravity
-		self.accelZ -= self.gravity
+		# self.accelZ -= self.gravity
 		# deceleration bcoz of friction
 		self.accelY *= 0.8
 		self.accelX *= 0.8
 
 		# apply acceleration to position
-		posZ += self.accelZ
 		posY += self.accelY
 		posX += self.accelX
 
@@ -266,9 +282,16 @@ class Game(ShowBase):
 			while ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.04): 
 				self.accelY *= 0.9
 				self.accelX *= 0.9
-		# panda
-		self.pandaActor2.setPos(posX, posY, posZ)
-		self.camera.setPos(posX, posY, posZ)
+		# player
+				
+		# see if the player has fallen off of the world
+		if (self.ppnp.getZ() < -5):
+			self.ppnp.setZ(10)
+		self.ppnp.setX(posX)
+		self.ppnp.setY(posY)
+		self.camera.setPos(self.ppnp.getPos())
+		# the +2.5 is there for emotional support
+		self.camera.setZ(self.ppnp.getZ() + 2.5)
 
 		return Task.cont
 
@@ -389,3 +412,8 @@ class Game(ShowBase):
 
 	def exitGame(self):
 		exit()
+
+
+# remove before commiting
+app = Game()
+app.run() 

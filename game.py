@@ -412,8 +412,3 @@ class Game(ShowBase):
 
 	def exitGame(self):
 		exit()
-
-
-# remove before commiting
-app = Game()
-app.run() 

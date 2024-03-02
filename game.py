@@ -16,7 +16,7 @@ import gametext
 KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
 # tentative jumping solution
-GROUND_POS = 4.5
+GROUND_POS = 3.5
 
 # antialiasing
 loadPrcFileData("", "framebuffer-multisample 1")
@@ -40,8 +40,6 @@ class Game(ShowBase):
 	
 	scene_rot = 0
 	gravity = 0.01
-	posYd = 0
-	posYdx = 0
 	
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -66,7 +64,7 @@ class Game(ShowBase):
 		self.render.setShaderAuto()
 
 		# camera
-		self.camLens.setNearFar(0.01, 10000000)
+		self.camLens.setNearFar(0.1, 10000000)
 
 		# lights and shadows
 		alight = AmbientLight("alight1")
@@ -132,7 +130,6 @@ class Game(ShowBase):
 		self.pandaActor2.reparentTo(self.render)
 		self.pandaActor2.setHpr(180, 0, 0)
 		self.pandaActor2.loop("walk")
-		posYd = self.pandaActor2.getY()
 
 		# https://arsthaumaturgis.github.io/Panda3DTutorial.io/tutorial/tut_lesson06.html
 		self.cTrav = CollisionTraverser()
@@ -211,8 +208,6 @@ class Game(ShowBase):
 		posX = self.pandaActor2.getX()
 		posY = self.pandaActor2.getY()
 		posZ = self.pandaActor2.getZ()
-		self.posYdx = abs(posY - self.posYd) * 1000000
-		print(self.posYdx)
 
 		self.speed = 0.05
 		if (button_down(KB.shift())):
@@ -274,7 +269,6 @@ class Game(ShowBase):
 		# panda
 		self.pandaActor2.setPos(posX, posY, posZ)
 		self.camera.setPos(posX, posY, posZ)
-		self.posYd = posY
 
 		return Task.cont
 

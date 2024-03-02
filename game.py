@@ -16,7 +16,7 @@ import gametext
 KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
 # tentative jumping solution
-GROUND_POS = 2.5
+GROUND_POS = 4.5
 
 # antialiasing
 loadPrcFileData("", "framebuffer-multisample 1")
@@ -38,6 +38,10 @@ class Game(ShowBase):
 	#accelYCap = 0.4
 	game_text = gametext.game_text
 	
+	scene_rot = 0
+	gravity = 0.01
+	posYd = 0
+	posYdx = 0
 	
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -62,7 +66,7 @@ class Game(ShowBase):
 		self.render.setShaderAuto()
 
 		# camera
-		self.camLens.setNearFar(1, 10000)
+		self.camLens.setNearFar(0.01, 10000000)
 
 		# lights and shadows
 		alight = AmbientLight("alight1")
@@ -98,7 +102,8 @@ class Game(ShowBase):
 
 		self.scene.setScale(0.4, 0.4, 0.4)
 		self.scene.setPos(0, 128, 6.1)
-		self.scene.setHpr(0, 90, 0)
+		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
+		self.scene.setHpr(0, 0, 0)
 
 		self.scene.setCollideMask(BitMask32.bit(0))
 
@@ -127,12 +132,13 @@ class Game(ShowBase):
 		self.pandaActor2.reparentTo(self.render)
 		self.pandaActor2.setHpr(180, 0, 0)
 		self.pandaActor2.loop("walk")
+		posYd = self.pandaActor2.getY()
 
 		# https://arsthaumaturgis.github.io/Panda3DTutorial.io/tutorial/tut_lesson06.html
 		self.cTrav = CollisionTraverser()
 		self.pusher = CollisionHandlerPusher()
 		colliderNode = CollisionNode("player")
-		colliderNode.addSolid(CollisionTube(0, 0, -800, 0, 200, 200, 200))
+		colliderNode.addSolid(CollisionTube(0, 0, -1000, 0, 200, 200, 200))
 		self.collider = self.pandaActor2.attachNewNode(colliderNode)
 		self.pusher.addCollider(self.collider, self.pandaActor2)
 		self.cTrav.addCollider(self.collider, self.pusher)
@@ -145,7 +151,7 @@ class Game(ShowBase):
 		
 		# filters 
 		filters = CommonFilters(self.win, self.cam)
-		filters.setAmbientOcclusion()
+		filters.setAmbientOcclusion(numsamples=64, amount=2, strength=5)
 		#filters.setBloom(intensity=0.1)
 
 		# fog
@@ -164,6 +170,7 @@ class Game(ShowBase):
 		self.textNodePath.setScale(0.07)
 		self.textNodePath.setPos(-1.2, 0, -0.85)
 
+	timer = 0
 	# basic player movement
 	def moveTask(self, task):
 		button_down = self.mouseWatcherNode.is_button_down
@@ -204,8 +211,10 @@ class Game(ShowBase):
 		posX = self.pandaActor2.getX()
 		posY = self.pandaActor2.getY()
 		posZ = self.pandaActor2.getZ()
-		self.speed = 0.5
+		self.posYdx = abs(posY - self.posYd) * 1000000
+		print(self.posYdx)
 
+		self.speed = 0.05
 		if (button_down(KB.shift())):
 			self.speed = 2
 
@@ -232,15 +241,22 @@ class Game(ShowBase):
 			if (self.accelZ < 0):
 				self.accelZ = 0
 			self.accelZ += 1
-
 		# misc
 		if (button_down(KB_BUTTON('m'))):
 			gametext.Text.hideText(self.game_text)
 		if (button_down(KB_BUTTON('n'))):
 			gametext.Text.showText(self.game_text)
-
+		# temp fix for bug
+		if (button_down(KB_BUTTON('o')) and self.timer <= 0):
+			if (self.scene_rot):
+				self.scene.setHpr(0, 0, 0)
+			else:
+				self.scene.setHpr(0, 90, 0)
+			self.scene_rot = not self.scene_rot
+			self.timer = 10
+		self.timer -= 1
 		# deceleration bcoz of gravity
-		self.accelZ -= 0.1
+		self.accelZ -= self.gravity
 		# deceleration bcoz of friction
 		self.accelY *= 0.8
 		self.accelX *= 0.8
@@ -249,7 +265,6 @@ class Game(ShowBase):
 		posZ += self.accelZ
 		posY += self.accelY
 		posX += self.accelX
-		print(posZ, GROUND_POS)
 
 		# the speed is faster when you're going diagonally since we apply the acceleration like a square instead of a circle (?)
 		if ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.04):
@@ -259,6 +274,7 @@ class Game(ShowBase):
 		# panda
 		self.pandaActor2.setPos(posX, posY, posZ)
 		self.camera.setPos(posX, posY, posZ)
+		self.posYd = posY
 
 		return Task.cont
 

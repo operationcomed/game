@@ -40,11 +40,23 @@ class Game(ShowBase):
 	accelY = 0
 	#accelYCap = 0.4
 	game_text = gametext.game_text
+
+	fog_color = (0.2, 0.3, 0.35)
 	
 	scene_rot = 0
+
+	# 0: none
+	# 1: girl
+	# 2: boy
+	character = 0
 	
 	def __init__(self):
 		ShowBase.__init__(self)
+		
+		props = WindowProperties()
+		props.set_icon_filename("icon.png")
+		self.win.request_properties(props)
+
 		# antialiasing
 		self.render.setAntialias(AntialiasAttrib.MAuto)
 		
@@ -67,6 +79,24 @@ class Game(ShowBase):
 
 		# camera
 		self.camLens.setNearFar(0.1, 10000000)
+
+		# tentative scene
+		self.scene = self.loader.loadModel("msu_tri.glb")
+
+		self.scene.reparentTo(self.render)
+
+		self.scene.setScale(2.25, 2.25, 2.25)
+		self.scene.setPos(0, 128, 6.8)
+
+		self.scene.setShaderOff()
+		self.scene.setTwoSided(False)
+
+		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
+		self.scene.setHpr(0, 0, 0)
+
+		self.scene.setCollideMask(BitMask32.bit(0))
+		self.enableParticles()
+
 
 		# lights and shadows
 		alight = AmbientLight("alight1")
@@ -94,21 +124,7 @@ class Game(ShowBase):
 		self.render.setLight(self.slnp)
 		self.render.setLight(self.slnpopp)
 		self.render.setLight(alnp)
-
-		# tentative scene
-		self.scene = self.loader.loadModel("msu_tri.glb")
-
-		self.scene.reparentTo(self.render)
-
-		self.scene.setScale(2.25, 2.25, 2.25)
-		self.scene.setPos(0, 128, 6.8)
-		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
-		self.scene.setHpr(0, 0, 0)
-
-		self.scene.setCollideMask(BitMask32.bit(0))
-		self.enableParticles()
-
-		self.setBackgroundColor(144/255, 195/255, 249/255)
+		self.setBackgroundColor(self.fog_color)
 
 		# tentative pandas
 		self.pandaActor = Actor("models/panda-model", {"walk": "models/panda-walk4"})
@@ -142,13 +158,6 @@ class Game(ShowBase):
 		self.physicsMgr.addLinearForce(self.gravity_amt)
 		self.playerPhysics.getPhysicsObject().setMass(45)
 
-		#self.jumpForce = ForceNode("jump-force")
-		#self.jfn = self.playerCharacter.attachNewNode(self.jumpForce)
-		## behold, camelWhoAte_a_snake case
-		#self.jumpForce_amt = LinearVectorForce(0,0,0)
-		#self.jumpForce.addForce(self.jumpForce_amt)
-		#self.physicsMgr.addLinearForce(self.jumpForce_amt)
-
 		self.playerCharacter.reparentTo(self.ppnp)
 		#self.ppnp.reparentTo(self.camera)
 		self.playerCharacter.loop("walk")
@@ -167,14 +176,14 @@ class Game(ShowBase):
 		
 		# filters 
 		filters = CommonFilters(self.win, self.cam)
-		filters.setAmbientOcclusion(numsamples=64, amount=2, strength=5)
+		filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
 		#filters.setBloom(intensity=0.1)
 
 		# fog
-		#fog = Fog("Fog Name")
-		#fog.setColor(0.1, 0.15, 0.175)
-		#fog.setExpDensity(0.001)
-		#self.render.setFog(fog)
+		fog = Fog("Fog")
+		fog.setColor(LVecBase4f(self.fog_color))
+		fog.setExpDensity(0.035)
+		self.render.setFog(fog)
 
 		# text
 		
@@ -249,7 +258,7 @@ class Game(ShowBase):
 		if (button_down(KB_BUTTON('a'))):
 			self.accelY -= self.speed * sin(rot_x * (pi/180))
 			self.accelX -= self.speed * cos(rot_x * (pi/180))
-		# jumping
+		# jumping (note, for debugging purposes only)
 		if (button_down(KB.space())):
 			self.ppnp.setZ(self.ppnp.getZ()+1)
 
@@ -303,7 +312,7 @@ class Game(ShowBase):
 
 		self.scaleFactor = 2.5
 		self.scaleFactorLogo = 0.35
-		x_offset = -0.6
+		x_offset = -0.95
 		
 		self.cm = CardMaker('card')
 		self.card = self.aspect2d.attachNewNode(self.cm.generate())
@@ -323,7 +332,7 @@ class Game(ShowBase):
 		self.logo_y = -0.5*self.scaleFactorLogo
 
 		self.card.setPos(self.background_x, 0, self.background_y)
-		self.logo.setPos(self.logo_x + x_offset, 0, self.logo_y + 0.5)
+		self.logo.setPos(self.logo_x + x_offset + 0.4, 0, self.logo_y + 0.5)
 		self.logo.setTransparency(TransparencyAttrib.MAlpha)
 
 		# buttons
@@ -341,8 +350,8 @@ class Game(ShowBase):
 		self.exitGameButton.setSx(482/226)
 
 		
-		self.muteTexture = (self.loader.loadTexture("buttons/mute.png"), self.loader.loadTexture("buttons/mute.png"), self.loader.loadTexture("buttons/mute.png"), self.loader.loadTexture("buttons/mute.png"))
-		self.unmuteTexture = (self.loader.loadTexture("buttons/unmute.png"), self.loader.loadTexture("buttons/unmute.png"), self.loader.loadTexture("buttons/unmute.png"), self.loader.loadTexture("buttons/unmute.png"))
+		self.muteTexture = (self.loader.loadTexture("buttons/mute.png"))
+		self.unmuteTexture = (self.loader.loadTexture("buttons/unmute.png"))
 		self.muteButton = DirectButton(command=self.mute, frameTexture=self.muteTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		self.muteButton.setTransparency(True)
 		self.muteButton.setSx(1)
@@ -408,6 +417,48 @@ class Game(ShowBase):
 		for node in self.menuItems:
 			node.removeNode()
 		self.taskMgr.remove("mainMenu")
+		self.characterSelect()
+
+	def characterSelect(self):
+		self.cselback = self.aspect2d.attachNewNode(self.cm.generate())
+		self.cselback.setScale((16/9)*self.scaleFactor, 1, 1*self.scaleFactor)
+
+		self.tex = self.loader.loadTexture('charselect/background.png')
+		self.cselback.setTexture(self.tex)
+		self.cselback.setPos(self.background_x, 0, self.background_y)
+
+		self.boyPreview = (self.loader.loadTexture("charselect/boy.png"))
+		self.girlPreview = (self.loader.loadTexture("charselect/girl.png"))
+
+		self.boySelect = DirectButton(frameTexture=self.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
+		self.girlSelect = DirectButton(frameTexture=self.girlPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
+		self.boySelect.setPos(0.67, 0, 0)
+		self.girlSelect.setPos(-0.67, 0, 0)
+
+		self.charButtons = [self.boySelect, self.girlSelect]
+		self.charNodes = [self.boySelect, self.girlSelect, self.cselback]
+
+		for char in self.charButtons:
+			char.setTransparency(True)
+			char.setScale((512/640) * 0.5, 0.5, 0.5)
+		# i wish there was like a 'this' from js in python so i could see what the pressed thing is so i dont have to do this stupid stuff
+			# ^^^ incomprehendable
+		self.girlSelect["command"] = self.setCharacterA
+		self.boySelect["command"] = self.setCharacterB
+	
+	def setCharacterA(self):
+		self.character = 1
+		self.setCharacter()
+
+	def setCharacterB(self):
+		self.character = 2
+		self.setCharacter()
+
+	def setCharacter(self):
+		print(self.character)
+		
+		for node in self.charNodes:
+			node.removeNode()
 		self.loadScene()
 
 	def exitGame(self):

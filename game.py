@@ -81,7 +81,7 @@ class Game(ShowBase):
 		self.camLens.setNearFar(0.1, 10000000)
 
 		# tentative scene
-		self.scene = self.loader.loadModel("msu_tri.glb")
+		self.scene = self.loader.loadModel("msu.glb")
 
 		self.scene.reparentTo(self.render)
 
@@ -92,7 +92,7 @@ class Game(ShowBase):
 		self.scene.setTwoSided(False)
 
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
-		self.scene.setHpr(0, 0, 0)
+		self.scene.setHpr(0, 90, 0)
 
 		self.scene.setCollideMask(BitMask32.bit(0))
 		self.enableParticles()
@@ -182,7 +182,7 @@ class Game(ShowBase):
 		# fog
 		fog = Fog("Fog")
 		fog.setColor(LVecBase4f(self.fog_color))
-		fog.setExpDensity(0.035)
+		fog.setExpDensity(0.045)
 		self.render.setFog(fog)
 
 		# text
@@ -236,9 +236,9 @@ class Game(ShowBase):
 		posX = self.ppnp.getX()
 		posY = self.ppnp.getY()
 
-		self.speed = 0.05
+		self.speed = 0.025
 		if (button_down(KB.shift())):
-			self.speed = 2
+			self.speed = 0.1
 
 		# primitive ground collision checking
 		#if (posZ < GROUND_POS):
@@ -310,7 +310,7 @@ class Game(ShowBase):
 		self.music.setLoop(True)
 		self.music.play()
 
-		self.scaleFactor = 2.5
+		self.scaleFactor = 3
 		self.scaleFactorLogo = 0.35
 		x_offset = -0.95
 		
@@ -332,7 +332,7 @@ class Game(ShowBase):
 		self.logo_y = -0.5*self.scaleFactorLogo
 
 		self.card.setPos(self.background_x, 0, self.background_y)
-		self.logo.setPos(self.logo_x + x_offset + 0.4, 0, self.logo_y + 0.5)
+		self.logo.setPos(self.logo_x + x_offset + -0.1, 0, self.logo_y + 0.5)
 		self.logo.setTransparency(TransparencyAttrib.MAlpha)
 
 		# buttons
@@ -356,10 +356,10 @@ class Game(ShowBase):
 		self.muteButton.setTransparency(True)
 		self.muteButton.setSx(1)
 
-		self.startGameButton.setPos(x_offset, 0, 0.1)
+		self.startGameButton.setPos(-1.1, 0, 0.1)
 		self.settingsButton.setPos(x_offset, 0, -0.2)
-		self.exitGameButton.setPos(x_offset, 0, -0.3) # -0.5 with settings button
-		self.muteButton.setPos(0.9, 0, -0.6)
+		self.exitGameButton.setPos(-1.1, 0, -0.3) # -0.5 with settings button
+		self.muteButton.setPos(1.7, -1.5, -0.8)
 
 		self.menuItems = [self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton]
 

@@ -356,9 +356,13 @@ class Game(ShowBase):
 		self.muteButton.setTransparency(True)
 		self.muteButton.setSx(1)
 
-		self.startGameButton.setPos(-1.1, 0, 0.1)
+		# y'know what'd be better
+		# positioning the offsets to be relative to the window bounds
+		# but noooooooooo i guess we have to do it this way
+		# :( 
+		self.startGameButton.setPos(x_offset, 0, 0.1)
 		self.settingsButton.setPos(x_offset, 0, -0.2)
-		self.exitGameButton.setPos(-1.1, 0, -0.3) # -0.5 with settings button
+		self.exitGameButton.setPos(x_offset, 0, -0.3)
 		self.muteButton.setPos(1.7, -1.5, -0.8)
 
 		self.menuItems = [self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton]

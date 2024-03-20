@@ -25,8 +25,8 @@ loadPrcFileData("", "multisamples 4")
 
 # window
 loadPrcFileData("", "window-title Escape MSU")
-loadPrcFileData("", 'win-size 1024 720') 
-loadPrcFileData("", "default-fov 60")
+loadPrcFileData("", 'win-size 1366 720') 
+loadPrcFileData("", "default-fov 90")
 
 loadPrcFileData("", "shadow-cube-map-filter true")
 
@@ -43,7 +43,7 @@ class Game(ShowBase):
 
 	fog_color = (0.2, 0.3, 0.35)
 	
-	scene_rot = 0
+	scene_rot = 1
 
 	# 0: none
 	# 1: girl
@@ -81,18 +81,18 @@ class Game(ShowBase):
 		self.camLens.setNearFar(0.1, 10000000)
 
 		# tentative scene
-		self.scene = self.loader.loadModel("msu.glb")
+		self.scene = self.loader.loadModel("bed.glb")
 
 		self.scene.reparentTo(self.render)
 
-		self.scene.setScale(2.25, 2.25, 2.25)
-		self.scene.setPos(0, 128, 6.8)
+		self.scene.setScale(1.25, 1.25, 1.25)
+		#self.scene.setPos(0, 128, 6.8)
 
 		self.scene.setShaderOff()
 		self.scene.setTwoSided(False)
 
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
-		self.scene.setHpr(0, 90, 0)
+		self.scene.setHpr(0, 0, 0)
 
 		self.scene.setCollideMask(BitMask32.bit(0))
 		self.enableParticles()
@@ -103,41 +103,25 @@ class Game(ShowBase):
 		alnp = self.render.attachNewNode(alight)
 		alight.setColor((.35, .45, .5, 1))
 
-		self.slight = Spotlight('slight')
-		self.slight.setColor((125, 110, 100, 1))
-		self.lens = PerspectiveLens()
-		self.slight.setLens(self.lens)
-		self.slightopp = Spotlight('slight')
-		self.slightopp.setColor((125, 110, 100, 1))
-		self.lensopp = PerspectiveLens()
-		self.slightopp.setLens(self.lens)
+		self.slight = PointLight('slight')
+		self.slight.setColor((1, 1, 1, 1))
+		#self.lens = PerspectiveLens()
+		#self.slight.setLens(self.lens)
+		#self.slight.attenuation = (0, 0, 1)
 		self.slnp = self.render.attachNewNode(self.slight)
-		self.slnpopp = self.render.attachNewNode(self.slightopp)
-		self.slnp.node().setShadowCaster(True, 2048, 2048)
-		self.slnp.setPos(0, -15, 15)
-		self.slnp.setHpr(0, -10, 0)
-		self.slnpopp.node().setShadowCaster(True, 2048, 2048)
-		self.slnpopp.setPos(0, 15, 15)
-		self.slnpopp.setHpr(0, 190, 0)
-		self.lens.setNearFar(1, 1000000)
+		self.slnp.node().setShadowCaster(True, 1024, 1024)
+		self.slnp.setPos(0, 0, 8.5)
+		self.slnp.setHpr(0, -90, 0)
+		#self.lens.setNearFar(1, 1000000)
 
 		self.render.setLight(self.slnp)
-		self.render.setLight(self.slnpopp)
 		self.render.setLight(alnp)
 		self.setBackgroundColor(self.fog_color)
-
-		# tentative pandas
-		self.pandaActor = Actor("models/panda-model", {"walk": "models/panda-walk4"})
-
-		self.pandaActor.setScale(0.005, 0.005, 0.005)
-		self.pandaActor.reparentTo(self.render)
-		self.pandaActor.setPos(0, 10, 0)
-		self.pandaActor.loop("walk")
 
 		self.sunActor = Actor("models/smiley")
 
 		self.sunActor.reparentTo(self.slnp)
-		self.sunActor.setColor(600, 450, 1)
+		self.sunActor.setColor(600, 600, 600)
 
 		# remove the shader for the sun because the sun shouldnt have a shadow
 		self.sunActor.setShaderOff()
@@ -168,7 +152,7 @@ class Game(ShowBase):
 		self.pusher.addCollider(self.colliderNode, self.ppnp)
 		self.cTrav.addCollider(self.colliderNode, self.pusher)
 		
-		self.colliderNode.show()
+		#self.colliderNode.show()
 
 		# tasks
 		self.taskMgr.add(self.moveTask, "moveTask")

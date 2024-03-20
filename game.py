@@ -51,7 +51,6 @@ class Game(ShowBase):
 	character = 0
 
 	cameraOffset = 4.5
-	lightPos = (0, 0, 8.5)
 	
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -71,7 +70,7 @@ class Game(ShowBase):
 		#self.taskMgr.add(self.startTask, "startTask")
 		self.mainMenu()
 	
-	def loadScene(self, scene, lightPos, doors=False, customTask=False):
+	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False):
 		self.music.stop()
 		self.disable_mouse()
 		
@@ -145,6 +144,9 @@ class Game(ShowBase):
 
 		self.playerPhysics = ActorNode("player-physics")
 		self.ppnp = self.render.attachNewNode(self.playerPhysics)
+		self.ppnp.setPos(playerPos)
+		if (playerRot != False):
+			self.camera.setHpr(playerRot)
 		self.physicsMgr.attachPhysicalNode(self.playerPhysics)
 		self.colliderNode = self.ppnp.attachNewNode(CollisionNode('colNode'))
 		self.colliderNode.node().addSolid(CollisionTube(0, 0, 0, 0, 0, 3, 0.5))
@@ -174,8 +176,8 @@ class Game(ShowBase):
 			self.taskMgr.add(customTask, "customTask")
 		
 		# filters 
-		filters = CommonFilters(self.win, self.cam)
-		filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
+		self.filters = CommonFilters(self.win, self.cam)
+		self.filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
 		#filters.setBloom(intensity=0.1)
 
 		# fog
@@ -193,10 +195,18 @@ class Game(ShowBase):
 		self.textNodePath = aspect2d.attachNewNode(self.game_text.escText)
 		self.textNodePath.setScale(0.07)
 		self.textNodePath.setPos(-1.2, 0, -0.85)
+		self.sceneObjects.append(self.textNodePath)
+
+		self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
+		self.interactNode.setScale(0.14)
+		self.interactNode.setPos(0, 0, 0)
+		self.sceneObjects.append(self.interactNode)
 
 	def unloadScene(self):
 		self.taskMgr.remove("moveTask")
-		self.taskMgr.remove("bs")
+		self.taskMgr.remove("customTask")
+		self.filters.cleanup()
+		self.game_text.itcText.setTextColor(1, 1, 1, 1)
 		for node in self.sceneObjects:
 			try:
 				node.cleanup()
@@ -209,6 +219,13 @@ class Game(ShowBase):
 	# basic player movement
 	def moveTask(self, task):
 		button_down = self.mouseWatcherNode.is_button_down
+
+		# print current position for debugging
+		if (button_down(KB_BUTTON('p'))):
+			print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
+		if (button_down(KB_BUTTON('l'))):
+			print("H:", round(self.camera.getH(), 3), "P:", round(self.camera.getP(), 3), "R:", round(self.camera.getR(), 3))
+
 		if (button_down(KB_BUTTON('x'))):
 			exit()
 
@@ -477,11 +494,39 @@ class Game(ShowBase):
 		# bed scene
 		if (self.character == 1):
 			self.cameraOffset = 4
-			self.loadScene("bed.glb", self.lightPos)
+			self.loadScene("bed.glb", (3.5, 6, 1.42), (0, 0, 10), False, self.bedDoor, (180, -90, 0))
 		# infirmary scene
 		if (self.character == 2):
 			self.cameraOffset = 4
-			self.loadScene("inf.glb", (0, 0, 12), "door.glb")
+			self.loadScene("inf.glb", (-16.93, 6.982, 0.414), (0, 0, 12), "door.glb")
+
+	def bedDoor(self, task):
+		rot = self.camera.getH()
+		crosshair = self.game_text.itcText
+		chnp = aspect2d.attachNewNode(self.game_text.itcText)
+		while rot > 360:
+			rot -= 360
+		while rot < 0:
+			rot += 360
+		# X: 1.5 -> -2.5
+		# Y: < -4
+		posX = self.camera.getX()
+		posY = self.camera.getY()
+		#print(posX, posY)
+		doorInteract = False
+		if ((posX >= -2.5 and posX <= 1.5) and posY <= -4):
+			crosshair.setTextColor(1, 0.5, 0, 1)
+			doorInteract = True
+		else:
+			crosshair.setTextColor(1, 1, 1, 1)
+			doorInteract = False
+			
+		button_down = self.mouseWatcherNode.is_button_down
+		if (button_down(KB_BUTTON('e')) and doorInteract):
+			self.unloadScene()
+			self.cameraOffset = 4
+			self.loadScene("inf.glb", (-16.93, 6.982, 0.414), (0, 0, 12), "door.glb")
+		return Task.cont
 
 	def exitGame(self):
 		exit()

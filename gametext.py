@@ -9,10 +9,10 @@ from direct.filter.CommonFilters import CommonFilters
 from panda3d.core import *
 
 class Text():
+
 	escText = TextNode('esc')
 	escText.setText("Hold escape to let go of mouse.\nPress X to exit.")
 	escText.setShadow(0.15, 0.15)
-
 	ctlText = TextNode('controls')
 	ctlText.setText("Use WASD to move. Shift to run. E to interact.")
 	ctlText.setShadow(0.15, 0.15)
@@ -20,6 +20,7 @@ class Text():
 	itmText = TextNode('items')
 	itmText.setText("Items obtained:")
 	itmText.setShadow(0.15, 0.15)
+	itmText.setAlign(TextNode.ARight)
 
 	itcText = TextNode('interact')
 	itcText.setText("+")

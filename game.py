@@ -47,6 +47,7 @@ class Game(ShowBase):
 
 	speedStop = False
 
+
 	# 0: none
 	# 1: girl
 	# 2: boy
@@ -57,6 +58,7 @@ class Game(ShowBase):
 	
 	def __init__(self):
 		ShowBase.__init__(self)
+		self.font = self.loader.loadFont('zilla-slab.ttf')
 		
 		props = WindowProperties()
 		props.set_icon_filename("icon.png")
@@ -194,21 +196,25 @@ class Game(ShowBase):
 		self.textNodePath = aspect2d.attachNewNode(self.game_text.ctlText)
 		self.textNodePath.setScale(0.07)
 		self.textNodePath.setPos(-1.2, 0, 0.9)
+		self.game_text.ctlText.setFont(self.font)
 
 		self.textNodePath = aspect2d.attachNewNode(self.game_text.escText)
 		self.textNodePath.setScale(0.07)
 		self.textNodePath.setPos(-1.2, 0, -0.85)
 		self.sceneObjects.append(self.textNodePath)
+		self.game_text.escText.setFont(self.font)
 
 		self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
 		self.interactNode.setScale(0.14)
 		self.interactNode.setPos(0, 0, 0)
 		self.sceneObjects.append(self.interactNode)
+		self.game_text.itcText.setFont(self.font)
 
 		self.itmTxtNode = aspect2d.attachNewNode(self.game_text.itmText)
 		self.itmTxtNode.setScale(0.07)
 		self.itmTxtNode.setPos(1, 0, 0.9)
 		self.sceneObjects.append(self.itmTxtNode)
+		self.game_text.itmText.setFont(self.font)
 
 
 	def unloadScene(self):
@@ -476,8 +482,11 @@ class Game(ShowBase):
 		self.characterSelect()
 
 	def characterSelect(self):
+		self.scaleFactorCS = 2.25
+		self.background_x = (-16/18)*self.scaleFactorCS
+		self.background_y = -0.5*self.scaleFactorCS
 		self.cselback = self.aspect2d.attachNewNode(self.cm.generate())
-		self.cselback.setScale((16/9)*self.scaleFactor, 1, 1*self.scaleFactor)
+		self.cselback.setScale((16/9)*self.scaleFactorCS, 1, 1*self.scaleFactorCS)
 
 		self.tex = self.loader.loadTexture('charselect/background.png')
 		self.cselback.setTexture(self.tex)
@@ -488,8 +497,8 @@ class Game(ShowBase):
 
 		self.boySelect = DirectButton(frameTexture=self.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
 		self.girlSelect = DirectButton(frameTexture=self.girlPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
-		self.boySelect.setPos(0.67, 0, 0)
-		self.girlSelect.setPos(-0.67, 0, 0)
+		self.boySelect.setPos(0.67, 0, -0.25)
+		self.girlSelect.setPos(-0.67, 0, -0.25)
 
 		self.charButtons = [self.boySelect, self.girlSelect]
 		self.charNodes = [self.boySelect, self.girlSelect, self.cselback]
@@ -563,13 +572,14 @@ class Game(ShowBase):
 		self.cm.setUvRange(self.tex)
 		self.video.setTexture(self.tex)
 
-		self.background_x = 0.125
-		self.background_y = 8/9
+		self.background_x = 0.115
+		self.background_y = 0.899
 
 		self.video.setPos(self.background_x, 0, self.background_y)
 		self.skipText = TextNode('items')
 		self.skipText.setText("Press E to skip intro.")
 		self.skipText.setShadow(0.15, 0.15)
+		self.skipText.setFont(self.font)
 		self.stnp = aspect2d.attachNewNode(self.skipText)
 		self.stnp.setPos(-1.2, 0, 0.85)
 		self.stnp.setScale(0.07)

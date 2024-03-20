@@ -17,6 +17,10 @@ class Text():
 	ctlText.setText("Use WASD to move. Shift to run. E to interact.")
 	ctlText.setShadow(0.15, 0.15)
 
+	itmText = TextNode('items')
+	itmText.setText("Items obtained:")
+	itmText.setShadow(0.15, 0.15)
+
 	itcText = TextNode('interact')
 	itcText.setText("+")
 	itcText.setShadow(0.07, 0.07)
@@ -26,11 +30,13 @@ class Text():
 		# 100% easier by loading and unloading these procedurally thru a text file
 		self.escText.setText("")
 		self.ctlText.setText("")
+		self.itmText.setText("")
 
 	def showText(self):
 		# 100% easier by loading and unloading these procedurally thru a text file
 		self.escText.setText("Hold escape to let go of mouse.\nPress X to exit.")
 		self.ctlText.setText("Use WASD to move. Shift to run. E to interact.")
+		self.itmText.setText("Items obtained:")
 
 # gametext instance
 game_text = Text

@@ -45,6 +45,8 @@ class Game(ShowBase):
 	
 	scene_rot = 1
 
+	speedStop = False
+
 	# 0: none
 	# 1: girl
 	# 2: boy
@@ -183,7 +185,7 @@ class Game(ShowBase):
 		# fog
 		fog = Fog("Fog")
 		fog.setColor(LVecBase4f(self.fog_color))
-		fog.setExpDensity(0.045)
+		fog.setExpDensity(0.145)
 		self.render.setFog(fog)
 
 		# text
@@ -201,6 +203,12 @@ class Game(ShowBase):
 		self.interactNode.setScale(0.14)
 		self.interactNode.setPos(0, 0, 0)
 		self.sceneObjects.append(self.interactNode)
+
+		self.itmTxtNode = aspect2d.attachNewNode(self.game_text.itmText)
+		self.itmTxtNode.setScale(0.07)
+		self.itmTxtNode.setPos(1.2, 0, 0.9)
+		self.sceneObjects.append(self.itmTxtNode)
+
 
 	def unloadScene(self):
 		self.taskMgr.remove("moveTask")
@@ -267,6 +275,8 @@ class Game(ShowBase):
 		if (button_down(KB.shift())):
 			self.speed = 0.1
 
+		if (self.speedStop):
+			self.speed = 0
 		# primitive ground collision checking
 		#if (posZ < GROUND_POS):
 		#	posZ = GROUND_POS
@@ -498,7 +508,7 @@ class Game(ShowBase):
 		# infirmary scene
 		if (self.character == 2):
 			self.cameraOffset = 4
-			self.loadScene("inf.glb", (-16.93, 6.982, 0.414), (0, 0, 12), "door.glb")
+			self.loadScene("inf.glb", (-16.93, 6.982, 0.414), (0, 0, 10.5), "door.glb", self.mission)
 
 	def bedDoor(self, task):
 		rot = self.camera.getH()
@@ -525,8 +535,79 @@ class Game(ShowBase):
 		if (button_down(KB_BUTTON('e')) and doorInteract):
 			self.unloadScene()
 			self.cameraOffset = 4
-			self.loadScene("inf.glb", (-16.93, 6.982, 0.414), (0, 0, 12), "door.glb")
+			self.loadScene("inf.glb", (-16.93, 6.982, 0.414), (0, 0, 10.5), "door.glb", self.mission)
 		return Task.cont
+	
+	missionShow = False
+	initItemsDone = False
+	itemsGotten = 0
+	def mission(self, task):
+		button_down = self.mouseWatcherNode.is_button_down
+		if (not self.missionShow):
+			self.missionShow = True
+			self.speedStop = True
+			self.showMission()
+		
+		if (button_down(KB_BUTTON('e')) and self.missionShow and self.speedStop == True and task.time >= 0.1):
+			self.speedStop = False
+			self.missionImg.removeNode()
+			gametext.Text.showText(self.game_text)
+		
+		if (not self.initItemsDone):
+			self.initItems()
+		else:
+			posX = self.ppnp.getX()
+			posY = self.ppnp.getY()
+			#posZ = self.ppnp.getZ() # no z axis atm because it'll be a hassle
+			i = 0
+			for itemPos in self.itemList:
+				if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
+					self.items[i].removeNode()
+					self.itemsGotten += 1
+					self.game_text.itmText.setText(self.game_text.itmText.getText() + "\n" + itemPos[2])
+					itemPos[2] = None
+				i += 1
+
+		return Task.cont
+	
+	def initItems(self):
+		self.initItemsDone = True
+		self.scaleFactorItem = 4
+		# filename, position, human readable name
+		self.itemList = [['1_mask', (0, 0, 0), 'Mask'], ['2_cert', (0, 8, 0), 'Medical Certificate'], ['3_excuse', (8, 0, 0), 'Excuse Letter'], ['4_meds', (8, 8, 0), 'Medicine'], ['5_perscription', (4, 4, 0), 'Doctor\'s Perscription']]
+		self.items = []
+		self.cm = CardMaker('card')
+		for itemPath in self.itemList:
+			item = self.render.attachNewNode(self.cm.generate())
+			item.setScale(self.scaleFactorItem, 1, self.scaleFactorItem)
+
+			tex = self.loader.loadTexture('items/' + itemPath[0] + '.png')
+			item.setTexture(tex)
+
+			item.setPos(itemPath[1])
+			item.setTransparency(TransparencyAttrib.MAlpha)
+
+			item.setBillboardAxis()
+
+			self.items.append(item)
+
+
+	def showMission(self):
+		gametext.Text.hideText(self.game_text)
+		self.scaleFactorMission = 7/4
+		self.cm = CardMaker('card')
+		self.missionImg = self.aspect2d.attachNewNode(self.cm.generate())
+		self.missionImg.setScale((791/895)*self.scaleFactorMission, 1, self.scaleFactorMission)
+
+		self.tex = self.loader.loadTexture('missions/1.png')
+		self.missionImg.setTexture(self.tex)
+
+		# these are the centers of the image
+		self.mission_x = (-791/895/2)*self.scaleFactorMission
+		self.mission_y = -0.5*self.scaleFactorMission
+
+		self.missionImg.setPos(self.mission_x, 0, self.mission_y)
+		self.missionImg.setTransparency(TransparencyAttrib.MAlpha)
 
 	def exitGame(self):
 		exit()

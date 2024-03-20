@@ -64,8 +64,7 @@ class Game(ShowBase):
 
 		# camera
 		self.camLens.setNearFar(1, 1000)
-
-		#self.taskMgr.add(self.startTask, "startTask")
+		#video before main menu
 		self.mainMenu()
 	
 	def loadScene(self):
@@ -287,8 +286,20 @@ class Game(ShowBase):
 		self.camera.setZ(self.ppnp.getZ() + 2.5)
 
 		return Task.cont
+		
 
 	def mainMenu(self):
+		self.scaleFactor = 3
+		self.scaleFactorLogo = 0.2
+	
+		self.cm = CardMaker('video')
+		self.video = self.aspect2d.attachNewNode(self.cm.generate())
+		self.video.setScale((2))
+		self.tex = self.loader.loadTexture('helloworld.avi')
+		self.video.setTexture(self.tex)
+
+		
+		
 		self.music = self.loader.loadSfx("main_menu.mp3")
 		self.music.setVolume(0.75)
 		self.music.setLoop(True)
@@ -349,7 +360,7 @@ class Game(ShowBase):
 		self.exitGameButton.setPos(x_offset, 0, -0.3)
 		self.muteButton.setPos(1.7, -1.5, -0.8)
 
-		self.menuItems = [self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton]
+		self.menuItems = [self.video, self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton,]
 
 		self.buttonList = [self.startGameButton, self.settingsButton, self.exitGameButton, self.muteButton]
 		self.buttonScale = 0.15
@@ -415,7 +426,7 @@ class Game(ShowBase):
 		self.cselback.setTexture(self.tex)
 		self.cselback.setPos(self.background_x, 0, self.background_y)
 
-		self.boyPreview = (self.loader.loadTexture("charselect/boy.png"))
+		self.boyPreview = (self.loader.loadTexture("helloworld.avi"))
 		self.girlPreview = (self.loader.loadTexture("charselect/girl.png"))
 
 		self.boySelect = DirectButton(frameTexture=self.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))

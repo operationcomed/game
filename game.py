@@ -51,6 +51,7 @@ class Game(ShowBase):
 	character = 0
 
 	cameraOffset = 4.5
+	lightPos = (0, 0, 8.5)
 	
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -70,9 +71,11 @@ class Game(ShowBase):
 		#self.taskMgr.add(self.startTask, "startTask")
 		self.mainMenu()
 	
-	def loadScene(self):
+	def loadScene(self, scene, lightPos, doors=False):
 		self.music.stop()
 		self.disable_mouse()
+		
+		self.sceneObjects = []
 
 		# antialiasing
 		self.render.setAntialias(AntialiasAttrib.MAuto)
@@ -83,19 +86,20 @@ class Game(ShowBase):
 		self.camLens.setNearFar(0.1, 10000000)
 
 		# scene
-		self.scene = self.loader.loadModel("inf.glb")
-		self.doors = self.loader.loadModel("door.glb")
-
+		self.scene = self.loader.loadModel(scene)
+		self.sceneObjects.append(self.scene)
 		self.scene.reparentTo(self.render)
-		self.doors.reparentTo(self.render)
-
 		self.scene.setScale(1.5, 1.5, 1.5)
-		self.doors.setScale(1.5, 1.5, 1.5)
 		#self.scene.setPos(0, 128, 6.8)
-
 		self.scene.setShaderOff()
-		self.doors.setShaderOff()
 		self.scene.setTwoSided(False)
+
+		if (doors != False):
+			self.doors = self.loader.loadModel(doors)
+			self.sceneObjects.append(self.doors)
+			self.doors.reparentTo(self.render)
+			self.doors.setScale(1.5, 1.5, 1.5)
+			self.doors.setShaderOff()
 
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
 		self.scene.setHpr(0, 0, 0)
@@ -108,6 +112,7 @@ class Game(ShowBase):
 		alight = AmbientLight("alight1")
 		alnp = self.render.attachNewNode(alight)
 		alight.setColor((.35, .45, .5, 1))
+		self.sceneObjects.append(alnp)
 
 		self.slight = PointLight('slight')
 		self.slight.setColor((1, 1, 1, 1))
@@ -115,8 +120,9 @@ class Game(ShowBase):
 		#self.slight.setLens(self.lens)
 		#self.slight.attenuation = (0, 0, 1)
 		self.slnp = self.render.attachNewNode(self.slight)
+		self.sceneObjects.append(self.slnp)
 		self.slnp.node().setShadowCaster(True, 1024, 1024)
-		self.slnp.setPos(0, 0, 8.5)
+		self.slnp.setPos(lightPos)
 		self.slnp.setHpr(0, -90, 0)
 		#self.lens.setNearFar(1, 1000000)
 
@@ -125,6 +131,7 @@ class Game(ShowBase):
 		self.setBackgroundColor(self.fog_color)
 
 		self.sunActor = Actor("models/smiley")
+		self.sceneObjects.append(self.sunActor)
 
 		self.sunActor.reparentTo(self.slnp)
 		self.sunActor.setColor(600, 600, 600)
@@ -134,6 +141,7 @@ class Game(ShowBase):
 
 		# player + physics
 		self.playerCharacter = Actor()
+		self.sceneObjects.append(self.playerCharacter)
 
 		self.playerPhysics = ActorNode("player-physics")
 		self.ppnp = self.render.attachNewNode(self.playerPhysics)
@@ -184,6 +192,11 @@ class Game(ShowBase):
 		self.textNodePath = aspect2d.attachNewNode(self.game_text.escText)
 		self.textNodePath.setScale(0.07)
 		self.textNodePath.setPos(-1.2, 0, -0.85)
+
+	def unloadScene(self):
+		self.taskMgr.remove("moveTask")
+		for node in self.sceneObjects:
+			node.remove_node()
 
 	timer = 0
 	# basic player movement
@@ -255,6 +268,7 @@ class Game(ShowBase):
 		# misc
 		if (button_down(KB_BUTTON('m'))):
 			gametext.Text.hideText(self.game_text)
+			self.unloadScene()
 		if (button_down(KB_BUTTON('n'))):
 			gametext.Text.showText(self.game_text)
 		# temp fix for bug
@@ -452,7 +466,15 @@ class Game(ShowBase):
 		
 		for node in self.charNodes:
 			node.removeNode()
-		self.loadScene()
+		
+		# bed scene
+		if (self.character == 1):
+			self.cameraOffset = 4
+			self.loadScene("bed.glb", self.lightPos)
+		# infirmary scene
+		if (self.character == 2):
+			self.cameraOffset = 4
+			self.loadScene("inf.glb", (0, 0, 12), "door.glb")
 
 	def exitGame(self):
 		exit()

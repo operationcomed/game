@@ -49,6 +49,8 @@ class Game(ShowBase):
 	# 1: girl
 	# 2: boy
 	character = 0
+
+	cameraOffset = 4.5
 	
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -80,15 +82,19 @@ class Game(ShowBase):
 		# camera
 		self.camLens.setNearFar(0.1, 10000000)
 
-		# tentative scene
+		# scene
 		self.scene = self.loader.loadModel("inf.glb")
+		self.doors = self.loader.loadModel("door.glb")
 
 		self.scene.reparentTo(self.render)
+		self.doors.reparentTo(self.render)
 
-		self.scene.setScale(1.25, 1.25, 1.25)
+		self.scene.setScale(1.5, 1.5, 1.5)
+		self.doors.setScale(1.5, 1.5, 1.5)
 		#self.scene.setPos(0, 128, 6.8)
 
 		self.scene.setShaderOff()
+		self.doors.setShaderOff()
 		self.scene.setTwoSided(False)
 
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
@@ -133,7 +139,7 @@ class Game(ShowBase):
 		self.ppnp = self.render.attachNewNode(self.playerPhysics)
 		self.physicsMgr.attachPhysicalNode(self.playerPhysics)
 		self.colliderNode = self.ppnp.attachNewNode(CollisionNode('colNode'))
-		self.colliderNode.node().addSolid(CollisionTube(0, 0, 0, 0, 1, 2.4, 1))
+		self.colliderNode.node().addSolid(CollisionTube(0, 0, 0, 0, 0, 3, 0.5))
 
 		self.gravity = ForceNode("gravity")
 		self.gnp = self.render.attachNewNode(self.gravity)
@@ -152,7 +158,7 @@ class Game(ShowBase):
 		self.pusher.addCollider(self.colliderNode, self.ppnp)
 		self.cTrav.addCollider(self.colliderNode, self.pusher)
 		
-		#self.colliderNode.show()
+		self.colliderNode.show()
 
 		# tasks
 		self.taskMgr.add(self.moveTask, "moveTask")
@@ -283,8 +289,7 @@ class Game(ShowBase):
 		self.ppnp.setX(posX)
 		self.ppnp.setY(posY)
 		self.camera.setPos(self.ppnp.getPos())
-		# the +2.5 is there for emotional support
-		self.camera.setZ(self.ppnp.getZ() + 2.5)
+		self.camera.setZ(self.ppnp.getZ() + self.cameraOffset)
 
 		return Task.cont
 

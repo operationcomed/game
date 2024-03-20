@@ -4,4 +4,4 @@
 import game
 
 app = game.Game()
-app.run() 
+app.run()

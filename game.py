@@ -356,8 +356,6 @@ class Game(ShowBase):
 		self.video.setScale((2))
 		self.tex = self.loader.loadTexture('helloworld.avi')
 		self.video.setTexture(self.tex)
-
-		
 		
 		self.music = self.loader.loadSfx("main_menu.mp3")
 		self.music.setVolume(0.75)
@@ -559,6 +557,7 @@ class Game(ShowBase):
 	initItemsDone = False
 	itemsGotten = 0
 	def mission(self, task):
+		crosshair = self.game_text.itcText
 		button_down = self.mouseWatcherNode.is_button_down
 		if (not self.missionShow):
 			self.missionShow = True
@@ -585,13 +584,32 @@ class Game(ShowBase):
 					itemPos[2] = None
 				i += 1
 
+		posX = self.camera.getX()
+		posY = self.camera.getY()
+		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 4):
+			crosshair.setTextColor(1, 0.5, 0, 1)
+			doorInteract = True
+		else: 
+			crosshair.setTextColor(1, 1, 1, 1)
+			doorInteract = False
+
+		if (button_down(KB_BUTTON('e')) and doorInteract):
+			self.unloadScene()
+			self.game_text.ctlText.setText("")
+			self.game_text.escText.setText("")
+			self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
+			self.interactNode.setScale(0.14)
+			self.interactNode.setPos(-0.5, 0, 0)
+			self.sceneObjects.append(self.interactNode)
+			self.game_text.itcText.setText("Level 1 Complete!")
+
 		return Task.cont
 	
 	def initItems(self):
 		self.initItemsDone = True
 		self.scaleFactorItem = 4
 		# filename, position, human readable name
-		self.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (21, -21, 0), 'Medicine'], ['5_perscription', (-15, -7.8, 0), 'Doctor\'s Perscription']]
+		self.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (20, -20, 0), 'Medicine'], ['5_perscription', (-15, -7.8, 0), 'Doctor\'s Perscription']]
 		self.items = []
 		self.cm = CardMaker('card')
 		for itemPath in self.itemList:

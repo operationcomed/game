@@ -158,7 +158,7 @@ class Game(ShowBase):
 		self.pusher.addCollider(self.colliderNode, self.ppnp)
 		self.cTrav.addCollider(self.colliderNode, self.pusher)
 		
-		self.colliderNode.show()
+		#self.colliderNode.show()
 
 		# tasks
 		self.taskMgr.add(self.moveTask, "moveTask")

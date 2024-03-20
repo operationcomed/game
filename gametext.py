@@ -38,5 +38,11 @@ class Text():
 		self.ctlText.setText("Use WASD to move. Shift to run. E to interact.")
 		self.itmText.setText("Items obtained:")
 
+	def hideCH(self):
+		self.itcText.setText("")
+
+	def showCH(self):
+		self.itcText.setText("+")
+
 # gametext instance
 game_text = Text

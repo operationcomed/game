@@ -483,7 +483,7 @@ class Game(ShowBase):
 		self.cselback.setTexture(self.tex)
 		self.cselback.setPos(self.background_x, 0, self.background_y)
 
-		self.boyPreview = (self.loader.loadTexture("helloworld.avi"))
+		self.boyPreview = (self.loader.loadTexture("charselect/boy.png"))
 		self.girlPreview = (self.loader.loadTexture("charselect/girl.png"))
 
 		self.boySelect = DirectButton(frameTexture=self.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
@@ -515,20 +515,61 @@ class Game(ShowBase):
 		
 		for node in self.charNodes:
 			node.removeNode()
-		
+
 		# bed scene
+		self.cameraOffset = 4
+		self.loadScene("bed.glb", (3.5, 6, 1.42), (0, 0, 10), False, self.bedDoor, (180, -90, 0))
+		self.taskMgr.add(self.backstory, "backstory")
+
+	isPlaying = False
+	def backstory(self, task):
+		
+		if (not self.isPlaying):
+			self.playVid()
+
+		button_down = self.mouseWatcherNode.is_button_down
+
+		if (task.time >= 10 or button_down(KB_BUTTON('e'))):
+			self.video.removeNode()
+			gametext.Text.showCH(self.game_text)
+			self.speedStop = False
+			self.skipText.setText("")
+			return Task.done
+		return Task.cont
+
+	def playVid(self):
+		self.isPlaying = True
+		gametext.Text.hideCH(self.game_text)
+		self.speedStop = True
+		self.cm = CardMaker('card')
+		self.cm.setFrameFullscreenQuad()
+		self.scaleFactorVid = 2.5
+		self.video = self.aspect2d.attachNewNode(self.cm.generate())
+		self.video.setScale(self.scaleFactorVid, 1, self.scaleFactorVid)
+
+		self.tex = MovieTexture("backstory")
 		if (self.character == 1):
-			self.cameraOffset = 4
-			self.loadScene("bed.glb", (3.5, 6, 1.42), (0, 0, 10), False, self.bedDoor, (180, -90, 0))
-		# infirmary scene
-		if (self.character == 2):
-			self.cameraOffset = 4
-			self.loadScene("inf.glb", (-16.93, 6.982, 0.414), (0, 0, 10.5), "door.glb", self.mission)
+			self.tex.read('girl.avi')
+		else:
+			self.tex.read('boy.avi')
+		self.cm.setUvRange(self.tex)
+		self.video.setTexture(self.tex)
+
+		self.background_x = 0
+		self.background_y = 7/8
+
+		self.video.setPos(self.background_x, 0, self.background_y)
+		self.skipText = TextNode('items')
+		self.skipText.setText("Press E to skip intro.")
+		self.skipText.setShadow(0.15, 0.15)
+		self.stnp = aspect2d.attachNewNode(self.skipText)
+		self.stnp.setPos(-1.2, 0, 0.85)
+		self.stnp.setScale(0.07)
 
 	def bedDoor(self, task):
 		rot = self.camera.getH()
 		crosshair = self.game_text.itcText
-		chnp = aspect2d.attachNewNode(self.game_text.itcText)
+		#chnp = aspect2d.attachNewNode(self.game_text.itcText)
 		while rot > 360:
 			rot -= 360
 		while rot < 0:
@@ -609,7 +650,7 @@ class Game(ShowBase):
 		self.initItemsDone = True
 		self.scaleFactorItem = 4
 		# filename, position, human readable name
-		self.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (20, -20, 0), 'Medicine'], ['5_perscription', (-15, -7.8, 0), 'Doctor\'s Perscription']]
+		self.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (20, -20, 0), 'Medicine'], ['5_prescription', (-15, -7.8, 0), 'Doctor\'s Prescription']]
 		self.items = []
 		self.cm = CardMaker('card')
 		for itemPath in self.itemList:
@@ -632,13 +673,13 @@ class Game(ShowBase):
 		self.scaleFactorMission = 7/4
 		self.cm = CardMaker('card')
 		self.missionImg = self.aspect2d.attachNewNode(self.cm.generate())
-		self.missionImg.setScale((791/895)*self.scaleFactorMission, 1, self.scaleFactorMission)
+		self.missionImg.setScale((16/9)*self.scaleFactorMission, 1, self.scaleFactorMission)
 
 		self.tex = self.loader.loadTexture('missions/1.png')
 		self.missionImg.setTexture(self.tex)
 
 		# these are the centers of the image
-		self.mission_x = (-791/895/2)*self.scaleFactorMission
+		self.mission_x = (-16/9/2)*self.scaleFactorMission
 		self.mission_y = -0.5*self.scaleFactorMission
 
 		self.missionImg.setPos(self.mission_x, 0, self.mission_y)

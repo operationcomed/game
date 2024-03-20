@@ -307,11 +307,15 @@ class Game(ShowBase):
 		if (button_down(KB_BUTTON('n'))):
 			gametext.Text.showText(self.game_text)
 		# temp fix for bug
-		if (button_down(KB_BUTTON('o')) and self.timer <= 0 and self.doorRot):
+		if (button_down(KB_BUTTON('o')) and self.timer <= 0):
 			if (self.scene_rot):
-				self.doors.setHpr(0, 0, 0)
+				self.scene.setHpr(0, 0, 0)
+				if (self.doorRot):
+					self.doors.setHpr(0, 0, 0)
 			else:
-				self.doors.setHpr(0, 90, 0)
+				self.scene.setHpr(0, 90, 0)
+				if (self.doorRot):
+					self.doors.setHpr(0, 90, 0)
 			self.scene_rot = not self.scene_rot
 			self.timer = 10
 		self.timer -= 1

@@ -45,10 +45,15 @@ class Game(ShowBase):
 	
 	scene_rot = 1
 
+	speedStop = False
+
 	# 0: none
 	# 1: girl
 	# 2: boy
 	character = 0
+
+	cameraOffset = 4.5
+	doorRot = False
 	
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -64,13 +69,14 @@ class Game(ShowBase):
 
 		# camera
 		self.camLens.setNearFar(1, 1000)
-
-		#self.taskMgr.add(self.startTask, "startTask")
+		#video before main menu
 		self.mainMenu()
 	
-	def loadScene(self):
+	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False):
 		self.music.stop()
 		self.disable_mouse()
+		
+		self.sceneObjects = []
 
 		# antialiasing
 		self.render.setAntialias(AntialiasAttrib.MAuto)
@@ -80,16 +86,22 @@ class Game(ShowBase):
 		# camera
 		self.camLens.setNearFar(0.1, 10000000)
 
-		# tentative scene
-		self.scene = self.loader.loadModel("inf.glb")
-
+		# scene
+		self.scene = self.loader.loadModel(scene)
+		self.sceneObjects.append(self.scene)
 		self.scene.reparentTo(self.render)
-
-		self.scene.setScale(1.25, 1.25, 1.25)
+		self.scene.setScale(1.5, 1.5, 1.5)
 		#self.scene.setPos(0, 128, 6.8)
-
 		self.scene.setShaderOff()
 		self.scene.setTwoSided(False)
+
+		if (doors != False):
+			self.doorRot = True
+			self.doors = self.loader.loadModel(doors)
+			self.sceneObjects.append(self.doors)
+			self.doors.reparentTo(self.render)
+			self.doors.setScale(1.5, 1.5, 1.5)
+			self.doors.setShaderOff()
 
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
 		self.scene.setHpr(0, 0, 0)
@@ -102,6 +114,7 @@ class Game(ShowBase):
 		alight = AmbientLight("alight1")
 		alnp = self.render.attachNewNode(alight)
 		alight.setColor((.35, .45, .5, 1))
+		self.sceneObjects.append(alnp)
 
 		self.slight = PointLight('slight')
 		self.slight.setColor((1, 1, 1, 1))
@@ -109,8 +122,9 @@ class Game(ShowBase):
 		#self.slight.setLens(self.lens)
 		#self.slight.attenuation = (0, 0, 1)
 		self.slnp = self.render.attachNewNode(self.slight)
+		self.sceneObjects.append(self.slnp)
 		self.slnp.node().setShadowCaster(True, 1024, 1024)
-		self.slnp.setPos(0, 0, 8.5)
+		self.slnp.setPos(lightPos)
 		self.slnp.setHpr(0, -90, 0)
 		#self.lens.setNearFar(1, 1000000)
 
@@ -119,6 +133,7 @@ class Game(ShowBase):
 		self.setBackgroundColor(self.fog_color)
 
 		self.sunActor = Actor("models/smiley")
+		self.sceneObjects.append(self.sunActor)
 
 		self.sunActor.reparentTo(self.slnp)
 		self.sunActor.setColor(600, 600, 600)
@@ -128,12 +143,16 @@ class Game(ShowBase):
 
 		# player + physics
 		self.playerCharacter = Actor()
+		self.sceneObjects.append(self.playerCharacter)
 
 		self.playerPhysics = ActorNode("player-physics")
 		self.ppnp = self.render.attachNewNode(self.playerPhysics)
+		self.ppnp.setPos(playerPos)
+		if (playerRot != False):
+			self.camera.setHpr(playerRot)
 		self.physicsMgr.attachPhysicalNode(self.playerPhysics)
 		self.colliderNode = self.ppnp.attachNewNode(CollisionNode('colNode'))
-		self.colliderNode.node().addSolid(CollisionTube(0, 0, 0, 0, 1, 2.4, 1))
+		self.colliderNode.node().addSolid(CollisionTube(0, 0, 0, 0, 0, 3, 0.5))
 
 		self.gravity = ForceNode("gravity")
 		self.gnp = self.render.attachNewNode(self.gravity)
@@ -156,17 +175,18 @@ class Game(ShowBase):
 
 		# tasks
 		self.taskMgr.add(self.moveTask, "moveTask")
-		#self.taskMgr.add(self.coordinateTask, "coordinateTask")
+		if (customTask != False):
+			self.taskMgr.add(customTask, "customTask")
 		
 		# filters 
-		filters = CommonFilters(self.win, self.cam)
-		filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
+		self.filters = CommonFilters(self.win, self.cam)
+		self.filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
 		#filters.setBloom(intensity=0.1)
 
 		# fog
 		fog = Fog("Fog")
 		fog.setColor(LVecBase4f(self.fog_color))
-		fog.setExpDensity(0.045)
+		fog.setExpDensity(0.145)
 		self.render.setFog(fog)
 
 		# text
@@ -178,11 +198,43 @@ class Game(ShowBase):
 		self.textNodePath = aspect2d.attachNewNode(self.game_text.escText)
 		self.textNodePath.setScale(0.07)
 		self.textNodePath.setPos(-1.2, 0, -0.85)
+		self.sceneObjects.append(self.textNodePath)
+
+		self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
+		self.interactNode.setScale(0.14)
+		self.interactNode.setPos(0, 0, 0)
+		self.sceneObjects.append(self.interactNode)
+
+		self.itmTxtNode = aspect2d.attachNewNode(self.game_text.itmText)
+		self.itmTxtNode.setScale(0.07)
+		self.itmTxtNode.setPos(1, 0, 0.9)
+		self.sceneObjects.append(self.itmTxtNode)
+
+
+	def unloadScene(self):
+		self.taskMgr.remove("moveTask")
+		self.taskMgr.remove("customTask")
+		self.filters.cleanup()
+		self.game_text.itcText.setTextColor(1, 1, 1, 1)
+		for node in self.sceneObjects:
+			try:
+				node.cleanup()
+				print("cleaned up")
+			except:
+				print("can't cleanup")
+			node.remove_node()
 
 	timer = 0
 	# basic player movement
 	def moveTask(self, task):
 		button_down = self.mouseWatcherNode.is_button_down
+
+		# print current position for debugging
+		if (button_down(KB_BUTTON('p'))):
+			print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
+		if (button_down(KB_BUTTON('l'))):
+			print("H:", round(self.camera.getH(), 3), "P:", round(self.camera.getP(), 3), "R:", round(self.camera.getR(), 3))
+
 		if (button_down(KB_BUTTON('x'))):
 			exit()
 
@@ -224,6 +276,8 @@ class Game(ShowBase):
 		if (button_down(KB.shift())):
 			self.speed = 0.1
 
+		if (self.speedStop):
+			self.speed = 0
 		# primitive ground collision checking
 		#if (posZ < GROUND_POS):
 		#	posZ = GROUND_POS
@@ -249,14 +303,19 @@ class Game(ShowBase):
 		# misc
 		if (button_down(KB_BUTTON('m'))):
 			gametext.Text.hideText(self.game_text)
+			self.unloadScene()
 		if (button_down(KB_BUTTON('n'))):
 			gametext.Text.showText(self.game_text)
 		# temp fix for bug
 		if (button_down(KB_BUTTON('o')) and self.timer <= 0):
 			if (self.scene_rot):
 				self.scene.setHpr(0, 0, 0)
+				if (self.doorRot):
+					self.doors.setHpr(0, 0, 0)
 			else:
 				self.scene.setHpr(0, 90, 0)
+				if (self.doorRot):
+					self.doors.setHpr(0, 90, 0)
 			self.scene_rot = not self.scene_rot
 			self.timer = 10
 		self.timer -= 1
@@ -283,12 +342,21 @@ class Game(ShowBase):
 		self.ppnp.setX(posX)
 		self.ppnp.setY(posY)
 		self.camera.setPos(self.ppnp.getPos())
-		# the +2.5 is there for emotional support
-		self.camera.setZ(self.ppnp.getZ() + 2.5)
+		self.camera.setZ(self.ppnp.getZ() + self.cameraOffset)
 
 		return Task.cont
+		
 
 	def mainMenu(self):
+		self.scaleFactor = 3
+		self.scaleFactorLogo = 0.2
+	
+		self.cm = CardMaker('video')
+		self.video = self.aspect2d.attachNewNode(self.cm.generate())
+		self.video.setScale((2))
+		self.tex = self.loader.loadTexture('helloworld.avi')
+		self.video.setTexture(self.tex)
+		
 		self.music = self.loader.loadSfx("main_menu.mp3")
 		self.music.setVolume(0.75)
 		self.music.setLoop(True)
@@ -349,7 +417,7 @@ class Game(ShowBase):
 		self.exitGameButton.setPos(x_offset, 0, -0.3)
 		self.muteButton.setPos(1.7, -1.5, -0.8)
 
-		self.menuItems = [self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton]
+		self.menuItems = [self.video, self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton,]
 
 		self.buttonList = [self.startGameButton, self.settingsButton, self.exitGameButton, self.muteButton]
 		self.buttonScale = 0.15
@@ -447,7 +515,183 @@ class Game(ShowBase):
 		
 		for node in self.charNodes:
 			node.removeNode()
-		self.loadScene()
+
+		# bed scene
+		self.cameraOffset = 4
+		self.loadScene("bed.glb", (3.5, 6, 1.42), (0, 0, 10), False, self.bedDoor, (180, -90, 0))
+		self.taskMgr.add(self.backstory, "backstory")
+
+	isPlaying = False
+	def backstory(self, task):
+		
+		if (not self.isPlaying):
+			self.playVid()
+
+		button_down = self.mouseWatcherNode.is_button_down
+
+		if (task.time >= 47 or button_down(KB_BUTTON('e'))):
+			self.video.removeNode()
+			gametext.Text.showCH(self.game_text)
+			self.speedStop = False
+			self.skipText.setText("")
+			self.blackBg.destroy()
+			self.sound.stop()
+			return Task.done
+		return Task.cont
+
+	def playVid(self):
+		self.isPlaying = True
+		gametext.Text.hideCH(self.game_text)
+		self.speedStop = True
+		# this bg is here to prevent 3d game from being shown
+		self.blackBg = OnscreenImage(image='backstories/black.png', scale=(1000, 1, 1000))
+		self.cm = CardMaker('card')
+		self.cm.setFrameFullscreenQuad()
+		self.scaleFactorVid = 1.9
+		self.video = self.aspect2d.attachNewNode(self.cm.generate())
+		self.video.setScale(self.scaleFactorVid, 1, self.scaleFactorVid)
+
+		self.tex = MovieTexture("backstory")
+		if (self.character == 1):
+			self.tex.read('backstories/Girl.avi')
+			self.sound = self.loader.loadSfx('backstories/Girl.avi')
+			self.sound.play()
+		else:
+			self.tex.read('backstories/Boy.avi')
+			self.sound = self.loader.loadSfx('backstories/Boy.avi')
+			self.sound.play()
+		self.cm.setUvRange(self.tex)
+		self.video.setTexture(self.tex)
+
+		self.background_x = 0.125
+		self.background_y = 8/9
+
+		self.video.setPos(self.background_x, 0, self.background_y)
+		self.skipText = TextNode('items')
+		self.skipText.setText("Press E to skip intro.")
+		self.skipText.setShadow(0.15, 0.15)
+		self.stnp = aspect2d.attachNewNode(self.skipText)
+		self.stnp.setPos(-1.2, 0, 0.85)
+		self.stnp.setScale(0.07)
+
+	def bedDoor(self, task):
+		rot = self.camera.getH()
+		crosshair = self.game_text.itcText
+		#chnp = aspect2d.attachNewNode(self.game_text.itcText)
+		while rot > 360:
+			rot -= 360
+		while rot < 0:
+			rot += 360
+		# X: 1.5 -> -2.5
+		# Y: < -4
+		posX = self.camera.getX()
+		posY = self.camera.getY()
+		#print(posX, posY)
+		doorInteract = False
+		if ((posX >= -2.5 and posX <= 1.5) and posY <= -4):
+			crosshair.setTextColor(1, 0.5, 0, 1)
+			doorInteract = True
+		else:
+			crosshair.setTextColor(1, 1, 1, 1)
+			doorInteract = False
+			
+		button_down = self.mouseWatcherNode.is_button_down
+		if (button_down(KB_BUTTON('e')) and doorInteract):
+			self.unloadScene()
+			self.cameraOffset = 4
+			self.loadScene("inf.glb", (-16.93, 6.982, 0.414), (0, 0, 10.5), "door.glb", self.mission)
+		return Task.cont
+	
+	missionShow = False
+	initItemsDone = False
+	itemsGotten = 0
+	def mission(self, task):
+		crosshair = self.game_text.itcText
+		button_down = self.mouseWatcherNode.is_button_down
+		if (not self.missionShow):
+			self.missionShow = True
+			self.speedStop = True
+			self.showMission()
+		
+		if (button_down(KB_BUTTON('e')) and self.missionShow and self.speedStop == True and task.time >= 0.1):
+			self.speedStop = False
+			self.missionImg.removeNode()
+			gametext.Text.showText(self.game_text)
+		
+		if (not self.initItemsDone):
+			self.initItems()
+		else:
+			posX = self.ppnp.getX()
+			posY = self.ppnp.getY()
+			#posZ = self.ppnp.getZ() # no z axis atm because it'll be a hassle
+			i = 0
+			for itemPos in self.itemList:
+				if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
+					self.items[i].removeNode()
+					self.itemsGotten += 1
+					self.game_text.itmText.setText(self.game_text.itmText.getText() + "\n" + itemPos[2])
+					itemPos[2] = None
+				i += 1
+
+		posX = self.camera.getX()
+		posY = self.camera.getY()
+		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 5):
+			crosshair.setTextColor(1, 0.5, 0, 1)
+			doorInteract = True
+		else: 
+			crosshair.setTextColor(1, 1, 1, 1)
+			doorInteract = False
+
+		if (button_down(KB_BUTTON('e')) and doorInteract):
+			self.unloadScene()
+			self.game_text.ctlText.setText("")
+			self.game_text.escText.setText("")
+			self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
+			self.interactNode.setScale(0.14)
+			self.interactNode.setPos(-0.5, 0, 0)
+			self.sceneObjects.append(self.interactNode)
+			self.game_text.itcText.setText("Level 1 Complete!")
+
+		return Task.cont
+	
+	def initItems(self):
+		self.initItemsDone = True
+		self.scaleFactorItem = 4
+		# filename, position, human readable name
+		self.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (20, -20, 0), 'Medicine'], ['5_prescription', (-15, -7.8, 0), 'Doctor\'s Prescription']]
+		self.items = []
+		self.cm = CardMaker('card')
+		for itemPath in self.itemList:
+			item = self.render.attachNewNode(self.cm.generate())
+			item.setScale(self.scaleFactorItem, 1, self.scaleFactorItem)
+
+			tex = self.loader.loadTexture('items/' + itemPath[0] + '.png')
+			item.setTexture(tex)
+
+			item.setPos(itemPath[1])
+			item.setTransparency(TransparencyAttrib.MAlpha)
+
+			item.setBillboardAxis()
+
+			self.items.append(item)
+
+
+	def showMission(self):
+		gametext.Text.hideText(self.game_text)
+		self.scaleFactorMission = 7/4
+		self.cm = CardMaker('card')
+		self.missionImg = self.aspect2d.attachNewNode(self.cm.generate())
+		self.missionImg.setScale((16/9)*self.scaleFactorMission, 1, self.scaleFactorMission)
+
+		self.tex = self.loader.loadTexture('missions/1.png')
+		self.missionImg.setTexture(self.tex)
+
+		# these are the centers of the image
+		self.mission_x = (-16/9/2)*self.scaleFactorMission
+		self.mission_y = -0.5*self.scaleFactorMission
+
+		self.missionImg.setPos(self.mission_x, 0, self.mission_y)
+		self.missionImg.setTransparency(TransparencyAttrib.MAlpha)
 
 	def exitGame(self):
 		exit()

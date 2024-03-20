@@ -80,7 +80,7 @@ class Game(ShowBase):
 		self.camLens.setNearFar(0.1, 10000000)
 
 		# tentative scene
-		self.scene = self.loader.loadModel("bed.glb")
+		self.scene = self.loader.loadModel("inf.glb")
 
 		self.scene.reparentTo(self.render)
 
@@ -243,7 +243,7 @@ class Game(ShowBase):
 			self.accelX -= self.speed * cos(rot_x * (pi/180))
 		# jumping (note, for debugging purposes only)
 		if (button_down(KB.space())):
-			self.ppnp.setZ(self.ppnp.getZ()+1)
+			self.ppnp.setZ(self.ppnp.getZ()+0.1)
 
 		# misc
 		if (button_down(KB_BUTTON('m'))):

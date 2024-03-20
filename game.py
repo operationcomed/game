@@ -71,7 +71,7 @@ class Game(ShowBase):
 		#self.taskMgr.add(self.startTask, "startTask")
 		self.mainMenu()
 	
-	def loadScene(self, scene, lightPos, doors=False):
+	def loadScene(self, scene, lightPos, doors=False, customTask=False):
 		self.music.stop()
 		self.disable_mouse()
 		
@@ -170,7 +170,8 @@ class Game(ShowBase):
 
 		# tasks
 		self.taskMgr.add(self.moveTask, "moveTask")
-		#self.taskMgr.add(self.coordinateTask, "coordinateTask")
+		if (customTask != False):
+			self.taskMgr.add(customTask, "customTask")
 		
 		# filters 
 		filters = CommonFilters(self.win, self.cam)
@@ -195,7 +196,13 @@ class Game(ShowBase):
 
 	def unloadScene(self):
 		self.taskMgr.remove("moveTask")
+		self.taskMgr.remove("bs")
 		for node in self.sceneObjects:
+			try:
+				node.cleanup()
+				print("cleaned up")
+			except:
+				print("can't cleanup")
 			node.remove_node()
 
 	timer = 0

@@ -26,7 +26,7 @@ loadPrcFileData("", "multisamples 4")
 # window
 loadPrcFileData("", "window-title Escape MSU")
 loadPrcFileData("", 'win-size 1366 720') 
-loadPrcFileData("", "default-fov 90")
+loadPrcFileData("", "default-fov 60")
 
 loadPrcFileData("", "shadow-cube-map-filter true")
 

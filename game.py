@@ -614,6 +614,7 @@ class Game(ShowBase):
 	
 	missionShow = False
 	initItemsDone = False
+	missionDone = False
 	itemsGotten = 0
 	def mission(self, task):
 		crosshair = self.game_text.itcText
@@ -645,6 +646,10 @@ class Game(ShowBase):
 
 		posX = self.camera.getX()
 		posY = self.camera.getY()
+		if (self.itemsGotten >= 5 and not self.missionDone):
+			self.missionDone = True
+			self.game_text.itmText.setTextColor(0, 1, 0.5, 1)
+			self.game_text.itmText.setText(self.game_text.itmText.getText() + "\n" + "You can escape through the door now!")
 		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 5):
 			crosshair.setTextColor(1, 0.5, 0, 1)
 			doorInteract = True

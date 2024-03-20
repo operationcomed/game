@@ -53,6 +53,7 @@ class Game(ShowBase):
 	character = 0
 
 	cameraOffset = 4.5
+	doorRot = False
 	
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -95,6 +96,7 @@ class Game(ShowBase):
 		self.scene.setTwoSided(False)
 
 		if (doors != False):
+			self.doorRot = True
 			self.doors = self.loader.loadModel(doors)
 			self.sceneObjects.append(self.doors)
 			self.doors.reparentTo(self.render)
@@ -305,11 +307,11 @@ class Game(ShowBase):
 		if (button_down(KB_BUTTON('n'))):
 			gametext.Text.showText(self.game_text)
 		# temp fix for bug
-		if (button_down(KB_BUTTON('o')) and self.timer <= 0):
+		if (button_down(KB_BUTTON('o')) and self.timer <= 0 and self.doorRot):
 			if (self.scene_rot):
-				self.scene.setHpr(0, 0, 0)
+				self.doors.setHpr(0, 0, 0)
 			else:
-				self.scene.setHpr(0, 90, 0)
+				self.doors.setHpr(0, 90, 0)
 			self.scene_rot = not self.scene_rot
 			self.timer = 10
 		self.timer -= 1

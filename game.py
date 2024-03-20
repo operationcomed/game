@@ -529,11 +529,13 @@ class Game(ShowBase):
 
 		button_down = self.mouseWatcherNode.is_button_down
 
-		if (task.time >= 10 or button_down(KB_BUTTON('e'))):
+		if (task.time >= 47 or button_down(KB_BUTTON('e'))):
 			self.video.removeNode()
 			gametext.Text.showCH(self.game_text)
 			self.speedStop = False
 			self.skipText.setText("")
+			self.blackBg.destroy()
+			self.sound.stop()
 			return Task.done
 		return Task.cont
 
@@ -541,22 +543,28 @@ class Game(ShowBase):
 		self.isPlaying = True
 		gametext.Text.hideCH(self.game_text)
 		self.speedStop = True
+		# this bg is here to prevent 3d game from being shown
+		self.blackBg = OnscreenImage(image='backstories/black.png', scale=(1000, 1, 1000))
 		self.cm = CardMaker('card')
 		self.cm.setFrameFullscreenQuad()
-		self.scaleFactorVid = 2.5
+		self.scaleFactorVid = 1.9
 		self.video = self.aspect2d.attachNewNode(self.cm.generate())
 		self.video.setScale(self.scaleFactorVid, 1, self.scaleFactorVid)
 
 		self.tex = MovieTexture("backstory")
 		if (self.character == 1):
-			self.tex.read('girl.avi')
+			self.tex.read('backstories/Girl.avi')
+			self.sound = self.loader.loadSfx('backstories/Girl.avi')
+			self.sound.play()
 		else:
-			self.tex.read('boy.avi')
+			self.tex.read('backstories/Boy.avi')
+			self.sound = self.loader.loadSfx('backstories/Boy.avi')
+			self.sound.play()
 		self.cm.setUvRange(self.tex)
 		self.video.setTexture(self.tex)
 
-		self.background_x = 0
-		self.background_y = 7/8
+		self.background_x = 0.125
+		self.background_y = 8/9
 
 		self.video.setPos(self.background_x, 0, self.background_y)
 		self.skipText = TextNode('items')
@@ -627,7 +635,7 @@ class Game(ShowBase):
 
 		posX = self.camera.getX()
 		posY = self.camera.getY()
-		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 4):
+		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 5):
 			crosshair.setTextColor(1, 0.5, 0, 1)
 			doorInteract = True
 		else: 

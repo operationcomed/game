@@ -591,7 +591,7 @@ class Game(ShowBase):
 		self.initItemsDone = True
 		self.scaleFactorItem = 4
 		# filename, position, human readable name
-		self.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (-21, -21, 0), 'Medicine'], ['5_perscription', (-15, -7.8, 0), 'Doctor\'s Perscription']]
+		self.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (21, -21, 0), 'Medicine'], ['5_perscription', (-15, -7.8, 0), 'Doctor\'s Perscription']]
 		self.items = []
 		self.cm = CardMaker('card')
 		for itemPath in self.itemList:

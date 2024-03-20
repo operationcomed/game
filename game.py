@@ -207,7 +207,7 @@ class Game(ShowBase):
 
 		self.itmTxtNode = aspect2d.attachNewNode(self.game_text.itmText)
 		self.itmTxtNode.setScale(0.07)
-		self.itmTxtNode.setPos(1, 0, 0.9)
+		self.itmTxtNode.setPos(1.2, 0, 0.9)
 		self.sceneObjects.append(self.itmTxtNode)
 
 
@@ -307,15 +307,11 @@ class Game(ShowBase):
 		if (button_down(KB_BUTTON('n'))):
 			gametext.Text.showText(self.game_text)
 		# temp fix for bug
-		if (button_down(KB_BUTTON('o')) and self.timer <= 0):
+		if (button_down(KB_BUTTON('o')) and self.timer <= 0 and self.doorRot):
 			if (self.scene_rot):
-				self.scene.setHpr(0, 0, 0)
-				if (self.doorRot):
-					self.doors.setHpr(0, 0, 0)
+				self.doors.setHpr(0, 0, 0)
 			else:
-				self.scene.setHpr(0, 90, 0)
-				if (self.doorRot):
-					self.doors.setHpr(0, 90, 0)
+				self.doors.setHpr(0, 90, 0)
 			self.scene_rot = not self.scene_rot
 			self.timer = 10
 		self.timer -= 1
@@ -348,15 +344,39 @@ class Game(ShowBase):
 		
 
 	def mainMenu(self):
-		self.scaleFactor = 3
-		self.scaleFactorLogo = 0.2
-	
-		self.cm = CardMaker('video')
-		self.video = self.aspect2d.attachNewNode(self.cm.generate())
-		self.video.setScale((2))
-		self.tex = self.loader.loadTexture('helloworld.avi')
-		self.video.setTexture(self.tex)
+		self.cselback = self.aspect2d.attachNewNode(self.cm.generate())
+		self.cselback.setScale((16/9)*self.scaleFactor, 1, 1*self.scaleFactor)
+
+		self.tex = self.loader.loadTexture('charselect/background.png')
+		self.cselback.setTexture(self.tex)
+		self.cselback.setPos(self.background_x, 0, self.background_y)
+
+		self.boyPreview = (self.loader.loadTexture("helloworld.avi"))
+		self.girlPreview = (self.loader.loadTexture("charselect/girl.png"))
+
+		self.boySelect = DirectButton(frameTexture=self.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
+		self.girlSelect = DirectButton(frameTexture=self.girlPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
+		self.boySelect.setPos(0.67, 0, 0)
+		self.girlSelect.setPos(-0.67, 0, 0)
+
+		self.charButtons = [self.boySelect, self.girlSelect]
+		self.charNodes = [self.boySelect, self.girlSelect, self.cselback]
+
+		for char in self.charButtons:
+			char.setTransparency(True)
+			char.setScale((512/640) * 0.5, 0.5, 0.5)
+		# i wish there was like a 'this' from js in python so i could see what the pressed thing is so i dont have to do this stupid stuff
+			# ^^^ incomprehendable
+		self.girlSelect["command"] = self.setCharacterA
+		self.boySelect["command"] = self.setCharacterB
 		
+		self.charButtons = [self.boySelect, self.girlSelect]
+		self.charNodes = [self.boySelect, self.girlSelect, self.cselback]
+
+		for char in self.charButtons:
+			char.setTransparency(True)
+			char.setScale((512/640) * 0.5, 0.5, 0.5)
+	
 		self.music = self.loader.loadSfx("main_menu.mp3")
 		self.music.setVolume(0.75)
 		self.music.setLoop(True)
@@ -483,7 +503,7 @@ class Game(ShowBase):
 		self.cselback.setTexture(self.tex)
 		self.cselback.setPos(self.background_x, 0, self.background_y)
 
-		self.boyPreview = (self.loader.loadTexture("charselect/boy.png"))
+		self.boyPreview = (self.loader.loadTexture("helloworld.avi"))
 		self.girlPreview = (self.loader.loadTexture("charselect/girl.png"))
 
 		self.boySelect = DirectButton(frameTexture=self.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
@@ -515,61 +535,20 @@ class Game(ShowBase):
 		
 		for node in self.charNodes:
 			node.removeNode()
-
-		# bed scene
-		self.cameraOffset = 4
-		self.loadScene("bed.glb", (3.5, 6, 1.42), (0, 0, 10), False, self.bedDoor, (180, -90, 0))
-		self.taskMgr.add(self.backstory, "backstory")
-
-	isPlaying = False
-	def backstory(self, task):
 		
-		if (not self.isPlaying):
-			self.playVid()
-
-		button_down = self.mouseWatcherNode.is_button_down
-
-		if (task.time >= 10 or button_down(KB_BUTTON('e'))):
-			self.video.removeNode()
-			gametext.Text.showCH(self.game_text)
-			self.speedStop = False
-			self.skipText.setText("")
-			return Task.done
-		return Task.cont
-
-	def playVid(self):
-		self.isPlaying = True
-		gametext.Text.hideCH(self.game_text)
-		self.speedStop = True
-		self.cm = CardMaker('card')
-		self.cm.setFrameFullscreenQuad()
-		self.scaleFactorVid = 2.5
-		self.video = self.aspect2d.attachNewNode(self.cm.generate())
-		self.video.setScale(self.scaleFactorVid, 1, self.scaleFactorVid)
-
-		self.tex = MovieTexture("backstory")
+		# bed scene
 		if (self.character == 1):
-			self.tex.read('girl.avi')
-		else:
-			self.tex.read('boy.avi')
-		self.cm.setUvRange(self.tex)
-		self.video.setTexture(self.tex)
-
-		self.background_x = 0
-		self.background_y = 7/8
-
-		self.video.setPos(self.background_x, 0, self.background_y)
-		self.skipText = TextNode('items')
-		self.skipText.setText("Press E to skip intro.")
-		self.skipText.setShadow(0.15, 0.15)
-		self.stnp = aspect2d.attachNewNode(self.skipText)
-		self.stnp.setPos(-1.2, 0, 0.85)
-		self.stnp.setScale(0.07)
+			self.cameraOffset = 4
+			self.loadScene("bed.glb", (3.5, 6, 1.42), (0, 0, 10), False, self.bedDoor, (180, -90, 0))
+		# infirmary scene
+		if (self.character == 2):
+			self.cameraOffset = 4
+			self.loadScene("inf.glb", (-16.93, 6.982, 0.414), (0, 0, 10.5), "door.glb", self.mission)
 
 	def bedDoor(self, task):
 		rot = self.camera.getH()
 		crosshair = self.game_text.itcText
-		#chnp = aspect2d.attachNewNode(self.game_text.itcText)
+		chnp = aspect2d.attachNewNode(self.game_text.itcText)
 		while rot > 360:
 			rot -= 360
 		while rot < 0:
@@ -598,7 +577,6 @@ class Game(ShowBase):
 	initItemsDone = False
 	itemsGotten = 0
 	def mission(self, task):
-		crosshair = self.game_text.itcText
 		button_down = self.mouseWatcherNode.is_button_down
 		if (not self.missionShow):
 			self.missionShow = True
@@ -625,32 +603,13 @@ class Game(ShowBase):
 					itemPos[2] = None
 				i += 1
 
-		posX = self.camera.getX()
-		posY = self.camera.getY()
-		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 4):
-			crosshair.setTextColor(1, 0.5, 0, 1)
-			doorInteract = True
-		else: 
-			crosshair.setTextColor(1, 1, 1, 1)
-			doorInteract = False
-
-		if (button_down(KB_BUTTON('e')) and doorInteract):
-			self.unloadScene()
-			self.game_text.ctlText.setText("")
-			self.game_text.escText.setText("")
-			self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
-			self.interactNode.setScale(0.14)
-			self.interactNode.setPos(-0.5, 0, 0)
-			self.sceneObjects.append(self.interactNode)
-			self.game_text.itcText.setText("Level 1 Complete!")
-
 		return Task.cont
 	
 	def initItems(self):
 		self.initItemsDone = True
 		self.scaleFactorItem = 4
 		# filename, position, human readable name
-		self.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (20, -20, 0), 'Medicine'], ['5_prescription', (-15, -7.8, 0), 'Doctor\'s Prescription']]
+		self.itemList = [['1_mask', (0, 0, 0), 'Mask'], ['2_cert', (0, 8, 0), 'Medical Certificate'], ['3_excuse', (8, 0, 0), 'Excuse Letter'], ['4_meds', (8, 8, 0), 'Medicine'], ['5_perscription', (4, 4, 0), 'Doctor\'s Perscription']]
 		self.items = []
 		self.cm = CardMaker('card')
 		for itemPath in self.itemList:
@@ -673,13 +632,13 @@ class Game(ShowBase):
 		self.scaleFactorMission = 7/4
 		self.cm = CardMaker('card')
 		self.missionImg = self.aspect2d.attachNewNode(self.cm.generate())
-		self.missionImg.setScale((16/9)*self.scaleFactorMission, 1, self.scaleFactorMission)
+		self.missionImg.setScale((791/895)*self.scaleFactorMission, 1, self.scaleFactorMission)
 
 		self.tex = self.loader.loadTexture('missions/1.png')
 		self.missionImg.setTexture(self.tex)
 
 		# these are the centers of the image
-		self.mission_x = (-16/9/2)*self.scaleFactorMission
+		self.mission_x = (-791/895/2)*self.scaleFactorMission
 		self.mission_y = -0.5*self.scaleFactorMission
 
 		self.missionImg.setPos(self.mission_x, 0, self.mission_y)

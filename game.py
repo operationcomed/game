@@ -68,9 +68,10 @@ class Game(ShowBase):
 		self.render.setShaderAuto()
 
 		# camera
-		self.camLens.setNearFar(1, 1000)
-
+		
 		self.mainMenu()
+		
+   
 		#video before main menu
 			
 	
@@ -438,6 +439,7 @@ class Game(ShowBase):
 		self.taskMgr.add(self.moveBackground, "mainMenu")
 		self.taskMgr.add(self.hoverEffect, "mainMenu")
 		
+		
 	def moveBackground(self, task):
 		sensitivity = 0.05
 		self.background_move_x = self.background_x
@@ -564,10 +566,10 @@ class Game(ShowBase):
 			self.sound.play()
 		self.cm.setUvRange(self.tex)
 		self.video.setTexture(self.tex)
-
+		time.sleep(10)
 		self.background_x = 0.125
 		self.background_y = 8/9
-		self.mainMenu()
+		
 
 		self.video.setPos(self.background_x, 0, self.background_y)
 		self.skipText = TextNode('items')
@@ -576,7 +578,7 @@ class Game(ShowBase):
 		self.stnp = aspect2d.attachNewNode(self.skipText)
 		self.stnp.setPos(-1.2, 0, 0.85)
 		self.stnp.setScale(0.07)
-		time.sleep(20)
+	
 		
 
 	def playVid(self):

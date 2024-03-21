@@ -390,7 +390,7 @@ class Game(ShowBase):
 		self.logo_y = -0.5*self.scaleFactorLogo
 
 		self.card.setPos(self.background_x, 0, self.background_y)
-		self.logo.setPos(self.logo_x + x_offset + -0.1, 0, self.logo_y + 0.5)
+		self.logo.setPos(self.logo_x + x_offset, 0, self.logo_y + 0.5)
 		self.logo.setTransparency(TransparencyAttrib.MAlpha)
 
 		# buttons

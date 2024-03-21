@@ -43,7 +43,7 @@ class Game(ShowBase):
 
 	fog_color = (0.2, 0.3, 0.35)
 	
-	scene_rot = 1
+	scene_rot = 0
 
 	speedStop = False
 
@@ -104,9 +104,10 @@ class Game(ShowBase):
 			self.doors.reparentTo(self.render)
 			self.doors.setScale(1.5, 1.5, 1.5)
 			self.doors.setShaderOff()
+			self.scene.setHpr(0, 90, 0)
 
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
-		self.scene.setHpr(0, 0, 0)
+		self.scene.setHpr(0, 90, 0)
 
 		self.scene.setCollideMask(BitMask32.bit(0))
 		self.enableParticles()

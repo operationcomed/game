@@ -10,11 +10,8 @@ from panda3d.core import *
 
 class Text():
 
-	escText = TextNode('esc')
-	escText.setText("Hold escape to let go of mouse.\nPress X to exit.")
-	escText.setShadow(0.15, 0.15)
 	ctlText = TextNode('controls')
-	ctlText.setText("Use WASD to move. Shift to run. E to interact.")
+	ctlText.setText("Press H for help menu.")
 	ctlText.setShadow(0.15, 0.15)
 
 	itmText = TextNode('items')
@@ -29,15 +26,11 @@ class Text():
 
 	def hideText(self):
 		# 100% easier by loading and unloading these procedurally thru a text file
-		self.escText.setText("")
 		self.ctlText.setText("")
-		self.itmText.setText("")
 
 	def showText(self):
 		# 100% easier by loading and unloading these procedurally thru a text file
-		self.escText.setText("Hold escape to let go of mouse.\nPress X to exit.")
-		self.ctlText.setText("Use WASD to move. Shift to run. E to interact.")
-		self.itmText.setText("Items obtained:")
+		self.ctlText.setText("Press H for help menu.")
 
 	def hideCH(self):
 		self.itcText.setText("")

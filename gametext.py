@@ -14,6 +14,10 @@ class Text():
 	ctlText.setText("Press H for help menu.")
 	ctlText.setShadow(0.15, 0.15)
 
+	stmText = TextNode('controls')
+	stmText.setText("Stamina:")
+	stmText.setShadow(0.15, 0.15)
+
 	itmText = TextNode('items')
 	itmText.setText("Items obtained:")
 	itmText.setShadow(0.15, 0.15)
@@ -27,10 +31,12 @@ class Text():
 	def hideText(self):
 		# 100% easier by loading and unloading these procedurally thru a text file
 		self.ctlText.setText("")
+		self.stmText.setText("")
 
 	def showText(self):
 		# 100% easier by loading and unloading these procedurally thru a text file
 		self.ctlText.setText("Press H for help menu.")
+		self.stmText.setText("Stamina:")
 
 	def hideCH(self):
 		self.itcText.setText("")

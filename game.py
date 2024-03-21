@@ -54,6 +54,9 @@ class Game(ShowBase):
 
 	cameraOffset = 4.5
 	doorRot = False
+
+	stamina = 10
+	staminaCap = 10
 	
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -78,6 +81,7 @@ class Game(ShowBase):
 	
 	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False):
 		self.accept("h", self.helpMenu)
+		self.stamina = self.staminaCap
 		self.music.stop()
 		self.disable_mouse()
 		
@@ -120,6 +124,8 @@ class Game(ShowBase):
 		self.scene.setCollideMask(BitMask32.bit(0))
 		self.enableParticles()
 
+		self.staminaBar = DirectWaitBar(text="", value=100, pos=(-0.89, 0, -0.85), scale=(0.3), barColor=(0.1, 1, 0.2, 1), range=self.staminaCap)
+		self.sceneObjects.append(self.staminaBar)
 
 		# lights and shadows
 		alight = AmbientLight("alight1")
@@ -207,6 +213,12 @@ class Game(ShowBase):
 		self.textNodePath.setPos(-1.2, 0, 0.85)
 		self.game_text.ctlText.setFont(self.font)
 		self.sceneObjects.append(self.textNodePath)
+		
+		self.stmTxtNode = aspect2d.attachNewNode(self.game_text.stmText)
+		self.stmTxtNode.setScale(0.07)
+		self.stmTxtNode.setPos(-1.2, 0, -0.78)
+		self.game_text.stmText.setFont(self.font)
+		self.sceneObjects.append(self.stmTxtNode)
 
 		self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
 		self.interactNode.setScale(0.14)
@@ -236,7 +248,8 @@ class Game(ShowBase):
 			node.remove_node()
 
 	timer = 0
-	# basic player movement
+	sprintable = False
+	# "basic" player movement
 	def moveTask(self, task):
 		button_down = self.mouseWatcherNode.is_button_down
 
@@ -258,6 +271,9 @@ class Game(ShowBase):
 		
 		props = WindowProperties()
 		if (button_down(KB.escape())):
+			props.setCursorHidden(False)
+			self.win.requestProperties(props)
+			props = self.win.getProperties()
 			has_mouse = False
 
 		# move screen with mouse
@@ -285,8 +301,16 @@ class Game(ShowBase):
 		posY = self.ppnp.getY()
 
 		self.speed = 0.025
-		if (button_down(KB.shift())):
+
+		# sprinting and stamina
+		if (button_down(KB.shift()) and self.stamina >= 0 and self.sprintable):
+			self.stamina -= 0.05
 			self.speed = 0.1
+		if (self.stamina <= 0.01):
+			self.sprintable = False
+
+		if (self.stamina < 0):
+			self.stamina = 0
 
 		if (self.speedStop):
 			self.speed = 0
@@ -296,28 +320,39 @@ class Game(ShowBase):
 		#	self.accelZ = 0
 		# movement with smooth acceleration
 		# hala may math ew
+		staminaGain = True
 		if (button_down(KB_BUTTON('w'))):
 			self.accelY += self.speed * cos(rot_x * (pi/180))
 			self.accelX -= self.speed * sin(rot_x * (pi/180))
+			staminaGain = False
 		if (button_down(KB_BUTTON('s'))):
 			self.accelY -= self.speed * cos(rot_x * (pi/180))
 			self.accelX += self.speed * sin(rot_x * (pi/180))
+			staminaGain = False
 		if (button_down(KB_BUTTON('d'))):
 			self.accelY += self.speed * sin(rot_x * (pi/180))
 			self.accelX += self.speed * cos(rot_x * (pi/180))
+			staminaGain = False
 		if (button_down(KB_BUTTON('a'))):
 			self.accelY -= self.speed * sin(rot_x * (pi/180))
 			self.accelX -= self.speed * cos(rot_x * (pi/180))
+			staminaGain = False
+
+		if (self.staminaCap > self.stamina and staminaGain):
+			self.stamina += 0.025
+		elif (self.stamina >= self.staminaCap):
+			self.stamina = self.staminaCap
+			self.sprintable = True
 		# jumping (note, for debugging purposes only)
 		if (button_down(KB.space())):
 			self.ppnp.setZ(self.ppnp.getZ()+0.1)
 
 		# misc
-		if (button_down(KB_BUTTON('m'))):
-			gametext.Text.hideText(self.game_text)
-			self.unloadScene()
-		if (button_down(KB_BUTTON('n'))):
-			gametext.Text.showText(self.game_text)
+		#if (button_down(KB_BUTTON('m'))):
+		#	gametext.Text.hideText(self.game_text)
+		#	self.unloadScene()
+		#if (button_down(KB_BUTTON('n'))):
+		#	gametext.Text.showText(self.game_text)
 		# fix for bug
 		if (button_down(KB_BUTTON('o')) and self.timer <= 0):
 			if (self.scene_rot):
@@ -356,6 +391,8 @@ class Game(ShowBase):
 		self.camera.setPos(self.ppnp.getPos())
 		self.camera.setZ(self.ppnp.getZ() + self.cameraOffset)
 
+		self.staminaBar["value"] = self.stamina
+
 		return Task.cont
 		
 	helpDisplay = False
@@ -364,10 +401,10 @@ class Game(ShowBase):
 		if (self.helpDisplay):
 			self.helpMenuImg = OnscreenImage(image='helpMenu.png', scale=(16/9, 1, 1))
 			self.helpMenuImg.setTransparency(TransparencyAttrib.MAlpha)
-			gametext.Text.hideText(self.game_text)
+			self.textNodePath.hide()
 		else:
 			self.helpMenuImg.destroy()
-			gametext.Text.showText(self.game_text)
+			self.textNodePath.show()
 
 
 	def mainMenu(self):
@@ -555,7 +592,7 @@ class Game(ShowBase):
 
 	isPlaying = False
 	def backstory(self, task):
-		
+		self.staminaBar.hide()
 		if (not self.isPlaying):
 			self.playVid()
 
@@ -568,6 +605,7 @@ class Game(ShowBase):
 			self.skipText.setText("")
 			self.blackBg.destroy()
 			self.sound.stop()
+			self.staminaBar.show()
 			return Task.done
 		return Task.cont
 

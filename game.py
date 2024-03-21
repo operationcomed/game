@@ -47,7 +47,6 @@ class Game(ShowBase):
 
 	speedStop = False
 
-
 	# 0: none
 	# 1: girl
 	# 2: boy
@@ -108,11 +107,13 @@ class Game(ShowBase):
 			self.doors.reparentTo(self.render)
 			self.doors.setScale(1.5, 1.5, 1.5)
 			self.doors.setShaderOff()
-			if (self.scene_rot):
+
+			# booleans are a mystery to humankind
+			if (self.scene_rot == True):
 				self.doors.setHpr(0, 90, 0)
 
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
-		if (self.scene_rot):
+		if (self.scene_rot == True):
 			self.scene.setHpr(0, 90, 0)
 
 		self.scene.setCollideMask(BitMask32.bit(0))

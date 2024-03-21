@@ -273,12 +273,13 @@ class Game(ShowBase):
 			mouse_y = self.mouseWatcherNode.getMouseY() * sensitivity
 
 			# prevent camera from going upside down
-			if (rot_y+mouse_y > 90):
-				self.camera.setHpr(rot_x-mouse_x, 90, 0)
-			elif (rot_y+mouse_y < -90):
-				self.camera.setHpr(rot_x-mouse_x, -90, 0)
-			else:
-				self.camera.setHpr(rot_x-mouse_x, rot_y+mouse_y, 0)
+			if (not self.speedStop):
+				if (rot_y+mouse_y > 90):
+					self.camera.setHpr(rot_x-mouse_x, 90, 0)
+				elif (rot_y+mouse_y < -90):
+					self.camera.setHpr(rot_x-mouse_x, -90, 0)
+				else:
+					self.camera.setHpr(rot_x-mouse_x, rot_y+mouse_y, 0)
 
 		posX = self.ppnp.getX()
 		posY = self.ppnp.getY()
@@ -361,7 +362,7 @@ class Game(ShowBase):
 	def helpMenu(self):
 		self.helpDisplay = not self.helpDisplay
 		if (self.helpDisplay):
-			self.helpMenuImg = OnscreenImage(image='missions/1.png')
+			self.helpMenuImg = OnscreenImage(image='helpMenu.png', scale=(16/9, 1, 1))
 			self.helpMenuImg.setTransparency(TransparencyAttrib.MAlpha)
 			gametext.Text.hideText(self.game_text)
 		else:

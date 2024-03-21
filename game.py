@@ -418,9 +418,9 @@ class Game(ShowBase):
 		# positioning the offsets to be relative to the window bounds
 		# but noooooooooo i guess we have to do it this way
 		# :( 
-		self.startGameButton.setPos(x_offset, 0, 0.1)
+		self.startGameButton.setPos(x_offset, 0, 0)
 		self.settingsButton.setPos(x_offset, 0, -0.2)
-		self.exitGameButton.setPos(x_offset, 0, -0.3)
+		self.exitGameButton.setPos(x_offset, 0, -0.4)
 		self.muteButton.setPos(1.7, -1.5, -0.8)
 
 		self.menuItems = [self.video, self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton,]

@@ -69,8 +69,10 @@ class Game(ShowBase):
 
 		# camera
 		self.camLens.setNearFar(1, 1000)
-		#video before main menu
+
 		self.mainMenu()
+		#video before main menu
+			
 	
 	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False):
 		self.music.stop()
@@ -369,16 +371,16 @@ class Game(ShowBase):
 		self.cm = CardMaker('card')
 		self.card = self.aspect2d.attachNewNode(self.cm.generate())
 		self.logo = self.aspect2d.attachNewNode(self.cm.generate())
-		self.card.setScale((16/9)*self.scaleFactor, 1, 1*self.scaleFactor)
+		self.card.setScale((16/8)*self.scaleFactor, 1, 1*self.scaleFactor)
 		self.logo.setScale((746/168)*self.scaleFactorLogo, 1, 1*self.scaleFactorLogo)
 
-		self.tex = self.loader.loadTexture('background.png')
+		self.tex = self.loader.loadTexture('bg.avi')
 		self.card.setTexture(self.tex)
 		self.tex = self.loader.loadTexture('logo.png')
 		self.logo.setTexture(self.tex)
 
 		# these are the centers of the images
-		self.background_x = (-16/18)*self.scaleFactor
+		self.background_x = -2
 		self.background_y = -0.5*self.scaleFactor
 		self.logo_x = (-746/168/2)*self.scaleFactorLogo
 		self.logo_y = -0.5*self.scaleFactorLogo
@@ -477,26 +479,26 @@ class Game(ShowBase):
 
 	def characterSelect(self):
 		self.cselback = self.aspect2d.attachNewNode(self.cm.generate())
-		self.cselback.setScale((16/9)*self.scaleFactor, 1, 1*self.scaleFactor)
+		self.cselback.setScale(4,2,2.2)
 
-		self.tex = self.loader.loadTexture('charselect/background.png')
+		self.tex = self.loader.loadTexture('background.png')
 		self.cselback.setTexture(self.tex)
-		self.cselback.setPos(self.background_x, 0, self.background_y)
+		self.cselback.setPos(-2, 2, -1)
 
-		self.boyPreview = (self.loader.loadTexture("charselect/boy.png"))
-		self.girlPreview = (self.loader.loadTexture("charselect/girl.png"))
+		self.boyPreview = (self.loader.loadTexture("boy.png"))
+		self.girlPreview = (self.loader.loadTexture("girl.png"))
 
 		self.boySelect = DirectButton(frameTexture=self.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
 		self.girlSelect = DirectButton(frameTexture=self.girlPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
-		self.boySelect.setPos(0.67, 0, 0)
-		self.girlSelect.setPos(-0.67, 0, 0)
+		self.boySelect.setPos(1.05, 0, 0)
+		self.girlSelect.setPos(-1.05, 0, 0)
 
 		self.charButtons = [self.boySelect, self.girlSelect]
 		self.charNodes = [self.boySelect, self.girlSelect, self.cselback]
 
 		for char in self.charButtons:
 			char.setTransparency(True)
-			char.setScale((512/640) * 0.5, 0.5, 0.5)
+			char.setScale(1, 0.5, 0.5)
 		# i wish there was like a 'this' from js in python so i could see what the pressed thing is so i dont have to do this stupid stuff
 			# ^^^ incomprehendable
 		self.girlSelect["command"] = self.setCharacterA
@@ -538,6 +540,44 @@ class Game(ShowBase):
 			self.sound.stop()
 			return Task.done
 		return Task.cont
+	
+	def playVid1(self):
+		self.isPlaying = True
+		gametext.Text.hideCH(self.game_text)
+		self.speedStop = True
+		# this bg is here to prevent 3d game from being shown
+		self.blackBg = OnscreenImage(image='backstories/black.png', scale=(1000, 1, 1000))
+		self.cm = CardMaker('card')
+		self.cm.setFrameFullscreenQuad()
+		self.scaleFactorVid = 1.9
+		self.video = self.aspect2d.attachNewNode(self.cm.generate())
+		self.video.setScale(self.scaleFactorVid, 1, self.scaleFactorVid)
+
+		self.tex = MovieTexture("backstory")
+		if (self.character == 1):
+			self.tex.read('backstories/Girl.avi')
+			self.sound = self.loader.loadSfx('backstories/Girl.avi')
+			self.sound.play()
+		else:
+			self.tex.read('backstories/Boy.avi')
+			self.sound = self.loader.loadSfx('backstories/Boy.avi')
+			self.sound.play()
+		self.cm.setUvRange(self.tex)
+		self.video.setTexture(self.tex)
+
+		self.background_x = 0.125
+		self.background_y = 8/9
+		self.mainMenu()
+
+		self.video.setPos(self.background_x, 0, self.background_y)
+		self.skipText = TextNode('items')
+		self.skipText.setText("Press E to skip intro.")
+		self.skipText.setShadow(0.15, 0.15)
+		self.stnp = aspect2d.attachNewNode(self.skipText)
+		self.stnp.setPos(-1.2, 0, 0.85)
+		self.stnp.setScale(0.07)
+		time.sleep(20)
+		
 
 	def playVid(self):
 		self.isPlaying = True
@@ -573,6 +613,7 @@ class Game(ShowBase):
 		self.stnp = aspect2d.attachNewNode(self.skipText)
 		self.stnp.setPos(-1.2, 0, 0.85)
 		self.stnp.setScale(0.07)
+		
 
 	def bedDoor(self, task):
 		rot = self.camera.getH()

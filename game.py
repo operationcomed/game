@@ -43,7 +43,7 @@ class Game(ShowBase):
 
 	fog_color = (0.2, 0.3, 0.35)
 	
-	scene_rot = 0
+	scene_rot = False
 
 	speedStop = False
 
@@ -58,6 +58,10 @@ class Game(ShowBase):
 	
 	def __init__(self):
 		ShowBase.__init__(self)
+
+		self.scene_rot = open("ROT_SCENE", "r").read()
+		print(self.scene_rot)
+
 		props = WindowProperties()
 		props.set_icon_filename("icon.ico")
 		self.win.request_properties(props)
@@ -96,6 +100,7 @@ class Game(ShowBase):
 		self.scene.setShaderOff()
 		self.scene.setTwoSided(False)
 
+
 		if (doors != False):
 			self.doorRot = True
 			self.doors = self.loader.loadModel(doors)
@@ -103,10 +108,12 @@ class Game(ShowBase):
 			self.doors.reparentTo(self.render)
 			self.doors.setScale(1.5, 1.5, 1.5)
 			self.doors.setShaderOff()
-			self.doors.setHpr(0, 90, 0)
+			if (self.scene_rot):
+				self.doors.setHpr(0, 90, 0)
 
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
-		self.scene.setHpr(0, 90, 0)
+		if (self.scene_rot):
+			self.scene.setHpr(0, 90, 0)
 
 		self.scene.setCollideMask(BitMask32.bit(0))
 		self.enableParticles()

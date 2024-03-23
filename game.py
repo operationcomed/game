@@ -43,7 +43,7 @@ class Game(ShowBase):
 
 	fog_color = (0.2, 0.3, 0.35)
 	
-	scene_rot = 1
+	scene_rot = False
 
 	speedStop = False
 
@@ -54,13 +54,20 @@ class Game(ShowBase):
 
 	cameraOffset = 4.5
 	doorRot = False
+
+	stamina = 10
+	staminaCap = 10
 	
 	def __init__(self):
 		ShowBase.__init__(self)
-		
+
+		self.scene_rot = open("ROT_SCENE", "r").read()
+		print(self.scene_rot)
+
 		props = WindowProperties()
-		props.set_icon_filename("icon.png")
+		props.set_icon_filename("icon.ico")
 		self.win.request_properties(props)
+		self.font = self.loader.loadFont('zilla-slab.ttf')
 
 		# antialiasing
 		self.render.setAntialias(AntialiasAttrib.MAuto)
@@ -79,6 +86,8 @@ class Game(ShowBase):
 			
 	
 	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False):
+		self.accept("h", self.helpMenu)
+		self.stamina = self.staminaCap
 		self.music.stop()
 		self.disable_mouse()
 		
@@ -101,6 +110,7 @@ class Game(ShowBase):
 		self.scene.setShaderOff()
 		self.scene.setTwoSided(False)
 
+
 		if (doors != False):
 			self.doorRot = True
 			self.doors = self.loader.loadModel(doors)
@@ -109,12 +119,19 @@ class Game(ShowBase):
 			self.doors.setScale(1.5, 1.5, 1.5)
 			self.doors.setShaderOff()
 
+			# booleans are a mystery to humankind
+			if (self.scene_rot == True):
+				self.doors.setHpr(0, 90, 0)
+
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
-		self.scene.setHpr(0, 0, 0)
+		if (self.scene_rot == True):
+			self.scene.setHpr(0, 90, 0)
 
 		self.scene.setCollideMask(BitMask32.bit(0))
 		self.enableParticles()
 
+		self.staminaBar = DirectWaitBar(text="", value=100, pos=(-0.89, 0, -0.85), scale=(0.3), barColor=(0.1, 1, 0.2, 1), range=self.staminaCap)
+		self.sceneObjects.append(self.staminaBar)
 
 		# lights and shadows
 		alight = AmbientLight("alight1")
@@ -192,34 +209,40 @@ class Game(ShowBase):
 		# fog
 		fog = Fog("Fog")
 		fog.setColor(LVecBase4f(self.fog_color))
-		fog.setExpDensity(0.145)
+		fog.setExpDensity(0.2)
 		self.render.setFog(fog)
 
 		# text
 		
 		self.textNodePath = aspect2d.attachNewNode(self.game_text.ctlText)
 		self.textNodePath.setScale(0.07)
-		self.textNodePath.setPos(-1.2, 0, 0.9)
-
-		self.textNodePath = aspect2d.attachNewNode(self.game_text.escText)
-		self.textNodePath.setScale(0.07)
-		self.textNodePath.setPos(-1.2, 0, -0.85)
+		self.textNodePath.setPos(-1.2, 0, 0.85)
+		self.game_text.ctlText.setFont(self.font)
 		self.sceneObjects.append(self.textNodePath)
+		
+		self.stmTxtNode = aspect2d.attachNewNode(self.game_text.stmText)
+		self.stmTxtNode.setScale(0.07)
+		self.stmTxtNode.setPos(-1.2, 0, -0.78)
+		self.game_text.stmText.setFont(self.font)
+		self.sceneObjects.append(self.stmTxtNode)
 
 		self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
 		self.interactNode.setScale(0.14)
 		self.interactNode.setPos(0, 0, 0)
 		self.sceneObjects.append(self.interactNode)
+		self.game_text.itcText.setFont(self.font)
 
 		self.itmTxtNode = aspect2d.attachNewNode(self.game_text.itmText)
 		self.itmTxtNode.setScale(0.07)
-		self.itmTxtNode.setPos(1, 0, 0.9)
+		self.itmTxtNode.setPos(1, 0, 0.85)
 		self.sceneObjects.append(self.itmTxtNode)
+		self.game_text.itmText.setFont(self.font)
 
 
 	def unloadScene(self):
 		self.taskMgr.remove("moveTask")
 		self.taskMgr.remove("customTask")
+		self.ignore("h")
 		self.filters.cleanup()
 		self.game_text.itcText.setTextColor(1, 1, 1, 1)
 		for node in self.sceneObjects:
@@ -231,7 +254,8 @@ class Game(ShowBase):
 			node.remove_node()
 
 	timer = 0
-	# basic player movement
+	sprintable = False
+	# "basic" player movement
 	def moveTask(self, task):
 		button_down = self.mouseWatcherNode.is_button_down
 
@@ -253,6 +277,9 @@ class Game(ShowBase):
 		
 		props = WindowProperties()
 		if (button_down(KB.escape())):
+			props.setCursorHidden(False)
+			self.win.requestProperties(props)
+			props = self.win.getProperties()
 			has_mouse = False
 
 		# move screen with mouse
@@ -268,19 +295,28 @@ class Game(ShowBase):
 			mouse_y = self.mouseWatcherNode.getMouseY() * sensitivity
 
 			# prevent camera from going upside down
-			if (rot_y+mouse_y > 90):
-				self.camera.setHpr(rot_x-mouse_x, 90, 0)
-			elif (rot_y+mouse_y < -90):
-				self.camera.setHpr(rot_x-mouse_x, -90, 0)
-			else:
-				self.camera.setHpr(rot_x-mouse_x, rot_y+mouse_y, 0)
+			if (not self.speedStop):
+				if (rot_y+mouse_y > 90):
+					self.camera.setHpr(rot_x-mouse_x, 90, 0)
+				elif (rot_y+mouse_y < -90):
+					self.camera.setHpr(rot_x-mouse_x, -90, 0)
+				else:
+					self.camera.setHpr(rot_x-mouse_x, rot_y+mouse_y, 0)
 
 		posX = self.ppnp.getX()
 		posY = self.ppnp.getY()
 
 		self.speed = 0.025
-		if (button_down(KB.shift())):
+
+		# sprinting and stamina
+		if (button_down(KB.shift()) and self.stamina >= 0 and self.sprintable):
+			self.stamina -= 0.05
 			self.speed = 0.1
+		if (self.stamina <= 0.01):
+			self.sprintable = False
+
+		if (self.stamina < 0):
+			self.stamina = 0
 
 		if (self.speedStop):
 			self.speed = 0
@@ -290,29 +326,40 @@ class Game(ShowBase):
 		#	self.accelZ = 0
 		# movement with smooth acceleration
 		# hala may math ew
+		staminaGain = True
 		if (button_down(KB_BUTTON('w'))):
 			self.accelY += self.speed * cos(rot_x * (pi/180))
 			self.accelX -= self.speed * sin(rot_x * (pi/180))
+			staminaGain = False
 		if (button_down(KB_BUTTON('s'))):
 			self.accelY -= self.speed * cos(rot_x * (pi/180))
 			self.accelX += self.speed * sin(rot_x * (pi/180))
+			staminaGain = False
 		if (button_down(KB_BUTTON('d'))):
 			self.accelY += self.speed * sin(rot_x * (pi/180))
 			self.accelX += self.speed * cos(rot_x * (pi/180))
+			staminaGain = False
 		if (button_down(KB_BUTTON('a'))):
 			self.accelY -= self.speed * sin(rot_x * (pi/180))
 			self.accelX -= self.speed * cos(rot_x * (pi/180))
+			staminaGain = False
+
+		if (self.staminaCap > self.stamina and staminaGain):
+			self.stamina += 0.025
+		elif (self.stamina >= self.staminaCap):
+			self.stamina = self.staminaCap
+			self.sprintable = True
 		# jumping (note, for debugging purposes only)
 		if (button_down(KB.space())):
 			self.ppnp.setZ(self.ppnp.getZ()+0.1)
 
 		# misc
-		if (button_down(KB_BUTTON('m'))):
-			gametext.Text.hideText(self.game_text)
-			self.unloadScene()
-		if (button_down(KB_BUTTON('n'))):
-			gametext.Text.showText(self.game_text)
-		# temp fix for bug
+		#if (button_down(KB_BUTTON('m'))):
+		#	gametext.Text.hideText(self.game_text)
+		#	self.unloadScene()
+		#if (button_down(KB_BUTTON('n'))):
+		#	gametext.Text.showText(self.game_text)
+		# fix for bug
 		if (button_down(KB_BUTTON('o')) and self.timer <= 0):
 			if (self.scene_rot):
 				self.scene.setHpr(0, 0, 0)
@@ -340,7 +387,7 @@ class Game(ShowBase):
 			while ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.04): 
 				self.accelY *= 0.9
 				self.accelX *= 0.9
-		# player
+				
 				
 		# see if the player has fallen off of the world
 		if (self.ppnp.getZ() < -5):
@@ -350,10 +397,24 @@ class Game(ShowBase):
 		self.camera.setPos(self.ppnp.getPos())
 		self.camera.setZ(self.ppnp.getZ() + self.cameraOffset)
 
+		self.staminaBar["value"] = self.stamina
+
 		return Task.cont
 		
+	helpDisplay = False
+	def helpMenu(self):
+		self.helpDisplay = not self.helpDisplay
+		if (self.helpDisplay):
+			self.helpMenuImg = OnscreenImage(image='helpMenu.png', scale=(16/9, 1, 1))
+			self.helpMenuImg.setTransparency(TransparencyAttrib.MAlpha)
+			self.textNodePath.hide()
+		else:
+			self.helpMenuImg.destroy()
+			self.textNodePath.show()
+
 
 	def mainMenu(self):
+		self.sensitivity = 0.025
 		self.scaleFactor = 3
 		self.scaleFactorLogo = 0.2
 	
@@ -378,7 +439,11 @@ class Game(ShowBase):
 		self.card.setScale((16/8)*self.scaleFactor, 1, 1*self.scaleFactor)
 		self.logo.setScale((746/168)*self.scaleFactorLogo, 1, 1*self.scaleFactorLogo)
 
+<<<<<<< HEAD
 		self.tex = self.loader.loadTexture('bg.avi')
+=======
+		self.tex = self.loader.loadTexture('bkgnew.png')
+>>>>>>> origin/steph
 		self.card.setTexture(self.tex)
 		self.tex = self.loader.loadTexture('logo.png')
 		self.logo.setTexture(self.tex)
@@ -390,7 +455,7 @@ class Game(ShowBase):
 		self.logo_y = -0.5*self.scaleFactorLogo
 
 		self.card.setPos(self.background_x, 0, self.background_y)
-		self.logo.setPos(self.logo_x + x_offset + -0.1, 0, self.logo_y + 0.5)
+		self.logo.setPos(self.logo_x + x_offset, 0, self.logo_y + 0.5)
 		self.logo.setTransparency(TransparencyAttrib.MAlpha)
 
 		# buttons
@@ -418,9 +483,9 @@ class Game(ShowBase):
 		# positioning the offsets to be relative to the window bounds
 		# but noooooooooo i guess we have to do it this way
 		# :( 
-		self.startGameButton.setPos(x_offset, 0, 0.1)
+		self.startGameButton.setPos(x_offset, 0, 0)
 		self.settingsButton.setPos(x_offset, 0, -0.2)
-		self.exitGameButton.setPos(x_offset, 0, -0.3)
+		self.exitGameButton.setPos(x_offset, 0, -0.4)
 		self.muteButton.setPos(1.7, -1.5, -0.8)
 
 		self.menuItems = [self.video, self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton,]
@@ -444,12 +509,11 @@ class Game(ShowBase):
 		
 		
 	def moveBackground(self, task):
-		sensitivity = 0.05
 		self.background_move_x = self.background_x
 		self.background_move_y = self.background_y
 		if (self.mouseWatcherNode.hasMouse()):
-			self.background_move_x += (self.mouseWatcherNode.getMouseX() * sensitivity)
-			self.background_move_y += (self.mouseWatcherNode.getMouseY() * sensitivity)
+			self.background_move_x += (-self.mouseWatcherNode.getMouseX() * self.sensitivity)
+			self.background_move_y += (-self.mouseWatcherNode.getMouseY() * self.sensitivity)
 			self.card.setPos(self.background_move_x, 0, self.background_move_y)
 		return Task.cont
 	
@@ -483,23 +547,44 @@ class Game(ShowBase):
 		self.characterSelect()
 
 	def characterSelect(self):
+<<<<<<< HEAD
 		self.cselback = self.aspect2d.attachNewNode(self.cm.generate())
 		self.cselback.setScale(4,2,2.2)
 
 		self.tex = self.loader.loadTexture('background.png')
 		self.cselback.setTexture(self.tex)
 		self.cselback.setPos(-2, 2, -1)
+=======
+		self.sensitivity = 0.005
+		self.scaleFactorCS = 2.25
+		self.background_x = (-16/18)*self.scaleFactorCS
+		self.background_y = -0.5*self.scaleFactorCS
+		self.card = self.aspect2d.attachNewNode(self.cm.generate())
+		self.card.setScale((16/9)*self.scaleFactorCS, 1, 1*self.scaleFactorCS)
+
+		self.tex = self.loader.loadTexture('charselect/background.png')
+		self.card.setTexture(self.tex)
+		self.card.setPos(self.background_x, 0, self.background_y)
+>>>>>>> origin/steph
 
 		self.boyPreview = (self.loader.loadTexture("boy.png"))
 		self.girlPreview = (self.loader.loadTexture("girl.png"))
 
 		self.boySelect = DirectButton(frameTexture=self.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
 		self.girlSelect = DirectButton(frameTexture=self.girlPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
+<<<<<<< HEAD
 		self.boySelect.setPos(1.05, 0, 0)
 		self.girlSelect.setPos(-1.05, 0, 0)
+=======
+		charDistance = 1.05
+		self.boySelect.setPos(charDistance, 0, -0.25)
+		self.girlSelect.setPos(-charDistance, 0, -0.25)
+>>>>>>> origin/steph
 
 		self.charButtons = [self.boySelect, self.girlSelect]
-		self.charNodes = [self.boySelect, self.girlSelect, self.cselback]
+		self.charNodes = [self.boySelect, self.girlSelect, self.card]
+
+		self.taskMgr.add(self.moveBackground, "moveBackground")
 
 		for char in self.charButtons:
 			char.setTransparency(True)
@@ -520,17 +605,19 @@ class Game(ShowBase):
 	def setCharacter(self):
 		print(self.character)
 		
+		self.taskMgr.remove("moveBackground")
 		for node in self.charNodes:
 			node.removeNode()
 
 		# bed scene
 		self.cameraOffset = 4
 		self.loadScene("bed.glb", (3.5, 6, 1.42), (0, 0, 10), False, self.bedDoor, (180, -90, 0))
+		self.helpMenu()
 		self.taskMgr.add(self.backstory, "backstory")
 
 	isPlaying = False
 	def backstory(self, task):
-		
+		self.staminaBar.hide()
 		if (not self.isPlaying):
 			self.playVid()
 
@@ -543,6 +630,7 @@ class Game(ShowBase):
 			self.skipText.setText("")
 			self.blackBg.destroy()
 			self.sound.stop()
+			self.staminaBar.show()
 			return Task.done
 		return Task.cont
 	
@@ -608,13 +696,14 @@ class Game(ShowBase):
 		self.cm.setUvRange(self.tex)
 		self.video.setTexture(self.tex)
 
-		self.background_x = 0.125
-		self.background_y = 8/9
+		self.background_x = 0.115
+		self.background_y = 0.899
 
 		self.video.setPos(self.background_x, 0, self.background_y)
 		self.skipText = TextNode('items')
 		self.skipText.setText("Press E to skip intro.")
 		self.skipText.setShadow(0.15, 0.15)
+		self.skipText.setFont(self.font)
 		self.stnp = aspect2d.attachNewNode(self.skipText)
 		self.stnp.setPos(-1.2, 0, 0.85)
 		self.stnp.setScale(0.07)
@@ -650,6 +739,7 @@ class Game(ShowBase):
 	
 	missionShow = False
 	initItemsDone = False
+	missionDone = False
 	itemsGotten = 0
 	def mission(self, task):
 		crosshair = self.game_text.itcText
@@ -681,6 +771,10 @@ class Game(ShowBase):
 
 		posX = self.camera.getX()
 		posY = self.camera.getY()
+		if (self.itemsGotten >= 5 and not self.missionDone):
+			self.missionDone = True
+			self.game_text.itmText.setTextColor(0, 1, 0.5, 1)
+			self.game_text.itmText.setText(self.game_text.itmText.getText() + "\n" + "You can escape through the door now!")
 		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 5):
 			crosshair.setTextColor(1, 0.5, 0, 1)
 			doorInteract = True
@@ -691,7 +785,6 @@ class Game(ShowBase):
 		if (button_down(KB_BUTTON('e')) and doorInteract):
 			self.unloadScene()
 			self.game_text.ctlText.setText("")
-			self.game_text.escText.setText("")
 			self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
 			self.interactNode.setScale(0.14)
 			self.interactNode.setPos(-0.5, 0, 0)

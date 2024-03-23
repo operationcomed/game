@@ -66,7 +66,10 @@ class Game(ShowBase):
 		self.render.setAntialias(AntialiasAttrib.MAuto)
 		
 		self.render.setShaderAuto()
-
+		loadingImage = OnscreenImage(image = 'bg.avi', pos = (0, 0, 0.0), parent=render2d)
+		base.graphicsEngine.renderFrame()
+		base.graphicsEngine.renderFrame()
+		loadingImage.destroy()
 		# camera
 		
 		self.mainMenu()

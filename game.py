@@ -139,6 +139,7 @@ class Game(ShowBase):
 		self.enableParticles()
 
 		self.staminaBar = DirectWaitBar(text="", value=100, pos=(-0.89, 0, -0.85), scale=(0.3), range=self.staminaCap)
+		self.staminaBar["barColor"] = (0.1, 1, 0.2, 1)
 		self.sceneObjects.append(self.staminaBar)
 
 		# lights and shadows
@@ -369,7 +370,7 @@ class Game(ShowBase):
 			self.stamina = self.staminaCap
 			self.sprintable = True
 		# jumping (note, for debugging purposes only)
-		if (button_down(KB.space())):
+		if (button_down(KB.space()) and not self.speedStop):
 			self.ppnp.setZ(self.ppnp.getZ()+0.1)
 
 		# misc
@@ -402,8 +403,9 @@ class Game(ShowBase):
 		posX += self.accelX
 
 		# the speed is faster when you're going diagonally since we apply the acceleration like a square instead of a circle (?)
-		if ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.04):
-			while ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.04): 
+		print(round((self.accelX * self.accelX) + (self.accelY * self.accelY), 3))
+		if ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.01):
+			while ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.01): 
 				self.accelY *= 0.9
 				self.accelX *= 0.9
 				
@@ -501,7 +503,7 @@ class Game(ShowBase):
 		self.startGameButton.setPos(x_offset, 0, 0)
 		self.settingsButton.setPos(x_offset, 0, -0.2)
 		self.exitGameButton.setPos(x_offset, 0, -0.4)
-		self.muteButton.setPos(1.7, -1.5, -0.8)
+		self.muteButton.setPos(1.575, -1.5, -0.8)
 
 		self.menuItems = [self.video, self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton,]
 

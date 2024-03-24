@@ -403,7 +403,6 @@ class Game(ShowBase):
 		posX += self.accelX
 
 		# the speed is faster when you're going diagonally since we apply the acceleration like a square instead of a circle (?)
-		print(round((self.accelX * self.accelX) + (self.accelY * self.accelY), 3))
 		if ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.01):
 			while ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.01): 
 				self.accelY *= 0.9

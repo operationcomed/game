@@ -27,6 +27,7 @@ loadPrcFileData("", "multisamples 4")
 loadPrcFileData("", "window-title Escape MSU")
 loadPrcFileData("", 'win-size 1366 720') 
 loadPrcFileData("", "default-fov 60")
+loadPrcFileData("", "show-frame-rate-meter true")
 
 loadPrcFileData("", "shadow-cube-map-filter true")
 
@@ -304,8 +305,9 @@ class Game(ShowBase):
 
 		# sprinting and stamina
 		if (button_down(KB.shift()) and self.stamina >= 0 and self.sprintable):
-			self.stamina -= 0.05
 			self.speed = 0.1
+			if (button_down(KB_BUTTON('w')) or button_down(KB_BUTTON('a')) or button_down(KB_BUTTON('s')) or button_down(KB_BUTTON('d'))):
+				self.stamina -= 0.05
 		if (self.stamina <= 0.01):
 			self.sprintable = False
 

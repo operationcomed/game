@@ -61,6 +61,9 @@ class Game(ShowBase):
 	
 	def __init__(self):
 		ShowBase.__init__(self)
+		self.accept("f11", self.toggleFullscreen)
+		self.accept("x", exit)
+		self.accept("shift-x", exit)
 
 		self.scene_rot = open("ROT_SCENE", "r").read()
 		print(self.scene_rot)
@@ -79,6 +82,16 @@ class Game(ShowBase):
 		self.camLens.setNearFar(1, 1000)
 		#video before main menu
 		self.mainMenu()
+
+	fullscreen = False
+	def toggleFullscreen(self):
+		props = WindowProperties()
+		if (self.fullscreen == False):
+			props.setFullscreen(True)
+		else:
+			props.setFullscreen(False)
+		self.win.request_properties(props)
+		self.fullscreen = not self.fullscreen
 	
 	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False):
 		self.accept("h", self.helpMenu)
@@ -125,7 +138,7 @@ class Game(ShowBase):
 		self.scene.setCollideMask(BitMask32.bit(0))
 		self.enableParticles()
 
-		self.staminaBar = DirectWaitBar(text="", value=100, pos=(-0.89, 0, -0.85), scale=(0.3), barColor=(0.1, 1, 0.2, 1), range=self.staminaCap)
+		self.staminaBar = DirectWaitBar(text="", value=100, pos=(-0.89, 0, -0.85), scale=(0.3), range=self.staminaCap)
 		self.sceneObjects.append(self.staminaBar)
 
 		# lights and shadows
@@ -165,7 +178,6 @@ class Game(ShowBase):
 
 		self.playerPhysics = ActorNode("player-physics")
 		self.ppnp = self.render.attachNewNode(self.playerPhysics)
-		self.ppnp.setPos(playerPos)
 		if (playerRot != False):
 			self.camera.setHpr(playerRot)
 		self.physicsMgr.attachPhysicalNode(self.playerPhysics)
@@ -180,6 +192,8 @@ class Game(ShowBase):
 		self.playerPhysics.getPhysicsObject().setMass(45)
 
 		self.playerCharacter.reparentTo(self.ppnp)
+		
+		self.ppnp.setPos(playerPos)
 		#self.ppnp.reparentTo(self.camera)
 		self.playerCharacter.loop("walk")
 
@@ -232,9 +246,13 @@ class Game(ShowBase):
 		self.itmTxtNode.setPos(1, 0, 0.85)
 		self.sceneObjects.append(self.itmTxtNode)
 		self.game_text.itmText.setFont(self.font)
+		print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
 
 
 	def unloadScene(self):
+		self.accelX = 0
+		self.accelY = 0
+		self.accelZ = 0
 		self.taskMgr.remove("moveTask")
 		self.taskMgr.remove("customTask")
 		self.ignore("h")
@@ -250,6 +268,7 @@ class Game(ShowBase):
 
 	timer = 0
 	sprintable = False
+	barColored = 0
 	# "basic" player movement
 	def moveTask(self, task):
 		button_down = self.mouseWatcherNode.is_button_down
@@ -259,9 +278,6 @@ class Game(ShowBase):
 			print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
 		if (button_down(KB_BUTTON('l'))):
 			print("H:", round(self.camera.getH(), 3), "P:", round(self.camera.getP(), 3), "R:", round(self.camera.getR(), 3))
-
-		if (button_down(KB_BUTTON('x'))):
-			exit()
 
 		has_mouse = self.mouseWatcherNode.hasMouse()
 		rot_x = self.camera.getH()
@@ -316,6 +332,13 @@ class Game(ShowBase):
 
 		if (self.speedStop):
 			self.speed = 0
+
+		if (self.sprintable == False and not self.barColored == 1):
+			self.staminaBar["barColor"] = (1, 0.4, 0.2, 1)
+			self.barColored = 1
+		elif (self.sprintable == True and not self.barColored == 2):
+			self.staminaBar["barColor"] = (0.1, 1, 0.2, 1)
+			self.barColored = 2
 		# primitive ground collision checking
 		#if (posZ < GROUND_POS):
 		#	posZ = GROUND_POS
@@ -672,7 +695,7 @@ class Game(ShowBase):
 		if (button_down(KB_BUTTON('e')) and doorInteract):
 			self.unloadScene()
 			self.cameraOffset = 4
-			self.loadScene("inf.glb", (-16.93, 6.982, 0.414), (0, 0, 10.5), "door.glb", self.mission)
+			self.loadScene("inf.glb", (-17.0, 6.25, 5.414), (0, 0, 10.5), "door.glb", self.mission)
 		return Task.cont
 	
 	missionShow = False
@@ -701,6 +724,9 @@ class Game(ShowBase):
 			i = 0
 			for itemPos in self.itemList:
 				if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
+					pickup = self.loader.loadSfx('pickup.wav')
+					pickup.setLoop(False)
+					pickup.play()
 					self.items[i].removeNode()
 					self.itemsGotten += 1
 					self.game_text.itmText.setText(self.game_text.itmText.getText() + "\n" + itemPos[2])
@@ -710,6 +736,9 @@ class Game(ShowBase):
 		posX = self.camera.getX()
 		posY = self.camera.getY()
 		if (self.itemsGotten >= 5 and not self.missionDone):
+			doneSound = self.loader.loadSfx('done.mp3')
+			doneSound.setLoop(False)
+			doneSound.play()
 			self.missionDone = True
 			self.game_text.itmText.setTextColor(0, 1, 0.5, 1)
 			self.game_text.itmText.setText(self.game_text.itmText.getText() + "\n" + "You can escape through the door now!")

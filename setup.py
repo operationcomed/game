@@ -5,6 +5,7 @@ setup(
     name='escapemsu',
     options={
         'build_apps': {
+			'platforms': ['win_amd64'],
             # Build asteroids.exe as a GUI application
             'gui_apps': {
                 'escapemsu': 'main.py',

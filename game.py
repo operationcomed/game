@@ -12,6 +12,7 @@ from direct.gui.DirectGui import *
 from panda3d.physics import ActorNode, ForceNode, LinearVectorForce, PhysicsCollisionHandler
 import time
 import gametext
+import direct.particles
 
 # function shorthand
 KB_BUTTON = KeyboardButton.ascii_key
@@ -62,16 +63,16 @@ class Game(ShowBase):
 	def __init__(self):
 		ShowBase.__init__(self)
 		self.accept("f11", self.toggleFullscreen)
-		self.accept("x", exit)
-		self.accept("shift-x", exit)
+		self.accept("x", self.exitGame)
+		self.accept("shift-x", self.exitGame)
 
-		self.scene_rot = open("ROT_SCENE", "r").read()
+		self.scene_rot = open("assets/ROT_SCENE", "r").read()
 		print(self.scene_rot)
 
 		props = WindowProperties()
 		props.set_icon_filename("icon.ico")
 		self.win.request_properties(props)
-		self.font = self.loader.loadFont('zilla-slab.ttf')
+		self.font = self.loader.loadFont('assets/fonts/zilla-slab.ttf')
 
 		# antialiasing
 		self.render.setAntialias(AntialiasAttrib.MAuto)
@@ -164,7 +165,7 @@ class Game(ShowBase):
 		self.render.setLight(alnp)
 		self.setBackgroundColor(self.fog_color)
 
-		self.sunActor = Actor("models/smiley")
+		self.sunActor = Actor("assets/models/ball.glb")
 		self.sceneObjects.append(self.sunActor)
 
 		self.sunActor.reparentTo(self.slnp)
@@ -425,7 +426,7 @@ class Game(ShowBase):
 	def helpMenu(self):
 		self.helpDisplay = not self.helpDisplay
 		if (self.helpDisplay):
-			self.helpMenuImg = OnscreenImage(image='helpMenu.png', scale=(16/9, 1, 1))
+			self.helpMenuImg = OnscreenImage(image='assets/media/helpMenu.png', scale=(16/9, 1, 1))
 			self.helpMenuImg.setTransparency(TransparencyAttrib.MAlpha)
 			self.textNodePath.hide()
 		else:
@@ -441,10 +442,10 @@ class Game(ShowBase):
 		self.cm = CardMaker('video')
 		self.video = self.aspect2d.attachNewNode(self.cm.generate())
 		self.video.setScale((2))
-		self.tex = self.loader.loadTexture('helloworld.avi')
+		self.tex = self.loader.loadTexture('assets/media/helloworld.avi')
 		self.video.setTexture(self.tex)
 		
-		self.music = self.loader.loadSfx("main_menu.mp3")
+		self.music = self.loader.loadSfx("assets/sound/main_menu.mp3")
 		self.music.setVolume(0.75)
 		self.music.setLoop(True)
 		self.music.play()
@@ -459,9 +460,9 @@ class Game(ShowBase):
 		self.card.setScale((16/9)*self.scaleFactor, 1, 1*self.scaleFactor)
 		self.logo.setScale((746/168)*self.scaleFactorLogo, 1, 1*self.scaleFactorLogo)
 
-		self.tex = self.loader.loadTexture('bkgnew.png')
+		self.tex = self.loader.loadTexture('assets/media/bkgnew.png')
 		self.card.setTexture(self.tex)
-		self.tex = self.loader.loadTexture('logo.png')
+		self.tex = self.loader.loadTexture('assets/media/logo.png')
 		self.logo.setTexture(self.tex)
 
 		# these are the centers of the images
@@ -475,7 +476,7 @@ class Game(ShowBase):
 		self.logo.setTransparency(TransparencyAttrib.MAlpha)
 
 		# buttons
-		playTexture = (self.loader.loadTexture("buttons/play_normal.png"), self.loader.loadTexture("buttons/play_normal.png"), self.loader.loadTexture("buttons/play_hover.png"), self.loader.loadTexture("buttons/play_normal.png"))
+		playTexture = (self.loader.loadTexture("assets/buttons/play_normal.png"), self.loader.loadTexture("assets/buttons/play_normal.png"), self.loader.loadTexture("assets/buttons/play_hover.png"), self.loader.loadTexture("assets/buttons/play_normal.png"))
 		self.startGameButton = DirectButton(command=self.initGame, frameTexture=playTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		self.startGameButton.setTransparency(True)
 		self.startGameButton.setSx(482/226)
@@ -483,14 +484,14 @@ class Game(ShowBase):
 		# unused for the time being
 		self.settingsButton = DirectButton(text="Settings")
 
-		exitGameTexture = (self.loader.loadTexture("buttons/exit_normal.png"), self.loader.loadTexture("buttons/exit_normal.png"), self.loader.loadTexture("buttons/exit_hover.png"), self.loader.loadTexture("buttons/exit_normal.png"))
+		exitGameTexture = (self.loader.loadTexture("assets/buttons/exit_normal.png"), self.loader.loadTexture("assets/buttons/exit_normal.png"), self.loader.loadTexture("assets/buttons/exit_hover.png"), self.loader.loadTexture("assets/buttons/exit_normal.png"))
 		self.exitGameButton = DirectButton(command=self.exitGame, frameTexture=exitGameTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		self.exitGameButton.setTransparency(True)
 		self.exitGameButton.setSx(482/226)
 
 		
-		self.muteTexture = (self.loader.loadTexture("buttons/mute.png"))
-		self.unmuteTexture = (self.loader.loadTexture("buttons/unmute.png"))
+		self.muteTexture = (self.loader.loadTexture("assets/buttons/mute.png"))
+		self.unmuteTexture = (self.loader.loadTexture("assets/buttons/unmute.png"))
 		self.muteButton = DirectButton(command=self.mute, frameTexture=self.muteTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		self.muteButton.setTransparency(True)
 		self.muteButton.setSx(1)
@@ -569,12 +570,12 @@ class Game(ShowBase):
 		self.card = self.aspect2d.attachNewNode(self.cm.generate())
 		self.card.setScale((16/9)*self.scaleFactorCS, 1, 1*self.scaleFactorCS)
 
-		self.tex = self.loader.loadTexture('charselect/background.png')
+		self.tex = self.loader.loadTexture('assets/charselect/background.png')
 		self.card.setTexture(self.tex)
 		self.card.setPos(self.background_x, 0, self.background_y)
 
-		self.boyPreview = (self.loader.loadTexture("charselect/boy.png"))
-		self.girlPreview = (self.loader.loadTexture("charselect/girl.png"))
+		self.boyPreview = (self.loader.loadTexture("assets/charselect/boy.png"))
+		self.girlPreview = (self.loader.loadTexture("assets/charselect/girl.png"))
 
 		self.boySelect = DirectButton(frameTexture=self.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
 		self.girlSelect = DirectButton(frameTexture=self.girlPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
@@ -612,7 +613,7 @@ class Game(ShowBase):
 
 		# bed scene
 		self.cameraOffset = 4
-		self.loadScene("bed.glb", (3.5, 6, 1.42), (0, 0, 10), False, self.bedDoor, (180, -90, 0))
+		self.loadScene("assets/models/bed.glb", (3.5, 6, 1.42), (0, 0, 10), False, self.bedDoor, (180, -90, 0))
 		self.helpMenu()
 		self.taskMgr.add(self.backstory, "backstory")
 
@@ -640,7 +641,7 @@ class Game(ShowBase):
 		gametext.Text.hideCH(self.game_text)
 		self.speedStop = True
 		# this bg is here to prevent 3d game from being shown
-		self.blackBg = OnscreenImage(image='backstories/black.png', scale=(1000, 1, 1000))
+		self.blackBg = OnscreenImage(image='assets/backstories/black.png', scale=(1000, 1, 1000))
 		self.cm = CardMaker('card')
 		self.cm.setFrameFullscreenQuad()
 		self.scaleFactorVid = 1.9
@@ -649,12 +650,12 @@ class Game(ShowBase):
 
 		self.tex = MovieTexture("backstory")
 		if (self.character == 1):
-			self.tex.read('backstories/Girl.avi')
-			self.sound = self.loader.loadSfx('backstories/Girl.avi')
+			self.tex.read('assets/backstories/Girl.avi')
+			self.sound = self.loader.loadSfx('assets/backstories/Girl.avi')
 			self.sound.play()
 		else:
-			self.tex.read('backstories/Boy.avi')
-			self.sound = self.loader.loadSfx('backstories/Boy.avi')
+			self.tex.read('assets/backstories/Boy.avi')
+			self.sound = self.loader.loadSfx('assets/backstories/Boy.avi')
 			self.sound.play()
 		self.cm.setUvRange(self.tex)
 		self.video.setTexture(self.tex)
@@ -696,7 +697,7 @@ class Game(ShowBase):
 		if (button_down(KB_BUTTON('e')) and doorInteract):
 			self.unloadScene()
 			self.cameraOffset = 4
-			self.loadScene("inf.glb", (-17.0, 6.25, 5.414), (0, 0, 10.5), "door.glb", self.mission)
+			self.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 10.5), "assets/models/door.glb", self.mission)
 		return Task.cont
 	
 	missionShow = False
@@ -725,7 +726,7 @@ class Game(ShowBase):
 			i = 0
 			for itemPos in self.itemList:
 				if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
-					pickup = self.loader.loadSfx('pickup.wav')
+					pickup = self.loader.loadSfx('assets/sound/pickup.wav')
 					pickup.setLoop(False)
 					pickup.play()
 					self.items[i].removeNode()
@@ -737,7 +738,7 @@ class Game(ShowBase):
 		posX = self.camera.getX()
 		posY = self.camera.getY()
 		if (self.itemsGotten >= 5 and not self.missionDone):
-			doneSound = self.loader.loadSfx('done.mp3')
+			doneSound = self.loader.loadSfx('assets/sound/done.mp3')
 			doneSound.setLoop(False)
 			doneSound.play()
 			self.missionDone = True
@@ -772,7 +773,7 @@ class Game(ShowBase):
 			item = self.render.attachNewNode(self.cm.generate())
 			item.setScale(self.scaleFactorItem, 1, self.scaleFactorItem)
 
-			tex = self.loader.loadTexture('items/' + itemPath[0] + '.png')
+			tex = self.loader.loadTexture('assets/items/' + itemPath[0] + '.png')
 			item.setTexture(tex)
 
 			item.setPos(itemPath[1])
@@ -790,7 +791,7 @@ class Game(ShowBase):
 		self.missionImg = self.aspect2d.attachNewNode(self.cm.generate())
 		self.missionImg.setScale((16/9)*self.scaleFactorMission, 1, self.scaleFactorMission)
 
-		self.tex = self.loader.loadTexture('missions/1.png')
+		self.tex = self.loader.loadTexture('assets/missions/1.png')
 		self.missionImg.setTexture(self.tex)
 
 		# these are the centers of the image

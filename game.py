@@ -59,6 +59,8 @@ class Game(ShowBase):
 
 	stamina = 10
 	staminaCap = 10
+
+	sceneScale = (1.5, 1.5, 1.5)
 	
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -94,7 +96,7 @@ class Game(ShowBase):
 		self.win.request_properties(props)
 		self.fullscreen = not self.fullscreen
 	
-	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False):
+	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False):
 		self.accept("h", self.helpMenu)
 		self.stamina = self.staminaCap
 		self.music.stop()
@@ -114,7 +116,7 @@ class Game(ShowBase):
 		self.scene = self.loader.loadModel(scene)
 		self.sceneObjects.append(self.scene)
 		self.scene.reparentTo(self.render)
-		self.scene.setScale(1.5, 1.5, 1.5)
+		self.scene.setScale(self.sceneScale)
 		#self.scene.setPos(0, 128, 6.8)
 		self.scene.setShaderOff()
 		self.scene.setTwoSided(False)
@@ -125,7 +127,7 @@ class Game(ShowBase):
 			self.doors = self.loader.loadModel(doors)
 			self.sceneObjects.append(self.doors)
 			self.doors.reparentTo(self.render)
-			self.doors.setScale(1.5, 1.5, 1.5)
+			self.doors.setScale(self.sceneScale)
 			self.doors.setShaderOff()
 
 			# booleans are a mystery to humankind
@@ -136,7 +138,16 @@ class Game(ShowBase):
 		if (self.scene_rot == True):
 			self.scene.setHpr(0, 90, 0)
 
-		self.scene.setCollideMask(BitMask32.bit(0))
+		if (collisionMap == False):
+			self.scene.setCollideMask(BitMask32.bit(0))
+		else:
+			self.collisionMap = self.loader.loadModel(collisionMap)
+			self.sceneObjects.append(self.collisionMap)
+			self.collisionMap.reparentTo(self.render)
+			self.collisionMap.setScale(self.sceneScale)
+			self.collisionMap.setShaderOff()
+			self.collisionMap.hide()
+			self.collisionMap.setCollideMask(BitMask32.bit(0))
 		self.enableParticles()
 
 		self.staminaBar = DirectWaitBar(text="", value=100, pos=(-0.89, 0, -0.85), scale=(0.3), range=self.staminaCap)
@@ -613,7 +624,7 @@ class Game(ShowBase):
 
 		# bed scene
 		self.cameraOffset = 4
-		self.loadScene("assets/models/bed.glb", (3.5, 6, 1.42), (0, 0, 10), False, self.bedDoor, (180, -90, 0))
+		self.loadScene("assets/models/bed.glb", (3.5, 6, 1.42), (0, 0, 10), doors=False, customTask=self.bedDoor, playerRot=(180, -90, 0))
 		self.helpMenu()
 		self.taskMgr.add(self.backstory, "backstory")
 

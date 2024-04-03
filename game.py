@@ -31,6 +31,11 @@ loadPrcFileData("", "default-fov 60")
 loadPrcFileData("", "show-frame-rate-meter true")
 
 loadPrcFileData("", "shadow-cube-map-filter true")
+loadPrcFileData("", """
+    text-minfilter linear
+    text-magfilter linear
+    text-pixels-per-unit 32
+""")
 
 class Game(ShowBase):
 
@@ -61,7 +66,10 @@ class Game(ShowBase):
 	staminaCap = 10
 
 	sceneScale = (1.5, 1.5, 1.5)
-	
+
+	staminaRed = (1, 0.4, 0.2, 1)
+	staminaGreen = (0.3, 1, 0.5, 1)
+
 	def __init__(self):
 		ShowBase.__init__(self)
 		self.accept("f11", self.toggleFullscreen)
@@ -117,8 +125,8 @@ class Game(ShowBase):
 		self.sceneObjects.append(self.scene)
 		self.scene.reparentTo(self.render)
 		self.scene.setScale(self.sceneScale)
-		#self.scene.setPos(0, 128, 6.8)
 		self.scene.setShaderOff()
+		#self.scene.applyTextureColors()
 		self.scene.setTwoSided(False)
 
 
@@ -150,8 +158,22 @@ class Game(ShowBase):
 			self.collisionMap.setCollideMask(BitMask32.bit(0))
 		self.enableParticles()
 
-		self.staminaBar = DirectWaitBar(text="", value=100, pos=(-0.89, 0, -0.85), scale=(0.3), range=self.staminaCap)
-		self.staminaBar["barColor"] = (0.1, 1, 0.2, 1)
+		# https://discourse.panda3d.org/t/directgui-directwaitbar/1761/2 (from 2006!)
+		staminaBg = loader.loadTexture("assets/buttons/stm_bkg.png")
+		staminaFg = loader.loadTexture("assets/buttons/stm_fg.png")
+		self.staminaBar = DirectWaitBar(frameSize=(0, 2, 0, 0.2), text="", value=100, pos=(-1.2, 0, -0.85), scale=(0.4), range=self.staminaCap, frameColor=(1, 1, 1, 0.8), frameTexture=staminaBg)
+		
+		self.staminaBar.setTransparency(TransparencyAttrib.MAlpha)
+		self.staminaBar["barColor"] = self.staminaGreen
+		self.staminaBar.barStyle.setTexture(staminaFg)
+		self.staminaBar.updateBarStyle()
+
+		ts = TextureStage.getDefault()
+		self.staminaBar.setTexGen(ts, TexGenAttrib.MWorldPosition)
+		self.staminaBar.setTexProjector(ts, self.render2d, self.staminaBar)
+		self.staminaBar.setTexHpr(ts, 0, -90, 0)
+		self.staminaBar.setTexScale(ts, 1/2, 1, 1/0.2)
+
 		self.sceneObjects.append(self.staminaBar)
 
 		# lights and shadows
@@ -244,7 +266,7 @@ class Game(ShowBase):
 		
 		self.stmTxtNode = aspect2d.attachNewNode(self.game_text.stmText)
 		self.stmTxtNode.setScale(0.07)
-		self.stmTxtNode.setPos(-1.2, 0, -0.78)
+		self.stmTxtNode.setPos(-1.2, 0, -0.73)
 		self.game_text.stmText.setFont(self.font)
 		self.sceneObjects.append(self.stmTxtNode)
 
@@ -347,10 +369,10 @@ class Game(ShowBase):
 			self.speed = 0
 
 		if (self.sprintable == False and not self.barColored == 1):
-			self.staminaBar["barColor"] = (1, 0.4, 0.2, 1)
+			self.staminaBar["barColor"] = self.staminaRed
 			self.barColored = 1
 		elif (self.sprintable == True and not self.barColored == 2):
-			self.staminaBar["barColor"] = (0.1, 1, 0.2, 1)
+			self.staminaBar["barColor"] = self.staminaGreen
 			self.barColored = 2
 		# primitive ground collision checking
 		#if (posZ < GROUND_POS):
@@ -722,10 +744,12 @@ class Game(ShowBase):
 			self.missionShow = True
 			self.speedStop = True
 			self.showMission()
+			self.staminaBar.hide()
 		
 		if (button_down(KB_BUTTON('e')) and self.missionShow and self.speedStop == True and task.time >= 0.1):
 			self.speedStop = False
 			self.missionImg.removeNode()
+			self.staminaBar.show()
 			gametext.Text.showText(self.game_text)
 		
 		if (not self.initItemsDone):

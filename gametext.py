@@ -27,16 +27,18 @@ class Text():
 	itcText.setText("+")
 	itcText.setShadow(0.07, 0.07)
 
+	text_list = [ctlText, stmText, itmText] 
+
 
 	def hideText(self):
-		# 100% easier by loading and unloading these procedurally thru a text file
-		self.ctlText.setText("")
-		self.stmText.setText("")
+		for node in self.text_list:
+			node.setTextColor(1, 1, 1, 0)
+			node.setShadowColor(0, 0, 0, 0)
 
 	def showText(self):
-		# 100% easier by loading and unloading these procedurally thru a text file
-		self.ctlText.setText("Press H for help menu.")
-		self.stmText.setText("Stamina:")
+		for node in self.text_list:
+			node.setTextColor(1, 1, 1, 1)
+			node.setShadowColor(0, 0, 0, 1)
 
 	def hideCH(self):
 		self.itcText.setText("")

@@ -69,6 +69,8 @@ class Game(ShowBase):
 
 	staminaRed = (1, 0.4, 0.2, 1)
 	staminaGreen = (0.3, 1, 0.5, 1)
+	
+	skipTextLabel = "Press E to skip intro."
 
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -710,7 +712,7 @@ class Game(ShowBase):
 
 		self.video.setPos(self.background_x, 0, self.background_y)
 		self.skipText = TextNode('items')
-		self.skipText.setText("Press E to skip intro.")
+		self.skipText.setText(self.skipTextLabel)
 		self.skipText.setShadow(0.15, 0.15)
 		self.skipText.setFont(self.font)
 		self.stnp = aspect2d.attachNewNode(self.skipText)

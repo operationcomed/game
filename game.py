@@ -92,7 +92,21 @@ class Game(ShowBase):
 		# camera
 		self.camLens.setNearFar(1, 1000)
 		#video before main menu
-		self.mainMenu()
+		self.taskMgr.add(self.splashScreen, "splashScreen")
+
+	def splashScreen(self, task):
+		button_down = self.mouseWatcherNode.is_button_down
+		if (task.time >= 23 or button_down(KB_BUTTON('e'))):
+			self.sound.stop()
+			self.video.removeNode()
+			self.skipText.setText("")
+			self.blackBg.destroy()
+			self.isPlaying = False
+			self.mainMenu()
+			return Task.done
+		if (not self.isPlaying):
+			self.playVid('assets/media/spash.avi')
+		return Task.cont
 
 	fullscreen = False
 	def toggleFullscreen(self):
@@ -631,10 +645,12 @@ class Game(ShowBase):
 	
 	def setCharacterA(self):
 		self.character = 1
+		self.backstoryVideo = "assets/backstories/Girl.avi"
 		self.setCharacter()
 
 	def setCharacterB(self):
 		self.character = 2
+		self.backstoryVideo = "assets/backstories/Boy.avi"
 		self.setCharacter()
 
 	def setCharacter(self):
@@ -654,7 +670,9 @@ class Game(ShowBase):
 	def backstory(self, task):
 		self.staminaBar.hide()
 		if (not self.isPlaying):
-			self.playVid()
+			gametext.Text.hideCH(self.game_text)
+			self.speedStop = True
+			self.playVid(self.backstoryVideo)
 
 		button_down = self.mouseWatcherNode.is_button_down
 
@@ -666,13 +684,12 @@ class Game(ShowBase):
 			self.blackBg.destroy()
 			self.sound.stop()
 			self.staminaBar.show()
+			self.isPlaying = False
 			return Task.done
 		return Task.cont
 
-	def playVid(self):
+	def playVid(self, vidFile):
 		self.isPlaying = True
-		gametext.Text.hideCH(self.game_text)
-		self.speedStop = True
 		# this bg is here to prevent 3d game from being shown
 		self.blackBg = OnscreenImage(image='assets/backstories/black.png', scale=(1000, 1, 1000))
 		self.cm = CardMaker('card')
@@ -682,14 +699,9 @@ class Game(ShowBase):
 		self.video.setScale(self.scaleFactorVid, 1, self.scaleFactorVid)
 
 		self.tex = MovieTexture("backstory")
-		if (self.character == 1):
-			self.tex.read('assets/backstories/Girl.avi')
-			self.sound = self.loader.loadSfx('assets/backstories/Girl.avi')
-			self.sound.play()
-		else:
-			self.tex.read('assets/backstories/Boy.avi')
-			self.sound = self.loader.loadSfx('assets/backstories/Boy.avi')
-			self.sound.play()
+		self.tex.read(vidFile)
+		self.sound = self.loader.loadSfx(vidFile)
+		self.sound.play()
 		self.cm.setUvRange(self.tex)
 		self.video.setTexture(self.tex)
 

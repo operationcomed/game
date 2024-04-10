@@ -24,19 +24,32 @@ For absolute beginners to programming and whatnot.
 
 ![image](https://github.com/operationcomed/game/assets/69134282/507f1c6c-4c34-46d9-a219-11bf4d8817ad)
 
-**Step 4:** Click on `Open Repository from GitHub`. If you are prompted to grant access to your GitHub account, grant it:
+**Step 4:** Type in `https://github.com/operationcomed/game.git` and press enter (or click on the result that pops up):
 
-![image](https://github.com/operationcomed/game/assets/69134282/ab573d3e-5306-4eb7-9ff7-daa48e915990)
+![image](https://github.com/operationcomed/game/assets/69134282/89f49c9c-2b64-4080-b7c0-4cca3a6aa340)
 
-**Step 5:** Type in `operationcomed/game` and press enter (or click on the result that comes up):
+**Step 5:** Select a folder to clone your repo to.
 
-![image](https://github.com/operationcomed/game/assets/69134282/5090bef7-2483-4adf-bca5-9de9b8821371)
+**Step 6:** Open the cloned repository.
 
-**Step 6:** Click on `main.py` in the sidebar on the left:
+**Step 7:** Trust the authors (me) in the folder.
+![image](https://github.com/operationcomed/game/assets/69134282/b0f49fb3-2fe3-4ec0-9039-0ae2473a5c0b)
 
-![image](https://github.com/operationcomed/game/assets/69134282/c34e38a3-ea9e-42b1-8248-ef1b3c1ffb28)
+**Step 7:** Click on `main.py` on the sidebar on the left:
 
-**Step 7:** To be continued:
+![image](https://github.com/operationcomed/game/assets/69134282/de2c974f-024c-4e08-add4-b53e18c82250)
+
+**Step 8:** Run the file using the play button on the top right corner:
+
+![image](https://github.com/operationcomed/game/assets/69134282/dfa2537d-5a12-4487-bd53-08a3c49f2e15)
+
+If it doesn't work try:
+* Installing python https://www.python.org/downloads/
+* If you already have python installed, try running this command: `python -m pip install panda3d` or `python3 -m pip install panda3d`
+  * If you get an error like `No module named pip`, try running this command then try the above again: `python -m ensurepip` or `python3 -m ensurepip`
+
+
+
 
 
 

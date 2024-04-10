@@ -2,9 +2,13 @@ from setuptools import setup
 
 # to build (must be in the directory where this file is located):
 # python setup.py build_apps
+# to build and zip:
+# python setup.py bdist_apps
+
 # https://docs.panda3d.org/1.10/python/distribution/building-binaries
 setup(
     name='escapemsu',
+	version='0.0.1',
     options={
         'build_apps': {
 			'platforms': ['win_amd64'],

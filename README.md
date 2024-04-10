@@ -33,6 +33,7 @@ For absolute beginners to programming and whatnot.
 **Step 6:** Open the cloned repository.
 
 **Step 7:** Trust the authors (me) in the folder.
+
 ![image](https://github.com/operationcomed/game/assets/69134282/b0f49fb3-2fe3-4ec0-9039-0ae2473a5c0b)
 
 **Step 7:** Click on `main.py` on the sidebar on the left:

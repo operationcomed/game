@@ -20,7 +20,7 @@ For absolute beginners to programming and whatnot.
 
 ![image](https://github.com/operationcomed/game/assets/69134282/30b4eddc-14bd-41fb-a4a6-786fe752563e)
 
-**Step 3:** Go back to the explorer tab and click on `Open Remote Repository`:
+**Step 3:** Go back to the explorer tab and click on `Open Remote Repository` or `Clone Repository`. You may need to install git first at https://git-scm.com/downloads:
 
 ![image](https://github.com/operationcomed/game/assets/69134282/507f1c6c-4c34-46d9-a219-11bf4d8817ad)
 
@@ -46,7 +46,7 @@ For absolute beginners to programming and whatnot.
 
 If it doesn't work try:
 * Installing python https://www.python.org/downloads/
-* If you already have python installed, try running this command: `python -m pip install panda3d` or `python3 -m pip install panda3d`
+* If you already have python installed, try running this command in a terminal (look up a tutorial on how to open a terminal on your OS): `python -m pip install panda3d` or `python3 -m pip install panda3d`
   * If you get an error like `No module named pip`, try running this command then try the above again: `python -m ensurepip` or `python3 -m ensurepip`
 
 

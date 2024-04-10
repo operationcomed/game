@@ -144,6 +144,10 @@ class Game(ShowBase):
 		self.accept("h", self.helpMenu)
 		self.stamina = self.staminaCap
 		self.music.stop()
+		self.music = self.loader.loadSfx("assets/sound/ambient.mp3")
+		self.music.setVolume(self.volume)
+		self.music.setLoop(True)
+		self.music.play()
 		self.disable_mouse()
 		
 		self.sceneObjects = []
@@ -761,11 +765,13 @@ class Game(ShowBase):
 		if (not self.isPlaying):
 			gametext.Text.hideCH(self.game_text)
 			self.speedStop = True
+			self.music.stop()
 			self.playVid(self.backstoryVideo)
 
 		button_down = self.mouseWatcherNode.is_button_down
 
 		if (task.time >= 47 or button_down(KB_BUTTON('e'))):
+			self.music.play()
 			self.video.removeNode()
 			gametext.Text.showCH(self.game_text)
 			self.speedStop = False

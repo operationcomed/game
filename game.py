@@ -87,7 +87,7 @@ class Game(ShowBase):
 		self.accept("x", self.exitGame)
 		self.accept("shift-x", self.exitGame)
 
-		self.scene_rot = open("assets/ROT_SCENE", "r").read()
+		self.scene_rot = bool(open("assets/ROT_SCENE", "r").read())
 		print(self.scene_rot)
 
 		props = WindowProperties()
@@ -184,7 +184,10 @@ class Game(ShowBase):
 
 		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
 		if (self.scene_rot == True):
+			print("rot")
 			self.scene.setHpr(0, 90, 0)
+		else:
+			print("no rot")
 
 		if (collisionMap == False):
 			self.scene.setCollideMask(BitMask32.bit(0))

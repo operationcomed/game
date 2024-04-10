@@ -13,6 +13,13 @@ from panda3d.physics import ActorNode, ForceNode, LinearVectorForce, PhysicsColl
 import time
 import gametext
 import direct.particles
+# i don't ever plan on using tkinter lol
+import tkinter as tk
+
+root = tk.Tk()
+
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
 
 # function shorthand
 KB_BUTTON = KeyboardButton.ascii_key
@@ -25,8 +32,9 @@ loadPrcFileData("", "framebuffer-multisample 1")
 loadPrcFileData("", "multisamples 4")
 
 # window
+width, height = 1366, 720
 loadPrcFileData("", "window-title Escape MSU")
-loadPrcFileData("", 'win-size 1366 720') 
+loadPrcFileData("", 'win-size ' + str(width) + ' ' + str(height)) 
 loadPrcFileData("", "default-fov 60")
 loadPrcFileData("", "show-frame-rate-meter true")
 
@@ -71,6 +79,7 @@ class Game(ShowBase):
 	staminaGreen = (0.3, 1, 0.5, 1)
 	
 	skipTextLabel = "Press E to skip intro."
+	volume = 0.75
 
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -115,8 +124,10 @@ class Game(ShowBase):
 		props = WindowProperties()
 		if (self.fullscreen == False):
 			props.setFullscreen(True)
-		else:
+			props.setSize(screen_width, screen_height)
+		elif (self.fullscreen == True):
 			props.setFullscreen(False)
+			props.setSize(width, height)
 		self.win.request_properties(props)
 		self.fullscreen = not self.fullscreen
 	
@@ -483,21 +494,24 @@ class Game(ShowBase):
 			self.textNodePath.show()
 
 
+	musicPlaying = False
 	def mainMenu(self):
 		self.sensitivity = 0.025
 		self.scaleFactor = 3
 		self.scaleFactorLogo = 0.2
 	
 		self.cm = CardMaker('video')
-		self.video = self.aspect2d.attachNewNode(self.cm.generate())
-		self.video.setScale((2))
-		self.tex = self.loader.loadTexture('assets/media/helloworld.avi')
-		self.video.setTexture(self.tex)
+		#self.video = self.aspect2d.attachNewNode(self.cm.generate())
+		#self.video.setScale((2))
+		#self.tex = self.loader.loadTexture('assets/media/helloworld.avi')
+		#self.video.setTexture(self.tex)
 		
-		self.music = self.loader.loadSfx("assets/sound/main_menu.mp3")
-		self.music.setVolume(0.75)
-		self.music.setLoop(True)
-		self.music.play()
+		if (self.musicPlaying == False):
+			self.music = self.loader.loadSfx("assets/sound/main_menu.mp3")
+			self.music.setVolume(self.volume)
+			self.music.setLoop(True)
+			self.music.play()
+			self.musicPlaying = True
 
 		self.scaleFactor = 3
 		self.scaleFactorLogo = 0.35
@@ -525,14 +539,19 @@ class Game(ShowBase):
 		self.logo.setTransparency(TransparencyAttrib.MAlpha)
 
 		# buttons
+		# play
 		playTexture = (self.loader.loadTexture("assets/buttons/play_normal.png"), self.loader.loadTexture("assets/buttons/play_normal.png"), self.loader.loadTexture("assets/buttons/play_hover.png"), self.loader.loadTexture("assets/buttons/play_normal.png"))
 		self.startGameButton = DirectButton(command=self.initGame, frameTexture=playTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		self.startGameButton.setTransparency(True)
 		self.startGameButton.setSx(482/226)
 
-		# unused for the time being
-		self.settingsButton = DirectButton(text="Settings")
+		# settings
+		settingsTexture = (self.loader.loadTexture("assets/buttons/settings_normal.png"), self.loader.loadTexture("assets/buttons/settings_normal.png"), self.loader.loadTexture("assets/buttons/settings_hover.png"), self.loader.loadTexture("assets/buttons/settings_normal.png"))
+		self.settingsButton = DirectButton(command=self.settings, frameTexture=settingsTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		self.settingsButton.setTransparency(True)
+		self.settingsButton.setSx(1024/226)
 
+		# exit
 		exitGameTexture = (self.loader.loadTexture("assets/buttons/exit_normal.png"), self.loader.loadTexture("assets/buttons/exit_normal.png"), self.loader.loadTexture("assets/buttons/exit_hover.png"), self.loader.loadTexture("assets/buttons/exit_normal.png"))
 		self.exitGameButton = DirectButton(command=self.exitGame, frameTexture=exitGameTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		self.exitGameButton.setTransparency(True)
@@ -549,9 +568,9 @@ class Game(ShowBase):
 		# positioning the offsets to be relative to the window bounds
 		# but noooooooooo i guess we have to do it this way
 		# :( 
-		self.startGameButton.setPos(x_offset, 0, 0)
+		self.startGameButton.setPos(x_offset, 0, 0.2)
 		self.settingsButton.setPos(x_offset, 0, -0.2)
-		self.exitGameButton.setPos(x_offset, 0, -0.4)
+		self.exitGameButton.setPos(x_offset, 0, -0.6)
 		self.muteButton.setPos(1.575, -1.5, -0.8)
 
 		self.menuItems = [self.video, self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton,]
@@ -564,15 +583,48 @@ class Game(ShowBase):
 			button.setScale(button.getSx()*self.buttonScale, self.buttonScale, self.buttonScale)
 
 		self.startGameButton.scale = self.startGameButton.getScale()
-		# hide non-functional settings button
-		self.settingsButton.setScale(0, 0, 0)
-		#self.settingsButton.scale = self.settingsButton.getScale()
+		self.settingsButton.scale = self.settingsButton.getScale()
 		self.exitGameButton.scale = self.exitGameButton.getScale()
 		self.muteButton.scale = self.muteButton.getScale()
 
 		self.taskMgr.add(self.moveBackground, "mainMenu")
 		self.taskMgr.add(self.hoverEffect, "mainMenu")
 		
+	def settings(self):
+		for node in self.menuItems:
+			if (node == self.card):
+				continue
+			node.removeNode()
+		self.taskMgr.remove("mainMenu")
+		self.taskMgr.add(self.moveBackground, "mainMenu")
+
+
+		backTexture = (self.loader.loadTexture("assets/buttons/exit_normal.png"), self.loader.loadTexture("assets/buttons/exit_normal.png"), self.loader.loadTexture("assets/buttons/exit_hover.png"), self.loader.loadTexture("assets/buttons/exit_normal.png"))
+		self.backButton = DirectButton(command=self.backSettings, frameTexture=backTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		self.backButton.setTransparency(True)
+		self.backButton.setSx(482/226)
+		self.backButton.setPos(-1.2, 0, 0.6)
+
+		soundSliderBg = loader.loadTexture("assets/buttons/stm_bkg.png")
+		self.soundSlider = DirectSlider(frameSize=(0, 2, 0, 0.2), text="", value=self.volume, pos=(-1.2, 0, -0.85), scale=(0.6), range=(0, 1), frameTexture=soundSliderBg, command=self.changeVol)
+
+		self.settingsButtons = [self.backButton]
+		for button in self.settingsButtons:
+			button.setScale(button.getSx()*self.buttonScale, self.buttonScale, self.buttonScale)
+		self.settingsItems = [self.backButton]
+
+	def changeVol(self):
+		self.volume = self.soundSlider['value']
+		self.music.setVolume(self.volume)
+
+	def backSettings(self):
+		for node in self.settingsItems:
+			if (node == self.card):
+				continue
+			node.removeNode()
+		self.taskMgr.remove("mainMenu")
+		self.mainMenu()
+
 	def moveBackground(self, task):
 		self.background_move_x = self.background_x
 		self.background_move_y = self.background_y
@@ -585,9 +637,6 @@ class Game(ShowBase):
 	buttonHoverScale = 1.2
 	def hoverEffect(self, task):
 		for button in self.buttonList:
-			# fix for settings
-			if (button == self.settingsButton):
-				continue
 			if (button.node().getState() == 2):
 				button.setScale(self.buttonHoverScale*button.scale[0], self.buttonHoverScale*button.scale[1], self.buttonHoverScale*button.scale[2])
 			else:

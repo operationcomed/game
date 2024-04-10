@@ -95,6 +95,8 @@ class Game(ShowBase):
 		self.win.request_properties(props)
 		self.font = self.loader.loadFont('assets/fonts/zilla-slab.ttf')
 
+		self.font.setPixelsPerUnit(64)
+
 		# antialiasing
 		self.render.setAntialias(AntialiasAttrib.MAuto)
 		
@@ -130,6 +132,13 @@ class Game(ShowBase):
 			props.setSize(width, height)
 		self.win.request_properties(props)
 		self.fullscreen = not self.fullscreen
+
+	def toggleFullscreenViaButton(self):
+		if (self.fullscreen == False):
+			self.fullscreenButton['frameTexture'] = self.fullscreenTextureOn
+		if (self.fullscreen == True):
+			self.fullscreenButton['frameTexture'] = self.fullscreenTextureOff
+		self.toggleFullscreen()
 	
 	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False):
 		self.accept("h", self.helpMenu)
@@ -605,22 +614,51 @@ class Game(ShowBase):
 		self.backButton.setSx(482/226)
 		self.backButton.setPos(-1.2, 0, 0.6)
 
-		soundSliderBg = loader.loadTexture("assets/buttons/stm_bkg.png")
-		self.soundSlider = DirectSlider(frameSize=(0, 2, 0, 0.2), text="", value=self.volume, pos=(-1.2, 0, -0.85), scale=(0.6), range=(0, 1), frameTexture=soundSliderBg, command=self.changeVol)
+		self.fullscreenTextureOff = (self.loader.loadTexture("assets/buttons/fullscreen_on.png"))
+		self.fullscreenTextureOn = (self.loader.loadTexture("assets/buttons/fullscreen_off.png"))
+		if (self.fullscreen):
+			fullscreenTexture = self.fullscreenTextureOn
+		else:
+			fullscreenTexture = self.fullscreenTextureOff
+		self.fullscreenButton = DirectButton(command=self.toggleFullscreenViaButton, frameTexture=fullscreenTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		self.fullscreenButton.setTransparency(TransparencyAttrib.MAlpha)
+		self.fullscreenButton.setScale(0.1)
+		self.fullscreenButton.setPos(0, 0, -0.2)
+
+		soundSliderBg = loader.loadTexture("assets/buttons/slider_bkg.png")
+		soundSliderThumb = loader.loadTexture("assets/buttons/slider_thumb.png")
+
+		self.soundSliderText = TextNode('volume')
+		self.soundSliderText.setText("Volume:")
+		self.soundSliderText.setShadow(0.07, 0.07)
+		self.soundSliderText.setFont(self.font)
+		self.soSlNode = aspect2d.attachNewNode(self.soundSliderText)
+		self.soSlNode.setScale(0.12)
+		self.soSlNode.setPos(-0.62, 0, 0.08)
+		
+		self.volumeText = TextNode('volume')
+		self.volumeText.setText(str(int(round(self.volume, 2) * 100)) + "%")
+		self.volumeText.setShadow(0.07, 0.07)
+		self.volumeText.setFont(self.font)
+		self.vTNode = aspect2d.attachNewNode(self.volumeText)
+		self.vTNode.setScale(0.1)
+		self.vTNode.setPos(0.62, 0, 0)
+
+		self.soundSlider = DirectSlider(value=self.volume, pos=(0, 0, 0), scale=(0.6), range=(0, 1), frameTexture=soundSliderBg, command=self.changeVol, thumb_frameTexture=soundSliderThumb, thumb_pressEffect=0, thumb_frameSize=(-0.075, 0.075, -0.075, 0.075), thumb_relief='flat')
+		self.soundSlider.setTransparency(TransparencyAttrib.MAlpha)
 
 		self.settingsButtons = [self.backButton]
 		for button in self.settingsButtons:
 			button.setScale(button.getSx()*self.buttonScale, self.buttonScale, self.buttonScale)
-		self.settingsItems = [self.backButton]
+		self.settingsItems = [self.backButton, self.soundSlider, self.soSlNode, self.vTNode, self.card, self.fullscreenButton]
 
 	def changeVol(self):
 		self.volume = self.soundSlider['value']
 		self.music.setVolume(self.volume)
+		self.volumeText.setText(str(int(round(self.volume, 2) * 100)) + "%")
 
 	def backSettings(self):
 		for node in self.settingsItems:
-			if (node == self.card):
-				continue
 			node.removeNode()
 		self.taskMgr.remove("mainMenu")
 		self.mainMenu()
@@ -648,7 +686,7 @@ class Game(ShowBase):
 			self.music.setVolume(0)
 			self.muteButton["frameTexture"] = self.unmuteTexture
 		else:
-			self.music.setVolume(0.75)
+			self.music.setVolume(self.volume)
 			self.muteButton["frameTexture"] = self.muteTexture
 		self.musicActive = not self.musicActive
 		print(self.musicActive)
@@ -752,6 +790,7 @@ class Game(ShowBase):
 		self.tex = MovieTexture("backstory")
 		self.tex.read(vidFile)
 		self.sound = self.loader.loadSfx(vidFile)
+		self.sound.setVolume(self.volume)
 		self.sound.play()
 		self.cm.setUvRange(self.tex)
 		self.video.setTexture(self.tex)
@@ -826,6 +865,7 @@ class Game(ShowBase):
 				if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
 					pickup = self.loader.loadSfx('assets/sound/pickup.wav')
 					pickup.setLoop(False)
+					pickup.setVolume(self.volume)
 					pickup.play()
 					self.items[i].removeNode()
 					self.itemsGotten += 1

@@ -38,7 +38,7 @@ For absolute beginners to programming and whatnot.
 
 **Step 7:** Click on `main.py` on the sidebar on the left:
 
-![image](https://github.com/operationcomed/game/assets/69134282/de2c974f-024c-4e08-add4-b53e18c82250)
+![image](https://github.com/operationcomed/game/assets/69134282/c34e38a3-ea9e-42b1-8248-ef1b3c1ffb28)
 
 **Step 8:** Run the file using the play button on the top right corner:
 

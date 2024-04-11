@@ -119,6 +119,7 @@ class Game(ShowBase):
 			return Task.done
 		if (not self.isPlaying):
 			self.playVid('assets/media/spash.avi')
+			self.skipText.setText("")
 		return Task.cont
 
 	fullscreen = False

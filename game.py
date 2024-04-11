@@ -593,7 +593,7 @@ class Game(ShowBase):
 		self.menuItems = [self.video, self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton,]
 
 		self.buttonList = [self.startGameButton, self.settingsButton, self.exitGameButton, self.muteButton]
-		self.buttonScale = 0.15
+		self.buttonScale = 0.1
 
 		# laziness will consume
 		for button in self.buttonList:

@@ -62,7 +62,7 @@ class Game(ShowBase):
 	l0 = l0.l0
 	l1 = l1.l1
 
-	fog_color = (0.2, 0.3, 0.35)
+	fog_color = (0.1, 0.15, 0.175)
 	
 	scene_rot = False
 
@@ -256,15 +256,11 @@ class Game(ShowBase):
 
 		self.slight = PointLight('slight')
 		self.slight.setColor((1, 1, 1, 1))
-		#self.lens = PerspectiveLens()
-		#self.slight.setLens(self.lens)
-		#self.slight.attenuation = (0, 0, 1)
 		self.slnp = self.render.attachNewNode(self.slight)
 		self.sceneObjects.append(self.slnp)
 		self.slnp.node().setShadowCaster(True, 1024, 1024)
 		self.slnp.setPos(lightPos)
 		self.slnp.setHpr(0, -90, 0)
-		#self.lens.setNearFar(1, 1000000)
 
 		self.render.setLight(self.slnp)
 		self.render.setLight(alnp)
@@ -301,7 +297,6 @@ class Game(ShowBase):
 		self.playerCharacter.reparentTo(self.ppnp)
 		
 		self.ppnp.setPos(playerPos)
-		#self.ppnp.reparentTo(self.camera)
 		self.playerCharacter.loop("walk")
 
 		# https://arsthaumaturgis.github.io/Panda3DTutorial.io/tutorial/tut_lesson06.html
@@ -320,12 +315,11 @@ class Game(ShowBase):
 		# filters 
 		self.filters = CommonFilters(self.win, self.cam)
 		self.filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
-		#filters.setBloom(intensity=0.1)
 
 		# fog
 		fog = Fog("Fog")
 		fog.setColor(LVecBase4f(self.fog_color))
-		fog.setExpDensity(0.2)
+		fog.setExpDensity(0.3)
 		self.render.setFog(fog)
 
 		# text

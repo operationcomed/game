@@ -1,11 +1,3 @@
-from direct.gui.OnscreenText import OnscreenText
-from panda3d.core import *
-from direct.showbase.ShowBase import ShowBase
-from math import pi, sin, cos
-from direct.task import Task
-from direct.actor.Actor import Actor
-from direct.interval.IntervalGlobal import Sequence
-from direct.filter.CommonFilters import CommonFilters
 from panda3d.core import *
 
 class Text():
@@ -18,6 +10,10 @@ class Text():
 	stmText.setText("Stamina:")
 	stmText.setShadow(0.15, 0.15)
 
+	hltText = TextNode('controls')
+	hltText.setText("Health:")
+	hltText.setShadow(0.15, 0.15)
+
 	itmText = TextNode('items')
 	itmText.setText("Items obtained:")
 	itmText.setShadow(0.15, 0.15)
@@ -27,7 +23,7 @@ class Text():
 	itcText.setText("+")
 	itcText.setShadow(0.07, 0.07)
 
-	text_list = [ctlText, stmText, itmText] 
+	text_list = [ctlText, stmText, itmText, hltText] 
 
 
 	def hideText(self):

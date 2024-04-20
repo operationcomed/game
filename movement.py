@@ -6,6 +6,9 @@ KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
 
 class Movement():
+	accelZ = 0
+	accelX = 0
+	accelY = 0
 	def movement(self, game):
 		button_down = game.mouseWatcherNode.is_button_down
 
@@ -75,28 +78,24 @@ class Movement():
 		elif (game.sprintable == True and not game.barColored == 2):
 			game.staminaBar["barColor"] = game.staminaGreen
 			game.barColored = 2
-		# primitive ground collision checking
-		#if (posZ < GROUND_POS):
-		#	posZ = GROUND_POS
-		#	game.accelZ = 0
+			
 		# movement with smooth acceleration
-		# hala may math ew
 		staminaGain = True
 		if (button_down(KB_BUTTON('w'))):
-			game.accelY += game.speed * cos(rot_x * (pi/180))
-			game.accelX -= game.speed * sin(rot_x * (pi/180))
+			self.accelY += game.speed * cos(rot_x * (pi/180))
+			self.accelX -= game.speed * sin(rot_x * (pi/180))
 			staminaGain = False
 		if (button_down(KB_BUTTON('s'))):
-			game.accelY -= game.speed * cos(rot_x * (pi/180))
-			game.accelX += game.speed * sin(rot_x * (pi/180))
+			self.accelY -= game.speed * cos(rot_x * (pi/180))
+			self.accelX += game.speed * sin(rot_x * (pi/180))
 			staminaGain = False
 		if (button_down(KB_BUTTON('d'))):
-			game.accelY += game.speed * sin(rot_x * (pi/180))
-			game.accelX += game.speed * cos(rot_x * (pi/180))
+			self.accelY += game.speed * sin(rot_x * (pi/180))
+			self.accelX += game.speed * cos(rot_x * (pi/180))
 			staminaGain = False
 		if (button_down(KB_BUTTON('a'))):
-			game.accelY -= game.speed * sin(rot_x * (pi/180))
-			game.accelX -= game.speed * cos(rot_x * (pi/180))
+			self.accelY -= game.speed * sin(rot_x * (pi/180))
+			self.accelX -= game.speed * cos(rot_x * (pi/180))
 			staminaGain = False
 
 		if (game.staminaCap > game.stamina and staminaGain):
@@ -104,16 +103,10 @@ class Movement():
 		elif (game.stamina >= game.staminaCap):
 			game.stamina = game.staminaCap
 			game.sprintable = True
-		# jumping (note, for debugging purposes only)
+		# jumping
 		if (button_down(KB.space()) and not game.speedStop):
 			game.ppnp.setZ(game.ppnp.getZ()+0.1)
 
-		# misc
-		#if (button_down(KB_BUTTON('m'))):
-		#	gametext.Text.hideText(game.game_text)
-		#	game.unloadScene()
-		#if (button_down(KB_BUTTON('n'))):
-		#	gametext.Text.showText(game.game_text)
 		# fix for bug
 		if (button_down(KB_BUTTON('o')) and game.timer <= 0):
 			if (game.scene_rot):
@@ -127,21 +120,19 @@ class Movement():
 			game.scene_rot = not game.scene_rot
 			game.timer = 10
 		game.timer -= 1
-		# deceleration bcoz of gravity
-		# game.accelZ -= game.gravity
 		# deceleration bcoz of friction
-		game.accelY *= 0.8
-		game.accelX *= 0.8
+		self.accelY *= 0.8
+		self.accelX *= 0.8
 
 		# apply acceleration to position
-		posY += game.accelY
-		posX += game.accelX
+		posY += self.accelY
+		posX += self.accelX
 
 		# the speed is faster when you're going diagonally since we apply the acceleration like a square instead of a circle (?)
-		if ((game.accelX * game.accelX) + (game.accelY * game.accelY) > 0.01):
-			while ((game.accelX * game.accelX) + (game.accelY * game.accelY) > 0.01): 
-				game.accelY *= 0.9
-				game.accelX *= 0.9
+		if ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.01):
+			while ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.01): 
+				self.accelY *= 0.9
+				self.accelX *= 0.9
 				
 				
 		# see if the player has fallen off of the world

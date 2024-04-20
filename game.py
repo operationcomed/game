@@ -49,14 +49,6 @@ loadPrcFileData("", """
 
 class Game(ShowBase):
 
-	accelZ = 0
-	#accelZCap = 1
-
-	accelX = 0
-	#accelXCap = 0.4
-	accelY = 0
-	#accelYCap = 0.4
-
 	# class instances
 	game_text = gametext.game_text
 	movement_inst = mv.movement
@@ -104,6 +96,10 @@ class Game(ShowBase):
 
 	def __init__(self):
 		ShowBase.__init__(self)
+		props = WindowProperties()
+		props.set_icon_filename("icon.ico")
+		self.win.request_properties(props)
+
 		self.accept("f11", self.toggleFullscreen)
 		self.accept("x", self.exitGame)
 		self.accept("shift-x", self.exitGame)
@@ -115,9 +111,6 @@ class Game(ShowBase):
 		else:
 			self.scene_rot = False
 
-		props = WindowProperties()
-		props.set_icon_filename("icon.ico")
-		self.win.request_properties(props)
 		self.font = self.loader.loadFont('assets/fonts/zilla-slab.ttf')
 
 		self.font.setPixelsPerUnit(64)
@@ -234,7 +227,7 @@ class Game(ShowBase):
 		# https://discourse.panda3d.org/t/directgui-directwaitbar/1761/2 (from 2006!)
 		barBg = loader.loadTexture("assets/buttons/stm_bkg.png")
 		barFg = loader.loadTexture("assets/buttons/stm_fg.png")
-		self.staminaBar = DirectWaitBar(frameSize=(0, 2, 0, 0.2), text="", value=100, pos=(-1.2, 0, -0.85), scale=(0.4), range=self.staminaCap, frameColor=(1, 1, 1, 0.8), frameTexture=barBg)
+		self.staminaBar = DirectWaitBar(frameSize=(0, 2, 0, 0.2), text="", value=self.staminaCap, pos=(-1.2, 0, -0.85), scale=(0.4), range=self.staminaCap, frameColor=(1, 1, 1, 0.8), frameTexture=barBg)
 		self.staminaBar["barColor"] = self.staminaGreen
 
 		self.healthBar = DirectWaitBar(frameSize=(0, 2, 0, 0.2), text="", value=100, pos=(-1.2, 0, -0.65), scale=(0.4), range=self.healthCap, frameColor=(1, 1, 1, 0.8), frameTexture=barBg)
@@ -336,29 +329,27 @@ class Game(ShowBase):
 		self.render.setFog(fog)
 
 		# text
+		def attachTextToHUD(text, gtext, pos, scale, font=self.font):
+			text.setScale(scale)
+			text.setPos(pos)
+			gtext.setFont(font)
+			self.sceneObjects.append(text)
+
 		self.textNodePath = aspect2d.attachNewNode(self.game_text.ctlText)
-		self.textNodePath.setScale(0.07)
-		self.textNodePath.setPos(-1.2, 0, 0.85)
-		self.game_text.ctlText.setFont(self.font)
-		self.sceneObjects.append(self.textNodePath)
+		attachTextToHUD(self.textNodePath, self.game_text.ctlText, (-1.2, 0, 0.85), 0.07)
 		
 		self.stmTxtNode = aspect2d.attachNewNode(self.game_text.stmText)
-		self.stmTxtNode.setScale(0.07)
-		self.stmTxtNode.setPos(-1.2, 0, -0.73)
-		self.game_text.stmText.setFont(self.font)
-		self.sceneObjects.append(self.stmTxtNode)
+		attachTextToHUD(self.stmTxtNode, self.game_text.stmText, (-1.2, 0, -0.73), 0.07)
+
+		self.hltTxtNode = aspect2d.attachNewNode(self.game_text.hltText)
+		attachTextToHUD(self.hltTxtNode, self.game_text.hltText, (-1.2, 0, -0.53), 0.07)
 
 		self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
-		self.interactNode.setScale(0.14)
-		self.interactNode.setPos(0, 0, 0)
-		self.sceneObjects.append(self.interactNode)
-		self.game_text.itcText.setFont(self.font)
+		attachTextToHUD(self.interactNode, self.game_text.itcText, (0, 0, 0), 0.14)
 
 		self.itmTxtNode = aspect2d.attachNewNode(self.game_text.itmText)
-		self.itmTxtNode.setScale(0.07)
-		self.itmTxtNode.setPos(1, 0, 0.85)
-		self.sceneObjects.append(self.itmTxtNode)
-		self.game_text.itmText.setFont(self.font)
+		attachTextToHUD(self.itmTxtNode, self.game_text.itmText, (1, 0, 0.85), 0.07)
+
 		print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
 
 	def unloadScene(self):

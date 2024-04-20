@@ -13,7 +13,12 @@ from panda3d.physics import ActorNode, ForceNode, LinearVectorForce, PhysicsColl
 import time
 import gametext
 import direct.particles
-# i don't ever plan on using tkinter lol
+import movement as mv
+import mainMenu as mm
+import mainMenuTasks as mmt
+import charSelect as chs
+import l0
+# i don't ever plan on using tkinter (for gui purposes) lol
 import tkinter as tk
 
 root = tk.Tk()
@@ -54,7 +59,16 @@ class Game(ShowBase):
 	#accelXCap = 0.4
 	accelY = 0
 	#accelYCap = 0.4
+
+	# class instances
 	game_text = gametext.game_text
+	movement_inst = mv.movement
+	mainmenu_inst = mm.main_menu
+	mainmenutasks_inst = mmt.mm_tasks
+	charsel_inst = chs.ch_select
+
+	# levels
+	l0 = l0.l0
 
 	fog_color = (0.2, 0.3, 0.35)
 	
@@ -87,8 +101,12 @@ class Game(ShowBase):
 		self.accept("x", self.exitGame)
 		self.accept("shift-x", self.exitGame)
 
-		self.scene_rot = bool(open("assets/ROT_SCENE", "r").read())
-		print(self.scene_rot)
+		self.scene_rot = open("assets/ROT_SCENE", "r").read()
+
+		if (self.scene_rot == "True"):
+			self.scene_rot = True
+		else:
+			self.scene_rot = False
 
 		props = WindowProperties()
 		props.set_icon_filename("icon.ico")
@@ -327,7 +345,6 @@ class Game(ShowBase):
 		self.game_text.itmText.setFont(self.font)
 		print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
 
-
 	def unloadScene(self):
 		self.accelX = 0
 		self.accelY = 0
@@ -350,153 +367,7 @@ class Game(ShowBase):
 	barColored = 0
 	# "basic" player movement
 	def moveTask(self, task):
-		button_down = self.mouseWatcherNode.is_button_down
-
-		# print current position for debugging
-		if (button_down(KB_BUTTON('p'))):
-			print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
-		if (button_down(KB_BUTTON('l'))):
-			print("H:", round(self.camera.getH(), 3), "P:", round(self.camera.getP(), 3), "R:", round(self.camera.getR(), 3))
-
-		has_mouse = self.mouseWatcherNode.hasMouse()
-		rot_x = self.camera.getH()
-		rot_y = self.camera.getP()
-		rot_z = self.camera.getR()
-
-		sensitivity = 30
-		
-		props = WindowProperties()
-		if (button_down(KB.escape())):
-			props.setCursorHidden(False)
-			self.win.requestProperties(props)
-			props = self.win.getProperties()
-			has_mouse = False
-
-		# move screen with mouse
-		if (has_mouse):
-			# hides cursor
-			props.setCursorHidden(True)
-			self.win.requestProperties(props)
-			props = self.win.getProperties()
-
-			# limits cursor to the middle
-			self.win.movePointer(0, props.getXSize() // 2, props.getYSize() // 2)
-			mouse_x = self.mouseWatcherNode.getMouseX() * sensitivity
-			mouse_y = self.mouseWatcherNode.getMouseY() * sensitivity
-
-			# prevent camera from going upside down
-			if (not self.speedStop):
-				if (rot_y+mouse_y > 90):
-					self.camera.setHpr(rot_x-mouse_x, 90, 0)
-				elif (rot_y+mouse_y < -90):
-					self.camera.setHpr(rot_x-mouse_x, -90, 0)
-				else:
-					self.camera.setHpr(rot_x-mouse_x, rot_y+mouse_y, 0)
-
-		posX = self.ppnp.getX()
-		posY = self.ppnp.getY()
-
-		self.speed = 0.025
-
-		# sprinting and stamina
-		if (button_down(KB.shift()) and self.stamina >= 0 and self.sprintable):
-			self.speed = 0.1
-			if (button_down(KB_BUTTON('w')) or button_down(KB_BUTTON('a')) or button_down(KB_BUTTON('s')) or button_down(KB_BUTTON('d'))):
-				self.stamina -= 0.05
-		if (self.stamina <= 0.01):
-			self.sprintable = False
-
-		if (self.stamina < 0):
-			self.stamina = 0
-
-		if (self.speedStop):
-			self.speed = 0
-
-		if (self.sprintable == False and not self.barColored == 1):
-			self.staminaBar["barColor"] = self.staminaRed
-			self.barColored = 1
-		elif (self.sprintable == True and not self.barColored == 2):
-			self.staminaBar["barColor"] = self.staminaGreen
-			self.barColored = 2
-		# primitive ground collision checking
-		#if (posZ < GROUND_POS):
-		#	posZ = GROUND_POS
-		#	self.accelZ = 0
-		# movement with smooth acceleration
-		# hala may math ew
-		staminaGain = True
-		if (button_down(KB_BUTTON('w'))):
-			self.accelY += self.speed * cos(rot_x * (pi/180))
-			self.accelX -= self.speed * sin(rot_x * (pi/180))
-			staminaGain = False
-		if (button_down(KB_BUTTON('s'))):
-			self.accelY -= self.speed * cos(rot_x * (pi/180))
-			self.accelX += self.speed * sin(rot_x * (pi/180))
-			staminaGain = False
-		if (button_down(KB_BUTTON('d'))):
-			self.accelY += self.speed * sin(rot_x * (pi/180))
-			self.accelX += self.speed * cos(rot_x * (pi/180))
-			staminaGain = False
-		if (button_down(KB_BUTTON('a'))):
-			self.accelY -= self.speed * sin(rot_x * (pi/180))
-			self.accelX -= self.speed * cos(rot_x * (pi/180))
-			staminaGain = False
-
-		if (self.staminaCap > self.stamina and staminaGain):
-			self.stamina += 0.025
-		elif (self.stamina >= self.staminaCap):
-			self.stamina = self.staminaCap
-			self.sprintable = True
-		# jumping (note, for debugging purposes only)
-		if (button_down(KB.space()) and not self.speedStop):
-			self.ppnp.setZ(self.ppnp.getZ()+0.1)
-
-		# misc
-		#if (button_down(KB_BUTTON('m'))):
-		#	gametext.Text.hideText(self.game_text)
-		#	self.unloadScene()
-		#if (button_down(KB_BUTTON('n'))):
-		#	gametext.Text.showText(self.game_text)
-		# fix for bug
-		if (button_down(KB_BUTTON('o')) and self.timer <= 0):
-			if (self.scene_rot):
-				self.scene.setHpr(0, 0, 0)
-				if (self.doorRot):
-					self.doors.setHpr(0, 0, 0)
-			else:
-				self.scene.setHpr(0, 90, 0)
-				if (self.doorRot):
-					self.doors.setHpr(0, 90, 0)
-			self.scene_rot = not self.scene_rot
-			self.timer = 10
-		self.timer -= 1
-		# deceleration bcoz of gravity
-		# self.accelZ -= self.gravity
-		# deceleration bcoz of friction
-		self.accelY *= 0.8
-		self.accelX *= 0.8
-
-		# apply acceleration to position
-		posY += self.accelY
-		posX += self.accelX
-
-		# the speed is faster when you're going diagonally since we apply the acceleration like a square instead of a circle (?)
-		if ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.01):
-			while ((self.accelX * self.accelX) + (self.accelY * self.accelY) > 0.01): 
-				self.accelY *= 0.9
-				self.accelX *= 0.9
-				
-				
-		# see if the player has fallen off of the world
-		if (self.ppnp.getZ() < -5):
-			self.ppnp.setZ(10)
-		self.ppnp.setX(posX)
-		self.ppnp.setY(posY)
-		self.camera.setPos(self.ppnp.getPos())
-		self.camera.setZ(self.ppnp.getZ() + self.cameraOffset)
-
-		self.staminaBar["value"] = self.stamina
-
+		mv.Movement.movement(self.movement_inst, self)
 		return Task.cont
 		
 	helpDisplay = False
@@ -510,282 +381,31 @@ class Game(ShowBase):
 			self.helpMenuImg.destroy()
 			self.textNodePath.show()
 
-
 	musicPlaying = False
 	def mainMenu(self):
-		self.sensitivity = 0.025
-		self.scaleFactor = 3
-		self.scaleFactorLogo = 0.2
-	
-		self.cm = CardMaker('video')
-		#self.video = self.aspect2d.attachNewNode(self.cm.generate())
-		#self.video.setScale((2))
-		#self.tex = self.loader.loadTexture('assets/media/helloworld.avi')
-		#self.video.setTexture(self.tex)
-		
-		if (self.musicPlaying == False):
-			self.music = self.loader.loadSfx("assets/sound/main_menu.mp3")
-			self.music.setVolume(self.volume)
-			self.music.setLoop(True)
-			self.music.play()
-			self.musicPlaying = True
-
-		self.scaleFactor = 3
-		self.scaleFactorLogo = 0.35
-		x_offset = -0.95
-		
-		self.cm = CardMaker('card')
-		self.card = self.aspect2d.attachNewNode(self.cm.generate())
-		self.logo = self.aspect2d.attachNewNode(self.cm.generate())
-		self.card.setScale((16/9)*self.scaleFactor, 1, 1*self.scaleFactor)
-		self.logo.setScale((746/168)*self.scaleFactorLogo, 1, 1*self.scaleFactorLogo)
-
-		self.tex = self.loader.loadTexture('assets/media/bkgnew.png')
-		self.card.setTexture(self.tex)
-		self.tex = self.loader.loadTexture('assets/media/logo.png')
-		self.logo.setTexture(self.tex)
-
-		# these are the centers of the images
-		self.background_x = (-16/18)*self.scaleFactor
-		self.background_y = -0.5*self.scaleFactor
-		self.logo_x = (-746/168/2)*self.scaleFactorLogo
-		self.logo_y = -0.5*self.scaleFactorLogo
-
-		self.card.setPos(self.background_x, 0, self.background_y)
-		self.logo.setPos(self.logo_x + x_offset, 0, self.logo_y + 0.5)
-		self.logo.setTransparency(TransparencyAttrib.MAlpha)
-
-		# buttons
-		# play
-		playTexture = (self.loader.loadTexture("assets/buttons/play_normal.png"), self.loader.loadTexture("assets/buttons/play_normal.png"), self.loader.loadTexture("assets/buttons/play_hover.png"), self.loader.loadTexture("assets/buttons/play_normal.png"))
-		self.startGameButton = DirectButton(command=self.initGame, frameTexture=playTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
-		self.startGameButton.setTransparency(True)
-		self.startGameButton.setSx(482/226)
-
-		# settings
-		settingsTexture = (self.loader.loadTexture("assets/buttons/settings_normal.png"), self.loader.loadTexture("assets/buttons/settings_normal.png"), self.loader.loadTexture("assets/buttons/settings_hover.png"), self.loader.loadTexture("assets/buttons/settings_normal.png"))
-		self.settingsButton = DirectButton(command=self.settings, frameTexture=settingsTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
-		self.settingsButton.setTransparency(True)
-		self.settingsButton.setSx(1024/226)
-
-		# exit
-		exitGameTexture = (self.loader.loadTexture("assets/buttons/exit_normal.png"), self.loader.loadTexture("assets/buttons/exit_normal.png"), self.loader.loadTexture("assets/buttons/exit_hover.png"), self.loader.loadTexture("assets/buttons/exit_normal.png"))
-		self.exitGameButton = DirectButton(command=self.exitGame, frameTexture=exitGameTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
-		self.exitGameButton.setTransparency(True)
-		self.exitGameButton.setSx(482/226)
-
-		
-		self.muteTexture = (self.loader.loadTexture("assets/buttons/mute.png"))
-		self.unmuteTexture = (self.loader.loadTexture("assets/buttons/unmute.png"))
-		self.muteButton = DirectButton(command=self.mute, frameTexture=self.muteTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
-		self.muteButton.setTransparency(True)
-		self.muteButton.setSx(1)
-
-		# y'know what'd be better
-		# positioning the offsets to be relative to the window bounds
-		# but noooooooooo i guess we have to do it this way
-		# :( 
-		self.startGameButton.setPos(x_offset, 0, 0.2)
-		self.settingsButton.setPos(x_offset, 0, -0.2)
-		self.exitGameButton.setPos(x_offset, 0, -0.6)
-		self.muteButton.setPos(1.575, -1.5, -0.8)
-
-		self.menuItems = [self.video, self.startGameButton, self.settingsButton, self.exitGameButton, self.card, self.logo, self.muteButton,]
-
-		self.buttonList = [self.startGameButton, self.settingsButton, self.exitGameButton, self.muteButton]
-		self.buttonScale = 0.1
-
-		# laziness will consume
-		for button in self.buttonList:
-			button.setScale(button.getSx()*self.buttonScale, self.buttonScale, self.buttonScale)
-
-		self.startGameButton.scale = self.startGameButton.getScale()
-		self.settingsButton.scale = self.settingsButton.getScale()
-		self.exitGameButton.scale = self.exitGameButton.getScale()
-		self.muteButton.scale = self.muteButton.getScale()
-
-		self.taskMgr.add(self.moveBackground, "mainMenu")
-		self.taskMgr.add(self.hoverEffect, "mainMenu")
+		mm.MainMenu.mainInit(self.mainmenu_inst, self)
 		
 	def settings(self):
-		for node in self.menuItems:
-			if (node == self.card):
-				continue
-			node.removeNode()
-		self.taskMgr.remove("mainMenu")
-		self.taskMgr.add(self.moveBackground, "mainMenu")
-
-
-		backTexture = (self.loader.loadTexture("assets/buttons/exit_normal.png"), self.loader.loadTexture("assets/buttons/exit_normal.png"), self.loader.loadTexture("assets/buttons/exit_hover.png"), self.loader.loadTexture("assets/buttons/exit_normal.png"))
-		self.backButton = DirectButton(command=self.backSettings, frameTexture=backTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
-		self.backButton.setTransparency(True)
-		self.backButton.setSx(482/226)
-		self.backButton.setPos(-1.2, 0, 0.6)
-
-		self.fullscreenTextureOff = (self.loader.loadTexture("assets/buttons/fullscreen_on.png"))
-		self.fullscreenTextureOn = (self.loader.loadTexture("assets/buttons/fullscreen_off.png"))
-		if (self.fullscreen):
-			fullscreenTexture = self.fullscreenTextureOn
-		else:
-			fullscreenTexture = self.fullscreenTextureOff
-		self.fullscreenButton = DirectButton(command=self.toggleFullscreenViaButton, frameTexture=fullscreenTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
-		self.fullscreenButton.setTransparency(TransparencyAttrib.MAlpha)
-		self.fullscreenButton.setScale(0.1)
-		self.fullscreenButton.setPos(0, 0, -0.2)
-
-		soundSliderBg = loader.loadTexture("assets/buttons/slider_bkg.png")
-		soundSliderThumb = loader.loadTexture("assets/buttons/slider_thumb.png")
-
-		self.soundSliderText = TextNode('volume')
-		self.soundSliderText.setText("Volume:")
-		self.soundSliderText.setShadow(0.07, 0.07)
-		self.soundSliderText.setFont(self.font)
-		self.soSlNode = aspect2d.attachNewNode(self.soundSliderText)
-		self.soSlNode.setScale(0.12)
-		self.soSlNode.setPos(-0.62, 0, 0.08)
-		
-		self.volumeText = TextNode('volume')
-		self.volumeText.setText(str(int(round(self.volume, 2) * 100)) + "%")
-		self.volumeText.setShadow(0.07, 0.07)
-		self.volumeText.setFont(self.font)
-		self.vTNode = aspect2d.attachNewNode(self.volumeText)
-		self.vTNode.setScale(0.1)
-		self.vTNode.setPos(0.62, 0, 0)
-
-		self.soundSlider = DirectSlider(value=self.volume, pos=(0, 0, 0), scale=(0.6), range=(0, 1), frameTexture=soundSliderBg, command=self.changeVol, thumb_frameTexture=soundSliderThumb, thumb_pressEffect=0, thumb_frameSize=(-0.075, 0.075, -0.075, 0.075), thumb_relief='flat')
-		self.soundSlider.setTransparency(TransparencyAttrib.MAlpha)
-
-		self.settingsButtons = [self.backButton]
-		for button in self.settingsButtons:
-			button.setScale(button.getSx()*self.buttonScale, self.buttonScale, self.buttonScale)
-		self.settingsItems = [self.backButton, self.soundSlider, self.soSlNode, self.vTNode, self.card, self.fullscreenButton]
-
-	def changeVol(self):
-		self.volume = self.soundSlider['value']
-		self.music.setVolume(self.volume)
-		self.volumeText.setText(str(int(round(self.volume, 2) * 100)) + "%")
-
-	def backSettings(self):
-		for node in self.settingsItems:
-			node.removeNode()
-		self.taskMgr.remove("mainMenu")
-		self.mainMenu()
+		mm.MainMenu.settings(self.mainmenu_inst, self)
 
 	def moveBackground(self, task):
-		self.background_move_x = self.background_x
-		self.background_move_y = self.background_y
-		if (self.mouseWatcherNode.hasMouse()):
-			self.background_move_x += (-self.mouseWatcherNode.getMouseX() * self.sensitivity)
-			self.background_move_y += (-self.mouseWatcherNode.getMouseY() * self.sensitivity)
-			self.card.setPos(self.background_move_x, 0, self.background_move_y)
+		mmt.MainMenuTasks.moveBackground(self.mainmenutasks_inst, self)
 		return Task.cont
 	
 	buttonHoverScale = 1.2
 	def hoverEffect(self, task):
-		for button in self.buttonList:
-			if (button.node().getState() == 2):
-				button.setScale(self.buttonHoverScale*button.scale[0], self.buttonHoverScale*button.scale[1], self.buttonHoverScale*button.scale[2])
-			else:
-				button.setScale(button.scale)
+		mmt.MainMenuTasks.hoverEffect(self.mainmenutasks_inst, self)
 		return Task.cont
-	
-	def mute(self):
-		if (self.musicActive):
-			self.music.setVolume(0)
-			self.muteButton["frameTexture"] = self.unmuteTexture
-		else:
-			self.music.setVolume(self.volume)
-			self.muteButton["frameTexture"] = self.muteTexture
-		self.musicActive = not self.musicActive
-		print(self.musicActive)
 
-	
 	def initGame(self):
 		for node in self.menuItems:
 			node.removeNode()
 		self.taskMgr.remove("mainMenu")
-		self.characterSelect()
-
-	def characterSelect(self):
-		self.sensitivity = 0.005
-		self.scaleFactorCS = 2.25
-		self.background_x = (-16/18)*self.scaleFactorCS
-		self.background_y = -0.5*self.scaleFactorCS
-		self.card = self.aspect2d.attachNewNode(self.cm.generate())
-		self.card.setScale((16/9)*self.scaleFactorCS, 1, 1*self.scaleFactorCS)
-
-		self.tex = self.loader.loadTexture('assets/charselect/background.png')
-		self.card.setTexture(self.tex)
-		self.card.setPos(self.background_x, 0, self.background_y)
-
-		self.boyPreview = (self.loader.loadTexture("assets/charselect/boy.png"))
-		self.girlPreview = (self.loader.loadTexture("assets/charselect/girl.png"))
-
-		self.boySelect = DirectButton(frameTexture=self.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
-		self.girlSelect = DirectButton(frameTexture=self.girlPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
-		charDistance = 1.05
-		self.boySelect.setPos(charDistance, 0, -0.25)
-		self.girlSelect.setPos(-charDistance, 0, -0.25)
-
-		self.charButtons = [self.boySelect, self.girlSelect]
-		self.charNodes = [self.boySelect, self.girlSelect, self.card]
-
-		self.taskMgr.add(self.moveBackground, "moveBackground")
-
-		for char in self.charButtons:
-			char.setTransparency(True)
-			char.setScale((512/640) * 0.5, 0.5, 0.5)
-		# i wish there was like a 'this' from js in python so i could see what the pressed thing is so i dont have to do this stupid stuff
-			# ^^^ incomprehendable
-		self.girlSelect["command"] = self.setCharacterA
-		self.boySelect["command"] = self.setCharacterB
-	
-	def setCharacterA(self):
-		self.character = 1
-		self.backstoryVideo = "assets/backstories/Girl.avi"
-		self.setCharacter()
-
-	def setCharacterB(self):
-		self.character = 2
-		self.backstoryVideo = "assets/backstories/Boy.avi"
-		self.setCharacter()
-
-	def setCharacter(self):
-		print(self.character)
-		
-		self.taskMgr.remove("moveBackground")
-		for node in self.charNodes:
-			node.removeNode()
-
-		# bed scene
-		self.cameraOffset = 4
-		self.loadScene("assets/models/bed.glb", (3.5, 6, 1.42), (0, 0, 10), doors=False, customTask=self.bedDoor, playerRot=(180, -90, 0))
-		self.helpMenu()
-		self.taskMgr.add(self.backstory, "backstory")
+		chs.CharSelect.characterSelect(self.charsel_inst, self)
 
 	isPlaying = False
 	def backstory(self, task):
-		self.staminaBar.hide()
-		if (not self.isPlaying):
-			gametext.Text.hideCH(self.game_text)
-			self.speedStop = True
-			self.music.stop()
-			self.playVid(self.backstoryVideo)
-
-		button_down = self.mouseWatcherNode.is_button_down
-
-		if (task.time >= 47 or button_down(KB_BUTTON('e'))):
-			self.music.play()
-			self.video.removeNode()
-			gametext.Text.showCH(self.game_text)
-			self.speedStop = False
-			self.skipText.setText("")
-			self.blackBg.destroy()
-			self.sound.stop()
-			self.staminaBar.show()
-			self.isPlaying = False
-			return Task.done
-		return Task.cont
+		return l0.Level0.backstory(self.l0, self, task)
 
 	def playVid(self, vidFile):
 		self.isPlaying = True
@@ -930,7 +550,6 @@ class Game(ShowBase):
 			item.setBillboardAxis()
 
 			self.items.append(item)
-
 
 	def showMission(self):
 		gametext.Text.hideText(self.game_text)

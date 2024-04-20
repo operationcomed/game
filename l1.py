@@ -18,12 +18,12 @@ class Level1():
 			self.missionShow = True
 			game.speedStop = True
 			self.showMission(self, game)
-			game.staminaBar.hide()
+			game.setBarVisibility(False)
 		
 		if (button_down(KB_BUTTON('e')) and self.missionShow and game.speedStop == True and task.time >= 0.1):
 			game.speedStop = False
 			game.missionImg.removeNode()
-			game.staminaBar.show()
+			game.setBarVisibility(True)
 			gametext.Text.showText(game.game_text)
 		
 		if (not self.initItemsDone):

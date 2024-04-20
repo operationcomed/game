@@ -87,7 +87,12 @@ class Game(ShowBase):
 	stamina = 10
 	staminaCap = 10
 
+	health = 100
+	healthCap = 100
+
 	sceneScale = (1.5, 1.5, 1.5)
+
+	healthRed = (1, 0.0, 0.4, 1)
 
 	staminaRed = (1, 0.4, 0.2, 1)
 	staminaGreen = (0.3, 1, 0.5, 1)
@@ -139,7 +144,6 @@ class Game(ShowBase):
 			return Task.done
 		if (not self.isPlaying):
 			vd.Video.playVid(self.video_inst, self, 'assets/media/spash.avi')
-			self.skipText.setText("")
 		return Task.cont
 
 	fullscreen = False
@@ -156,6 +160,14 @@ class Game(ShowBase):
 	
 	def helpMenu(self):
 		hm.HelpMenu.helpMenu(self.help_inst, self)
+
+	def setBarVisibility(self, visible):
+		for bar in self.bars:
+			if (visible):
+				bar.show()
+			else:
+				bar.hide()
+			
 
 	# scene loading
 	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False, level=False):
@@ -220,22 +232,28 @@ class Game(ShowBase):
 		self.enableParticles()
 
 		# https://discourse.panda3d.org/t/directgui-directwaitbar/1761/2 (from 2006!)
-		staminaBg = loader.loadTexture("assets/buttons/stm_bkg.png")
-		staminaFg = loader.loadTexture("assets/buttons/stm_fg.png")
-		self.staminaBar = DirectWaitBar(frameSize=(0, 2, 0, 0.2), text="", value=100, pos=(-1.2, 0, -0.85), scale=(0.4), range=self.staminaCap, frameColor=(1, 1, 1, 0.8), frameTexture=staminaBg)
-		
-		self.staminaBar.setTransparency(TransparencyAttrib.MAlpha)
+		barBg = loader.loadTexture("assets/buttons/stm_bkg.png")
+		barFg = loader.loadTexture("assets/buttons/stm_fg.png")
+		self.staminaBar = DirectWaitBar(frameSize=(0, 2, 0, 0.2), text="", value=100, pos=(-1.2, 0, -0.85), scale=(0.4), range=self.staminaCap, frameColor=(1, 1, 1, 0.8), frameTexture=barBg)
 		self.staminaBar["barColor"] = self.staminaGreen
-		self.staminaBar.barStyle.setTexture(staminaFg)
-		self.staminaBar.updateBarStyle()
 
-		ts = TextureStage.getDefault()
-		self.staminaBar.setTexGen(ts, TexGenAttrib.MWorldPosition)
-		self.staminaBar.setTexProjector(ts, self.render2d, self.staminaBar)
-		self.staminaBar.setTexHpr(ts, 0, -90, 0)
-		self.staminaBar.setTexScale(ts, 1/2, 1, 1/0.2)
+		self.healthBar = DirectWaitBar(frameSize=(0, 2, 0, 0.2), text="", value=100, pos=(-1.2, 0, -0.65), scale=(0.4), range=self.healthCap, frameColor=(1, 1, 1, 0.8), frameTexture=barBg)
+		self.healthBar["barColor"] = self.healthRed
+		
+		self.bars = [self.staminaBar, self.healthBar]
 
-		self.sceneObjects.append(self.staminaBar)
+		for bar in self.bars:
+			bar.setTransparency(TransparencyAttrib.MAlpha)
+			bar.barStyle.setTexture(barFg)
+			bar.updateBarStyle()
+
+			ts = TextureStage.getDefault()
+			bar.setTexGen(ts, TexGenAttrib.MWorldPosition)
+			bar.setTexProjector(ts, self.render2d, bar)
+			bar.setTexHpr(ts, 0, -90, 0)
+			bar.setTexScale(ts, 1/2, 1, 1/0.2)
+			self.sceneObjects.append(bar)
+
 
 		# lights and shadows
 		alight = AmbientLight("alight1")

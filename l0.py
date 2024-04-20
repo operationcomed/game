@@ -8,7 +8,7 @@ KB = KeyboardButton
 
 class Level0():
 	def backstory(self, game, task):
-		game.staminaBar.hide()
+		game.setBarVisibility(False)
 		if (not game.isPlaying):
 			gametext.Text.hideCH(game.game_text)
 			game.speedStop = True
@@ -24,7 +24,7 @@ class Level0():
 			game.speedStop = False
 			game.blackBg.destroy()
 			game.sound.stop()
-			game.staminaBar.show()
+			game.setBarVisibility(True)
 			game.isPlaying = False
 			game.skipText.setText("")
 			return Task.done

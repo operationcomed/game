@@ -23,7 +23,7 @@ class Level0():
 			gametext.Text.hideCH(game.game_text)
 			game.speedStop = True
 			game.music.stop()
-			game.playVid(game.backstoryVideo)
+			game.video_inst.playVid(game.video_inst, game, game.backstoryVideo)
 
 		button_down = game.mouseWatcherNode.is_button_down
 
@@ -39,6 +39,33 @@ class Level0():
 			game.isPlaying = False
 			return Task.done
 		
+		return Task.cont
+	def bedDoor(self, game, task):
+		rot = game.camera.getH()
+		crosshair = game.game_text.itcText
+		#chnp = aspect2d.attachNewNode(game.game_text.itcText)
+		while rot > 360:
+			rot -= 360
+		while rot < 0:
+			rot += 360
+		# X: 1.5 -> -2.5
+		# Y: < -4
+		posX = game.camera.getX()
+		posY = game.camera.getY()
+		#print(posX, posY)
+		doorInteract = False
+		if ((posX >= -2.5 and posX <= 1.5) and posY <= -4):
+			crosshair.setTextColor(1, 0.5, 0, 1)
+			doorInteract = True
+		else:
+			crosshair.setTextColor(1, 1, 1, 1)
+			doorInteract = False
+			
+		button_down = game.mouseWatcherNode.is_button_down
+		if (button_down(KB_BUTTON('e')) and doorInteract):
+			game.unloadScene()
+			game.cameraOffset = 4
+			game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 10.5), "assets/models/door.glb", game.mission)
 		return Task.cont
 
 l0 = Level0

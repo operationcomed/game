@@ -120,6 +120,12 @@ class MainMenu():
 
 	
 	def settings(self, game):
+		def toggleFullscreenViaButton():
+			if (game.fullscreen == False):
+				game.fullscreenButton['frameTexture'] = game.fullscreenTextureOn
+			if (game.fullscreen == True):
+				game.fullscreenButton['frameTexture'] = game.fullscreenTextureOff
+			game.toggleFullscreen()
 		def changeVol():
 			game.volume = game.soundSlider['value']
 			game.music.setVolume(game.volume)
@@ -149,7 +155,7 @@ class MainMenu():
 			fullscreenTexture = game.fullscreenTextureOn
 		else:
 			fullscreenTexture = game.fullscreenTextureOff
-		game.fullscreenButton = DirectButton(command=game.toggleFullscreenViaButton, frameTexture=fullscreenTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		game.fullscreenButton = DirectButton(command=toggleFullscreenViaButton, frameTexture=fullscreenTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		game.fullscreenButton.setTransparency(TransparencyAttrib.MAlpha)
 		game.fullscreenButton.setScale(0.1)
 		game.fullscreenButton.setPos(0, 0, -0.2)

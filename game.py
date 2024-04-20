@@ -17,6 +17,7 @@ import movement as mv
 import mainMenu as mm
 import mainMenuTasks as mmt
 import charSelect as chs
+import video as vd
 import l0
 # i don't ever plan on using tkinter (for gui purposes) lol
 import tkinter as tk
@@ -66,6 +67,7 @@ class Game(ShowBase):
 	mainmenu_inst = mm.main_menu
 	mainmenutasks_inst = mmt.mm_tasks
 	charsel_inst = chs.ch_select
+	video_inst = vd.video
 
 	# levels
 	l0 = l0.l0
@@ -136,7 +138,7 @@ class Game(ShowBase):
 			self.mainMenu()
 			return Task.done
 		if (not self.isPlaying):
-			self.playVid('assets/media/spash.avi')
+			vd.Video.playVid(self.video_inst, self, 'assets/media/spash.avi')
 			self.skipText.setText("")
 		return Task.cont
 
@@ -151,14 +153,8 @@ class Game(ShowBase):
 			props.setSize(width, height)
 		self.win.request_properties(props)
 		self.fullscreen = not self.fullscreen
-
-	def toggleFullscreenViaButton(self):
-		if (self.fullscreen == False):
-			self.fullscreenButton['frameTexture'] = self.fullscreenTextureOn
-		if (self.fullscreen == True):
-			self.fullscreenButton['frameTexture'] = self.fullscreenTextureOff
-		self.toggleFullscreen()
 	
+	# scene loading
 	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False):
 		self.accept("h", self.helpMenu)
 		self.stamina = self.staminaCap
@@ -389,13 +385,11 @@ class Game(ShowBase):
 		mm.MainMenu.settings(self.mainmenu_inst, self)
 
 	def moveBackground(self, task):
-		mmt.MainMenuTasks.moveBackground(self.mainmenutasks_inst, self)
-		return Task.cont
+		return mmt.MainMenuTasks.moveBackground(self.mainmenutasks_inst, self, task)
 	
 	buttonHoverScale = 1.2
 	def hoverEffect(self, task):
-		mmt.MainMenuTasks.hoverEffect(self.mainmenutasks_inst, self)
-		return Task.cont
+		return mmt.MainMenuTasks.hoverEffect(self.mainmenutasks_inst, self, task)
 
 	def initGame(self):
 		for node in self.menuItems:
@@ -403,67 +397,14 @@ class Game(ShowBase):
 		self.taskMgr.remove("mainMenu")
 		chs.CharSelect.characterSelect(self.charsel_inst, self)
 
+	# level 0
 	isPlaying = False
 	def backstory(self, task):
 		return l0.Level0.backstory(self.l0, self, task)
-
-	def playVid(self, vidFile):
-		self.isPlaying = True
-		# this bg is here to prevent 3d game from being shown
-		self.blackBg = OnscreenImage(image='assets/backstories/black.png', scale=(1000, 1, 1000))
-		self.cm = CardMaker('card')
-		self.cm.setFrameFullscreenQuad()
-		self.scaleFactorVid = 1.9
-		self.video = self.aspect2d.attachNewNode(self.cm.generate())
-		self.video.setScale(self.scaleFactorVid, 1, self.scaleFactorVid)
-
-		self.tex = MovieTexture("backstory")
-		self.tex.read(vidFile)
-		self.sound = self.loader.loadSfx(vidFile)
-		self.sound.setVolume(self.volume)
-		self.sound.play()
-		self.cm.setUvRange(self.tex)
-		self.video.setTexture(self.tex)
-
-		self.background_x = 0.115
-		self.background_y = 0.899
-
-		self.video.setPos(self.background_x, 0, self.background_y)
-		self.skipText = TextNode('items')
-		self.skipText.setText(self.skipTextLabel)
-		self.skipText.setShadow(0.15, 0.15)
-		self.skipText.setFont(self.font)
-		self.stnp = aspect2d.attachNewNode(self.skipText)
-		self.stnp.setPos(-1.2, 0, 0.85)
-		self.stnp.setScale(0.07)
-
+	
 	def bedDoor(self, task):
-		rot = self.camera.getH()
-		crosshair = self.game_text.itcText
-		#chnp = aspect2d.attachNewNode(self.game_text.itcText)
-		while rot > 360:
-			rot -= 360
-		while rot < 0:
-			rot += 360
-		# X: 1.5 -> -2.5
-		# Y: < -4
-		posX = self.camera.getX()
-		posY = self.camera.getY()
-		#print(posX, posY)
-		doorInteract = False
-		if ((posX >= -2.5 and posX <= 1.5) and posY <= -4):
-			crosshair.setTextColor(1, 0.5, 0, 1)
-			doorInteract = True
-		else:
-			crosshair.setTextColor(1, 1, 1, 1)
-			doorInteract = False
-			
-		button_down = self.mouseWatcherNode.is_button_down
-		if (button_down(KB_BUTTON('e')) and doorInteract):
-			self.unloadScene()
-			self.cameraOffset = 4
-			self.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 10.5), "assets/models/door.glb", self.mission)
-		return Task.cont
+		return l0.Level0.bedDoor(self.l0, self, task)
+
 	
 	missionShow = False
 	initItemsDone = False

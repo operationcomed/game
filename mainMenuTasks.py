@@ -1,17 +1,6 @@
-from direct.showbase.ShowBase import ShowBase
-from direct.showbase import Audio3DManager
-from math import pi, sin, cos
 from direct.task import Task
-from direct.actor.Actor import Actor
-from direct.interval.IntervalGlobal import Sequence
-from direct.gui.OnscreenText import OnscreenText
-from direct.filter.CommonFilters import CommonFilters
-from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import *
 from direct.gui.DirectGui import *
-from panda3d.physics import ActorNode, ForceNode, LinearVectorForce, PhysicsCollisionHandler
-import time
-import gametext
 
 class MainMenuTasks():
 	def moveBackground(self, game, task):

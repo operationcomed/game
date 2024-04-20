@@ -1,16 +1,10 @@
 from direct.showbase.ShowBase import ShowBase
-from direct.showbase import Audio3DManager
-from math import pi, sin, cos
 from direct.task import Task
 from direct.actor.Actor import Actor
-from direct.interval.IntervalGlobal import Sequence
-from direct.gui.OnscreenText import OnscreenText
 from direct.filter.CommonFilters import CommonFilters
-from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import *
 from direct.gui.DirectGui import *
 from panda3d.physics import ActorNode, ForceNode, LinearVectorForce, PhysicsCollisionHandler
-import time
 import gametext
 import direct.particles
 import movement as mv
@@ -18,7 +12,9 @@ import mainMenu as mm
 import mainMenuTasks as mmt
 import charSelect as chs
 import video as vd
+import helpmenu as hm
 import l0
+import l1
 # i don't ever plan on using tkinter (for gui purposes) lol
 import tkinter as tk
 
@@ -68,9 +64,11 @@ class Game(ShowBase):
 	mainmenutasks_inst = mmt.mm_tasks
 	charsel_inst = chs.ch_select
 	video_inst = vd.video
+	help_inst = hm.hm
 
 	# levels
 	l0 = l0.l0
+	l1 = l1.l1
 
 	fog_color = (0.2, 0.3, 0.35)
 	
@@ -96,6 +94,8 @@ class Game(ShowBase):
 	
 	skipTextLabel = "Press E to skip intro."
 	volume = 0.75
+
+	isPlaying = False
 
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -154,8 +154,11 @@ class Game(ShowBase):
 		self.win.request_properties(props)
 		self.fullscreen = not self.fullscreen
 	
+	def helpMenu(self):
+		hm.HelpMenu.helpMenu(self.help_inst, self)
+
 	# scene loading
-	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False):
+	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False, level=False):
 		self.accept("h", self.helpMenu)
 		self.stamina = self.staminaCap
 		self.music.stop()
@@ -315,7 +318,6 @@ class Game(ShowBase):
 		self.render.setFog(fog)
 
 		# text
-		
 		self.textNodePath = aspect2d.attachNewNode(self.game_text.ctlText)
 		self.textNodePath.setScale(0.07)
 		self.textNodePath.setPos(-1.2, 0, 0.85)
@@ -365,17 +367,6 @@ class Game(ShowBase):
 	def moveTask(self, task):
 		mv.Movement.movement(self.movement_inst, self)
 		return Task.cont
-		
-	helpDisplay = False
-	def helpMenu(self):
-		self.helpDisplay = not self.helpDisplay
-		if (self.helpDisplay):
-			self.helpMenuImg = OnscreenImage(image='assets/media/helpMenu.png', scale=(16/9, 1, 1))
-			self.helpMenuImg.setTransparency(TransparencyAttrib.MAlpha)
-			self.textNodePath.hide()
-		else:
-			self.helpMenuImg.destroy()
-			self.textNodePath.show()
 
 	musicPlaying = False
 	def mainMenu(self):
@@ -398,116 +389,15 @@ class Game(ShowBase):
 		chs.CharSelect.characterSelect(self.charsel_inst, self)
 
 	# level 0
-	isPlaying = False
 	def backstory(self, task):
 		return l0.Level0.backstory(self.l0, self, task)
 	
 	def bedDoor(self, task):
 		return l0.Level0.bedDoor(self.l0, self, task)
-
 	
-	missionShow = False
-	initItemsDone = False
-	missionDone = False
-	itemsGotten = 0
-	def mission(self, task):
-		crosshair = self.game_text.itcText
-		button_down = self.mouseWatcherNode.is_button_down
-		if (not self.missionShow):
-			self.missionShow = True
-			self.speedStop = True
-			self.showMission()
-			self.staminaBar.hide()
-		
-		if (button_down(KB_BUTTON('e')) and self.missionShow and self.speedStop == True and task.time >= 0.1):
-			self.speedStop = False
-			self.missionImg.removeNode()
-			self.staminaBar.show()
-			gametext.Text.showText(self.game_text)
-		
-		if (not self.initItemsDone):
-			self.initItems()
-		else:
-			posX = self.ppnp.getX()
-			posY = self.ppnp.getY()
-			#posZ = self.ppnp.getZ() # no z axis atm because it'll be a hassle
-			i = 0
-			for itemPos in self.itemList:
-				if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
-					pickup = self.loader.loadSfx('assets/sound/pickup.wav')
-					pickup.setLoop(False)
-					pickup.setVolume(self.volume)
-					pickup.play()
-					self.items[i].removeNode()
-					self.itemsGotten += 1
-					self.game_text.itmText.setText(self.game_text.itmText.getText() + "\n" + itemPos[2])
-					itemPos[2] = None
-				i += 1
-
-		posX = self.camera.getX()
-		posY = self.camera.getY()
-		if (self.itemsGotten >= 5 and not self.missionDone):
-			doneSound = self.loader.loadSfx('assets/sound/done.mp3')
-			doneSound.setLoop(False)
-			doneSound.play()
-			self.missionDone = True
-			self.game_text.itmText.setTextColor(0, 1, 0.5, 1)
-			self.game_text.itmText.setText(self.game_text.itmText.getText() + "\n" + "You can escape through the door now!")
-		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 5):
-			crosshair.setTextColor(1, 0.5, 0, 1)
-			doorInteract = True
-		else: 
-			crosshair.setTextColor(1, 1, 1, 1)
-			doorInteract = False
-
-		if (button_down(KB_BUTTON('e')) and doorInteract):
-			self.unloadScene()
-			self.game_text.ctlText.setText("")
-			self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
-			self.interactNode.setScale(0.14)
-			self.interactNode.setPos(-0.5, 0, 0)
-			self.sceneObjects.append(self.interactNode)
-			self.game_text.itcText.setText("Level 1 Complete!")
-
-		return Task.cont
-	
-	def initItems(self):
-		self.initItemsDone = True
-		self.scaleFactorItem = 4
-		# filename, position, human readable name
-		self.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (20, -20, 0), 'Medicine'], ['5_prescription', (-15, -7.8, 0), 'Doctor\'s Prescription']]
-		self.items = []
-		self.cm = CardMaker('card')
-		for itemPath in self.itemList:
-			item = self.render.attachNewNode(self.cm.generate())
-			item.setScale(self.scaleFactorItem, 1, self.scaleFactorItem)
-
-			tex = self.loader.loadTexture('assets/items/' + itemPath[0] + '.png')
-			item.setTexture(tex)
-
-			item.setPos(itemPath[1])
-			item.setTransparency(TransparencyAttrib.MAlpha)
-
-			item.setBillboardAxis()
-
-			self.items.append(item)
-
-	def showMission(self):
-		gametext.Text.hideText(self.game_text)
-		self.scaleFactorMission = 7/4
-		self.cm = CardMaker('card')
-		self.missionImg = self.aspect2d.attachNewNode(self.cm.generate())
-		self.missionImg.setScale((16/9)*self.scaleFactorMission, 1, self.scaleFactorMission)
-
-		self.tex = self.loader.loadTexture('assets/missions/1.png')
-		self.missionImg.setTexture(self.tex)
-
-		# these are the centers of the image
-		self.mission_x = (-16/9/2)*self.scaleFactorMission
-		self.mission_y = -0.5*self.scaleFactorMission
-
-		self.missionImg.setPos(self.mission_x, 0, self.mission_y)
-		self.missionImg.setTransparency(TransparencyAttrib.MAlpha)
+	# level 1
+	def missionLevel1(self, task):
+		return l1.Level1.mission(self.l1, self, task)
 
 	def exitGame(self):
 		exit()

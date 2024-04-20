@@ -1,16 +1,6 @@
-from direct.showbase.ShowBase import ShowBase
-from direct.showbase import Audio3DManager
-from math import pi, sin, cos
 from direct.task import Task
-from direct.actor.Actor import Actor
-from direct.interval.IntervalGlobal import Sequence
-from direct.gui.OnscreenText import OnscreenText
-from direct.filter.CommonFilters import CommonFilters
-from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import *
 from direct.gui.DirectGui import *
-from panda3d.physics import ActorNode, ForceNode, LinearVectorForce, PhysicsCollisionHandler
-import time
 import gametext
 
 KB_BUTTON = KeyboardButton.ascii_key
@@ -32,11 +22,11 @@ class Level0():
 			game.video.removeNode()
 			gametext.Text.showCH(game.game_text)
 			game.speedStop = False
-			game.skipText.setText("")
 			game.blackBg.destroy()
 			game.sound.stop()
 			game.staminaBar.show()
 			game.isPlaying = False
+			game.skipText.setText("")
 			return Task.done
 		
 		return Task.cont
@@ -65,7 +55,7 @@ class Level0():
 		if (button_down(KB_BUTTON('e')) and doorInteract):
 			game.unloadScene()
 			game.cameraOffset = 4
-			game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 10.5), "assets/models/door.glb", game.mission)
+			game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 10.5), "assets/models/door.glb", game.missionLevel1)
 		return Task.cont
 
 l0 = Level0

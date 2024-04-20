@@ -1,7 +1,6 @@
 from math import pi, sin, cos
 from panda3d.core import *
 from direct.gui.DirectGui import *
-import direct.particles
 
 KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton

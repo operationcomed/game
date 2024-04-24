@@ -142,5 +142,13 @@ class Movement():
 		game.camera.setZ(game.ppnp.getZ() + game.cameraOffset)
 
 		game.staminaBar["value"] = game.stamina
+		game.healthBar["value"] = game.health
+
+		if (game.health <= 1):
+			game.speedStop = True
+			pickup = game.loader.loadSfx('assets/sound/pickup.wav')
+			pickup.setLoop(False)
+			pickup.setVolume(game.volume)
+			pickup.play()
 
 movement = Movement

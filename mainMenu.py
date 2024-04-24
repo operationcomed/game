@@ -118,6 +118,7 @@ class MainMenu():
 		def changeVol():
 			game.volume = game.soundSlider['value']
 			game.music.setVolume(game.volume)
+			game.sound.setVolume(game.volume)
 			game.volumeText.setText(str(int(round(game.volume, 2) * 100)) + "%")
 		def changeSens():
 			game.sensitivity = round(game.sensitivitySlider['value'], 2)
@@ -210,6 +211,7 @@ class MainMenu():
 		def changeVol():
 			game.volume = game.soundSlider['value']
 			game.music.setVolume(game.volume)
+			game.sound.setVolume(game.volume)
 			game.volumeText.setText(str(int(round(game.volume, 2) * 100)) + "%")
 		def changeSens():
 			game.sensitivity = round(game.sensitivitySlider['value'], 2)

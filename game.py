@@ -15,6 +15,7 @@ import video as vd
 import helpmenu as hm
 import l0
 import l1
+import l2
 # i don't ever plan on using tkinter (for gui purposes) lol
 import tkinter as tk
 
@@ -61,6 +62,7 @@ class Game(ShowBase):
 	# levels
 	l0 = l0.l0
 	l1 = l1.l1
+	l2 = l2.l2
 
 	fog_color = (0.1, 0.15, 0.175)
 	
@@ -240,7 +242,7 @@ class Game(ShowBase):
 		self.staminaBar = DirectWaitBar(frameSize=(0, 2, 0, 0.2), text="", value=self.staminaCap, pos=(-1.2, 0, -0.85), scale=(0.4), range=self.staminaCap, frameColor=(1, 1, 1, 0.8), frameTexture=barBg)
 		self.staminaBar["barColor"] = self.staminaGreen
 
-		self.healthBar = DirectWaitBar(frameSize=(0, 2, 0, 0.2), text="", value=100, pos=(-1.2, 0, -0.65), scale=(0.4), range=self.healthCap, frameColor=(1, 1, 1, 0.8), frameTexture=barBg)
+		self.healthBar = DirectWaitBar(frameSize=(0, 2, 0, 0.2), text="", value=self.healthCap, pos=(-1.2, 0, -0.65), scale=(0.4), range=self.healthCap, frameColor=(1, 1, 1, 0.8), frameTexture=barBg)
 		self.healthBar["barColor"] = self.healthRed
 		
 		self.bars = [self.staminaBar, self.healthBar]
@@ -411,6 +413,13 @@ class Game(ShowBase):
 	# level 1
 	def missionLevel1(self, task):
 		return l1.Level1.mission(self.l1, self, task)
+	
+	# level 2
+	def l2Cutscene(self, task):
+		return l2.Level2.l2Cutscene(self.l2, self, task)
+	
+	def missionLevel2(self, task):
+		return l2.Level2.mission(self.l2, self, task)
 
 	def exitGame(self):
 		exit()

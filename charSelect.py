@@ -38,11 +38,13 @@ class CharSelect():
 		def setCharacterA():
 			game.character = 1
 			game.backstoryVideo = "assets/backstories/Girl.avi"
+			game.l2Video = "assets/media/l2_girl.avi"
 			self.setCharacter(game)
 
 		def setCharacterB():
 			game.character = 2
 			game.backstoryVideo = "assets/backstories/Boy.avi"
+			game.l2Video = "assets/media/l2_boy.avi"
 			self.setCharacter(game)
 
 		game.girlSelect["command"] = setCharacterA

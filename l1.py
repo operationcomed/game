@@ -71,12 +71,10 @@ class Level1():
 			for img in game.itemsImg:
 				img.destroy()
 			game.unloadScene()
-			game.game_text.ctlText.setText("")
-			game.interactNode = aspect2d.attachNewNode(game.game_text.itcText)
-			game.interactNode.setScale(0.14)
-			game.interactNode.setPos(-0.5, 0, 0)
-			game.sceneObjects.append(game.interactNode)
-			game.game_text.itcText.setText("Level 1 Complete!")
+			game.game_text.itmText.setTextColor(1, 1, 1, 1)
+			game.game_text.itmText.setText("Items obtained:")
+			game.loadScene("assets/models/msu.glb", (-17.0, 6.25, 5.414), (0, 0, 10.5), customTask=game.missionLevel2)
+			game.taskMgr.add(game.l2Cutscene, "l2Cutscene")
 
 		return Task.cont
 	

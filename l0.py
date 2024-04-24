@@ -56,7 +56,7 @@ class Level0():
 		if (button_down(KB_BUTTON('e')) and doorInteract):
 			game.unloadScene()
 			game.cameraOffset = 4
-			game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 10.5), "assets/models/door.glb", game.missionLevel1)
+			game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 100.5), "assets/models/door.glb", game.missionLevel1)
 		return Task.cont
 
 l0 = Level0

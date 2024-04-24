@@ -89,7 +89,7 @@ class Game(ShowBase):
 	staminaRed = (1, 0.4, 0.2, 1)
 	staminaGreen = (0.3, 1, 0.5, 1)
 	
-	skipTextLabel = "Press E to skip intro."
+	skipTextLabel = "Press E to skip."
 	volume = 0.75
 
 	isPlaying = False

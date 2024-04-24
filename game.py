@@ -5,6 +5,7 @@ from direct.filter.CommonFilters import CommonFilters
 from panda3d.core import *
 from direct.gui.DirectGui import *
 from panda3d.physics import ActorNode, ForceNode, LinearVectorForce, PhysicsCollisionHandler
+import json
 import gametext
 import direct.particles
 import movement as mv
@@ -96,7 +97,6 @@ class Game(ShowBase):
 
 	isPlaying = False
 
-
 	sensitivity = 30
 
 	def __init__(self):
@@ -109,6 +109,7 @@ class Game(ShowBase):
 		self.accept("x", self.exitGame)
 		self.accept("shift-x", self.exitGame)
 
+		# settings loading
 		self.scene_rot = open("assets/ROT_SCENE", "r").read()
 
 		if (self.scene_rot == "True"):
@@ -116,6 +117,11 @@ class Game(ShowBase):
 		else:
 			self.scene_rot = False
 
+		settings = json.load(open("assets/SETTINGS", "r"))
+		self.volume = settings["volume"]
+		self.sensitivity = settings["sensitivity"]
+		
+		#font
 		self.font = self.loader.loadFont('assets/fonts/zilla-slab.ttf')
 
 		self.font.setPixelsPerUnit(64)

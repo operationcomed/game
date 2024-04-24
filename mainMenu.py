@@ -1,5 +1,6 @@
 from panda3d.core import *
 from direct.gui.DirectGui import *
+import json
 import gametext
 
 class MainMenu():
@@ -120,9 +121,11 @@ class MainMenu():
 			game.music.setVolume(game.volume)
 			game.sound.setVolume(game.volume)
 			game.volumeText.setText(str(int(round(game.volume, 2) * 100)) + "%")
+			self.modifySettings(self, game)
 		def changeSens():
 			game.sensitivity = round(game.sensitivitySlider['value'], 2)
 			game.sensText.setText(str(game.sensitivity))
+			self.modifySettings(self, game)
 		def backSettings():
 			for node in game.settingsItems:
 				node.removeNode()
@@ -213,9 +216,11 @@ class MainMenu():
 			game.music.setVolume(game.volume)
 			game.sound.setVolume(game.volume)
 			game.volumeText.setText(str(int(round(game.volume, 2) * 100)) + "%")
+			self.modifySettings(self, game)
 		def changeSens():
 			game.sensitivity = round(game.sensitivitySlider['value'], 2)
 			game.sensText.setText(str(game.sensitivity))
+			self.modifySettings(self, game)
 		def backSettings():
 			for node in game.settingsItems:
 				node.removeNode()
@@ -314,5 +319,12 @@ class MainMenu():
 			button.setScale(button.getSx()*game.buttonScale, game.buttonScale, game.buttonScale)
 		game.settingsItems = [game.backButton, game.soundSlider, game.soSlNode, game.vTNode, game.card, game.fullscreenButton, game.sNode, game.sTNode, game.sensitivitySlider, game.bkg]
 
+	def modifySettings(self, game):
+		settings = open("assets/SETTINGS", "w")
+		settings.write('''{
+  "sensitivity": ''' + str(game.sensitivity) + ''',
+  "volume": ''' + str(game.volume) + '''
+}
+''')
 
 main_menu = MainMenu

@@ -94,6 +94,9 @@ class Game(ShowBase):
 
 	isPlaying = False
 
+
+	sensitivity = 30
+
 	def __init__(self):
 		ShowBase.__init__(self)
 		props = WindowProperties()
@@ -160,7 +163,12 @@ class Game(ShowBase):
 				bar.show()
 			else:
 				bar.hide()
-			
+
+	settingsShow = False
+	def settingsIG(self):
+		if (not self.settingsShow):
+			self.filters.setBlurSharpen(0.0)
+			mm.MainMenu.settingsIG(self.mainmenu_inst, self)
 
 	# scene loading
 	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False, level=False):
@@ -172,6 +180,8 @@ class Game(ShowBase):
 		self.music.setLoop(True)
 		self.music.play()
 		self.disable_mouse()
+
+		self.accept("escape", self.settingsIG)
 		
 		self.sceneObjects = []
 

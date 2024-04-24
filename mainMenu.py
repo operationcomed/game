@@ -1,5 +1,6 @@
 from panda3d.core import *
 from direct.gui.DirectGui import *
+import gametext
 
 class MainMenu():
 	def mainInit(self, game):
@@ -12,7 +13,7 @@ class MainMenu():
 				game.muteButton["frameTexture"] = game.muteTexture
 			game.musicActive = not game.musicActive
 			print(game.musicActive)
-		game.sensitivity = 0.025
+		game.MMsensitivity = 0.025
 		game.scaleFactor = 3
 		game.scaleFactorLogo = 0.2
 	
@@ -118,18 +119,22 @@ class MainMenu():
 			game.volume = game.soundSlider['value']
 			game.music.setVolume(game.volume)
 			game.volumeText.setText(str(int(round(game.volume, 2) * 100)) + "%")
+		def changeSens():
+			game.sensitivity = round(game.sensitivitySlider['value'], 2)
+			game.sensText.setText(str(game.sensitivity))
 		def backSettings():
 			for node in game.settingsItems:
 				node.removeNode()
 			game.taskMgr.remove("mainMenu")
 			game.mainMenu()
+
 		for node in game.menuItems:
 			if (node == game.card):
 				continue
 			node.removeNode()
+
 		game.taskMgr.remove("mainMenu")
 		game.taskMgr.add(game.moveBackground, "mainMenu")
-
 
 		backTexture = (game.loader.loadTexture("assets/buttons/exit_normal.png"), game.loader.loadTexture("assets/buttons/exit_normal.png"), game.loader.loadTexture("assets/buttons/exit_hover.png"), game.loader.loadTexture("assets/buttons/exit_normal.png"))
 		game.backButton = DirectButton(command=backSettings, frameTexture=backTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
@@ -146,7 +151,7 @@ class MainMenu():
 		game.fullscreenButton = DirectButton(command=toggleFullscreenViaButton, frameTexture=fullscreenTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		game.fullscreenButton.setTransparency(TransparencyAttrib.MAlpha)
 		game.fullscreenButton.setScale(0.1)
-		game.fullscreenButton.setPos(0, 0, -0.2)
+		game.fullscreenButton.setPos(0, 0, -0.3)
 
 		soundSliderBg = loader.loadTexture("assets/buttons/slider_bkg.png")
 		soundSliderThumb = loader.loadTexture("assets/buttons/slider_thumb.png")
@@ -157,23 +162,155 @@ class MainMenu():
 		game.soundSliderText.setFont(game.font)
 		game.soSlNode = aspect2d.attachNewNode(game.soundSliderText)
 		game.soSlNode.setScale(0.12)
-		game.soSlNode.setPos(-0.62, 0, 0.08)
-		
+		game.soSlNode.setPos(-0.62, 0, -0.03)
+
 		game.volumeText = TextNode('volume')
 		game.volumeText.setText(str(int(round(game.volume, 2) * 100)) + "%")
 		game.volumeText.setShadow(0.07, 0.07)
 		game.volumeText.setFont(game.font)
 		game.vTNode = aspect2d.attachNewNode(game.volumeText)
 		game.vTNode.setScale(0.1)
-		game.vTNode.setPos(0.62, 0, 0)
+		game.vTNode.setPos(0.62, 0, -0.1)
 
-		game.soundSlider = DirectSlider(value=game.volume, pos=(0, 0, 0), scale=(0.6), range=(0, 1), frameTexture=soundSliderBg, command=changeVol, thumb_frameTexture=soundSliderThumb, thumb_pressEffect=0, thumb_frameSize=(-0.075, 0.075, -0.075, 0.075), thumb_relief='flat')
+		game.sensSText = TextNode('sensitivity')
+		game.sensSText.setText("Sensitivity:")
+		game.sensSText.setShadow(0.07, 0.07)
+		game.sensSText.setFont(game.font)
+		game.sNode = aspect2d.attachNewNode(game.sensSText)
+		game.sNode.setScale(0.12)
+		game.sNode.setPos(-0.62, 0, 0.4)
+
+		game.sensText = TextNode('sensitivity')
+		game.sensText.setText(str(int(round(game.sensitivity, 2))))
+		game.sensText.setShadow(0.07, 0.07)
+		game.sensText.setFont(game.font)
+		game.sTNode = aspect2d.attachNewNode(game.sensText)
+		game.sTNode.setScale(0.1)
+		game.sTNode.setPos(0.62, 0, 0.3)
+
+		game.soundSlider = DirectSlider(value=game.volume, pos=(0, 0, -0.1), scale=(0.6), range=(0, 1), frameTexture=soundSliderBg, command=changeVol, thumb_frameTexture=soundSliderThumb, thumb_pressEffect=0, thumb_frameSize=(-0.075, 0.075, -0.075, 0.075), thumb_relief='flat')
 		game.soundSlider.setTransparency(TransparencyAttrib.MAlpha)
+
+		game.sensitivitySlider = DirectSlider(value=game.sensitivity, pos=(0, 0, 0.3), scale=(0.6), range=(5, 100), frameTexture=soundSliderBg, command=changeSens, thumb_frameTexture=soundSliderThumb, thumb_pressEffect=0, thumb_frameSize=(-0.075, 0.075, -0.075, 0.075), thumb_relief='flat')
+		game.sensitivitySlider.setTransparency(TransparencyAttrib.MAlpha)
 
 		game.settingsButtons = [game.backButton]
 		for button in game.settingsButtons:
 			button.setScale(button.getSx()*game.buttonScale, game.buttonScale, game.buttonScale)
-		game.settingsItems = [game.backButton, game.soundSlider, game.soSlNode, game.vTNode, game.card, game.fullscreenButton]
+		game.settingsItems = [game.backButton, game.soundSlider, game.soSlNode, game.vTNode, game.card, game.fullscreenButton, game.sNode, game.sTNode, game.sensitivitySlider]
+
+	# settings in-game
+	def settingsIG(self, game):
+		def toggleFullscreenViaButton():
+			if (game.fullscreen == False):
+				game.fullscreenButton['frameTexture'] = game.fullscreenTextureOn
+			if (game.fullscreen == True):
+				game.fullscreenButton['frameTexture'] = game.fullscreenTextureOff
+			game.toggleFullscreen()
+		def changeVol():
+			game.volume = game.soundSlider['value']
+			game.music.setVolume(game.volume)
+			game.volumeText.setText(str(int(round(game.volume, 2) * 100)) + "%")
+		def changeSens():
+			game.sensitivity = round(game.sensitivitySlider['value'], 2)
+			game.sensText.setText(str(game.sensitivity))
+		def backSettings():
+			for node in game.settingsItems:
+				node.removeNode()
+			for bar in game.bars:
+				bar.setScale(0.4)
+			try:
+				for img in game.itemsImg:
+					img["scale"] = 0.15
+			except:
+				''''''
+			game.filters.delBlurSharpen()
+			gametext.Text.showCH(game.game_text)
+			gametext.Text.showText(game.game_text)
+			game.speedStop = False
+			game.settingsShow = False
+
+		game.bkg = OnscreenImage(image='assets/media/semi-black.png', scale=(512))
+		game.bkg.setTransparency(True)
+		gametext.Text.hideCH(game.game_text)
+		gametext.Text.hideText(game.game_text)
+
+		try:
+			for img in game.itemsImg:
+				img["scale"] = 0
+		except:
+			''''''
+
+		game.speedStop = True
+
+		for bar in game.bars:
+			# setting it to 0 crashes the game
+			bar.setScale(0.001)
+
+		game.settingsShow = True
+
+		backTexture = (game.loader.loadTexture("assets/buttons/exit_normal.png"), game.loader.loadTexture("assets/buttons/exit_normal.png"), game.loader.loadTexture("assets/buttons/exit_hover.png"), game.loader.loadTexture("assets/buttons/exit_normal.png"))
+		game.backButton = DirectButton(command=backSettings, frameTexture=backTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		game.backButton.setTransparency(True)
+		game.backButton.setSx(482/226)
+		game.backButton.setPos(-1.2, 0, 0.6)
+
+		game.fullscreenTextureOff = (game.loader.loadTexture("assets/buttons/fullscreen_on.png"))
+		game.fullscreenTextureOn = (game.loader.loadTexture("assets/buttons/fullscreen_off.png"))
+		if (game.fullscreen):
+			fullscreenTexture = game.fullscreenTextureOn
+		else:
+			fullscreenTexture = game.fullscreenTextureOff
+		game.fullscreenButton = DirectButton(command=toggleFullscreenViaButton, frameTexture=fullscreenTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		game.fullscreenButton.setTransparency(TransparencyAttrib.MAlpha)
+		game.fullscreenButton.setScale(0.1)
+		game.fullscreenButton.setPos(0, 0, -0.3)
+
+		soundSliderBg = loader.loadTexture("assets/buttons/slider_bkg.png")
+		soundSliderThumb = loader.loadTexture("assets/buttons/slider_thumb.png")
+
+		game.soundSliderText = TextNode('volume')
+		game.soundSliderText.setText("Volume:")
+		game.soundSliderText.setShadow(0.07, 0.07)
+		game.soundSliderText.setFont(game.font)
+		game.soSlNode = aspect2d.attachNewNode(game.soundSliderText)
+		game.soSlNode.setScale(0.12)
+		game.soSlNode.setPos(-0.62, 0, -0.03)
+
+		game.volumeText = TextNode('volume')
+		game.volumeText.setText(str(int(round(game.volume, 2) * 100)) + "%")
+		game.volumeText.setShadow(0.07, 0.07)
+		game.volumeText.setFont(game.font)
+		game.vTNode = aspect2d.attachNewNode(game.volumeText)
+		game.vTNode.setScale(0.1)
+		game.vTNode.setPos(0.62, 0, -0.1)
+
+		game.sensSText = TextNode('sensitivity')
+		game.sensSText.setText("Sensitivity:")
+		game.sensSText.setShadow(0.07, 0.07)
+		game.sensSText.setFont(game.font)
+		game.sNode = aspect2d.attachNewNode(game.sensSText)
+		game.sNode.setScale(0.12)
+		game.sNode.setPos(-0.62, 0, 0.4)
+
+		game.sensText = TextNode('sensitivity')
+		game.sensText.setText(str(int(round(game.sensitivity, 2))))
+		game.sensText.setShadow(0.07, 0.07)
+		game.sensText.setFont(game.font)
+		game.sTNode = aspect2d.attachNewNode(game.sensText)
+		game.sTNode.setScale(0.1)
+		game.sTNode.setPos(0.62, 0, 0.3)
+
+		game.soundSlider = DirectSlider(value=game.volume, pos=(0, 0, -0.1), scale=(0.6), range=(0, 1), frameTexture=soundSliderBg, command=changeVol, thumb_frameTexture=soundSliderThumb, thumb_pressEffect=0, thumb_frameSize=(-0.075, 0.075, -0.075, 0.075), thumb_relief='flat')
+		game.soundSlider.setTransparency(TransparencyAttrib.MAlpha)
+
+		game.sensitivitySlider = DirectSlider(value=game.sensitivity, pos=(0, 0, 0.3), scale=(0.6), range=(5, 100), frameTexture=soundSliderBg, command=changeSens, thumb_frameTexture=soundSliderThumb, thumb_pressEffect=0, thumb_frameSize=(-0.075, 0.075, -0.075, 0.075), thumb_relief='flat')
+		game.sensitivitySlider.setTransparency(TransparencyAttrib.MAlpha)
+
+		game.settingsButtons = [game.backButton]
+		for button in game.settingsButtons:
+			button.setScale(button.getSx()*game.buttonScale, game.buttonScale, game.buttonScale)
+		game.settingsItems = [game.backButton, game.soundSlider, game.soSlNode, game.vTNode, game.card, game.fullscreenButton, game.sNode, game.sTNode, game.sensitivitySlider, game.bkg]
 
 
 main_menu = MainMenu

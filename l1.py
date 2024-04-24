@@ -21,10 +21,11 @@ class Level1():
 			game.setBarVisibility(False)
 		
 		if (button_down(KB_BUTTON('e')) and self.missionShow and game.speedStop == True and task.time >= 0.1):
+			game.itmTxtNode.show()
 			game.speedStop = False
 			game.missionImg.removeNode()
 			game.setBarVisibility(True)
-			for img in self.itemsImg:
+			for img in game.itemsImg:
 				img["scale"] = 0.15
 			gametext.Text.showText(game.game_text)
 		
@@ -44,7 +45,7 @@ class Level1():
 					game.items[i].removeNode()
 					self.itemsGotten += 1
 					#game.game_text.itmText.setText(game.game_text.itmText.getText() + "\n" + itemPos[2])
-					self.itemsImg[i].setColorScale(1, 1, 1, 1)
+					game.itemsImg[i].setColorScale(1, 1, 1, 1)
 					itemPos[2] = None
 				i += 1
 
@@ -57,7 +58,7 @@ class Level1():
 			self.missionDone = True
 			game.game_text.itmText.setTextColor(0, 1, 0.5, 1)
 			game.game_text.itmText.setText(game.game_text.itmText.getText() + "\n\n\n\n" + "You can escape through the door now!")
-			for img in self.itemsImg:
+			for img in game.itemsImg:
 				img.setColorScale(0, 1, 0.5, 1)
 		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 5):
 			crosshair.setTextColor(1, 0.5, 0, 1)
@@ -67,7 +68,7 @@ class Level1():
 			doorInteract = False
 
 		if (button_down(KB_BUTTON('e')) and doorInteract):
-			for img in self.itemsImg:
+			for img in game.itemsImg:
 				img.destroy()
 			game.unloadScene()
 			game.game_text.ctlText.setText("")
@@ -83,9 +84,9 @@ class Level1():
 		self.initItemsDone = True
 		game.scaleFactorItem = 4
 		# filename, position, human readable name
-		game.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (20, -20, 0), 'Medicine'], ['5_prescription', (-15, -7.8, 0), 'Doctor\'s Prescription']]
+		game.itemList = [['1_mask', (4.4, 17.5, 0), 'Mask'], ['2_cert', (-7.25, -18.25, 0), 'Medical Certificate'], ['3_excuse', (-9.5, 12.65, 0), 'Excuse Letter'], ['4_meds', (18, -18, 0), 'Medicine'], ['5_prescription', (-15, -7.8, 0), 'Doctor\'s Prescription']]
 		game.items = []
-		self.itemsImg = []
+		game.itemsImg = []
 		game.cm = CardMaker('card')
 		i = 0
 		for itemPath in game.itemList:
@@ -104,7 +105,7 @@ class Level1():
 			item.setBillboardAxis()
 
 			game.items.append(item)
-			self.itemsImg.append(image)
+			game.itemsImg.append(image)
 			i += 1
 
 	def showMission(self, game):

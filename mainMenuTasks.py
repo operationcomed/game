@@ -7,8 +7,8 @@ class MainMenuTasks():
 		game.background_move_x = game.background_x
 		game.background_move_y = game.background_y
 		if (game.mouseWatcherNode.hasMouse()):
-			game.background_move_x += (-game.mouseWatcherNode.getMouseX() * game.sensitivity)
-			game.background_move_y += (-game.mouseWatcherNode.getMouseY() * game.sensitivity)
+			game.background_move_x += (-game.mouseWatcherNode.getMouseX() * game.MMsensitivity)
+			game.background_move_y += (-game.mouseWatcherNode.getMouseY() * game.MMsensitivity)
 			game.card.setPos(game.background_move_x, 0, game.background_move_y)
 		return Task.cont
 	

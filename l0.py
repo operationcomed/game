@@ -30,6 +30,7 @@ class Level0():
 			return Task.done
 		
 		return Task.cont
+	
 	def bedDoor(self, game, task):
 		rot = game.camera.getH()
 		crosshair = game.game_text.itcText

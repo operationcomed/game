@@ -22,11 +22,9 @@ class Movement():
 		rot_x = game.camera.getH()
 		rot_y = game.camera.getP()
 		rot_z = game.camera.getR()
-
-		sensitivity = 30
 		
 		props = WindowProperties()
-		if (button_down(KB.escape())):
+		if (game.settingsShow):
 			props.setCursorHidden(False)
 			game.win.requestProperties(props)
 			props = game.win.getProperties()
@@ -41,8 +39,8 @@ class Movement():
 
 			# limits cursor to the middle
 			game.win.movePointer(0, props.getXSize() // 2, props.getYSize() // 2)
-			mouse_x = game.mouseWatcherNode.getMouseX() * sensitivity
-			mouse_y = game.mouseWatcherNode.getMouseY() * sensitivity
+			mouse_x = game.mouseWatcherNode.getMouseX() * game.sensitivity
+			mouse_y = game.mouseWatcherNode.getMouseY() * game.sensitivity
 
 			# prevent camera from going upside down
 			if (not game.speedStop):

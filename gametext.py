@@ -25,7 +25,6 @@ class Text():
 
 	text_list = [ctlText, stmText, itmText, hltText] 
 
-
 	def hideText(self):
 		for node in self.text_list:
 			node.setTextColor(1, 1, 1, 0)

@@ -4,7 +4,7 @@ from direct.gui.DirectGui import *
 class CharSelect():
 	def characterSelect(self, game):
 		self.game_i = game
-		game.sensitivity = 0.005
+		game.MMsensitivity = 0.005
 		game.scaleFactorCS = 2.25
 		game.background_x = (-16/18)*game.scaleFactorCS
 		game.background_y = -0.5*game.scaleFactorCS
@@ -59,6 +59,7 @@ class CharSelect():
 		game.cameraOffset = 4
 		game.loadScene("assets/models/bed.glb", (3.5, 6, 1.42), (0, 0, 10), doors=False, customTask=game.bedDoor, playerRot=(180, -90, 0))
 		game.helpMenu()
+		game.itmTxtNode.hide()
 		game.taskMgr.add(game.backstory, "backstory")
 
 ch_select = CharSelect

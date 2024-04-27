@@ -20,13 +20,5 @@ class MainMenuTasks():
 			else:
 				button.setScale(button.scale)
 		return Task.cont
-	
-	def hoverEffect2(self, game, task):
-		for button in game.charButtons:
-			if (button.node().getState() == 2):
-				button.setScale(game.buttonHoverScale*button.scale[0], game.buttonHoverScale*button.scale[1], game.buttonHoverScale*button.scale[2])
-			else:
-				button.setScale(button.scale)
-		return Task.cont
 
 mm_tasks = MainMenuTasks

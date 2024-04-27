@@ -67,13 +67,16 @@ class Level1():
 			crosshair.setTextColor(1, 1, 1, 1)
 			doorInteract = False
 
-		if (button_down(KB_BUTTON('e')) and doorInteract):
+		if ((button_down(KB_BUTTON('e')) and doorInteract) or (button_down(KB_BUTTON('2')) and game.debug)):
 			for img in game.itemsImg:
 				img.destroy()
+			if (game.debug):
+				for item in game.items:
+					item.removeNode()
 			game.unloadScene()
 			game.game_text.itmText.setTextColor(1, 1, 1, 1)
 			game.game_text.itmText.setText("Items obtained:")
-			game.loadScene("assets/models/msu.glb", (-17.0, 6.25, 5.414), (0, 0, 10.5), customTask=game.missionLevel2)
+			game.loadScene("assets/models/msu.glb", (-17.0, 6.25, -0.46), (0, 0, 10.5), customTask=game.missionLevel2)
 			game.taskMgr.add(game.l2Cutscene, "l2Cutscene")
 
 		return Task.cont

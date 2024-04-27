@@ -24,7 +24,7 @@ class Movement():
 		rot_z = game.camera.getR()
 		
 		props = WindowProperties()
-		if (game.settingsShow):
+		if (game.settingsShow or game.mouseLetGo):
 			props.setCursorHidden(False)
 			game.win.requestProperties(props)
 			props = game.win.getProperties()
@@ -79,19 +79,19 @@ class Movement():
 			
 		# movement with smooth acceleration
 		staminaGain = True
-		if (button_down(KB_BUTTON('w'))):
+		if (button_down(KB_BUTTON('w')) and game.input == False):
 			self.accelY += game.speed * cos(rot_x * (pi/180))
 			self.accelX -= game.speed * sin(rot_x * (pi/180))
 			staminaGain = False
-		if (button_down(KB_BUTTON('s'))):
+		if (button_down(KB_BUTTON('s')) and game.input == False):
 			self.accelY -= game.speed * cos(rot_x * (pi/180))
 			self.accelX += game.speed * sin(rot_x * (pi/180))
 			staminaGain = False
-		if (button_down(KB_BUTTON('d'))):
+		if (button_down(KB_BUTTON('d')) and game.input == False):
 			self.accelY += game.speed * sin(rot_x * (pi/180))
 			self.accelX += game.speed * cos(rot_x * (pi/180))
 			staminaGain = False
-		if (button_down(KB_BUTTON('a'))):
+		if (button_down(KB_BUTTON('a')) and game.input == False):
 			self.accelY -= game.speed * sin(rot_x * (pi/180))
 			self.accelX -= game.speed * cos(rot_x * (pi/180))
 			staminaGain = False
@@ -106,15 +106,21 @@ class Movement():
 			game.ppnp.setZ(game.ppnp.getZ()+0.1)
 
 		# fix for bug
-		if (button_down(KB_BUTTON('o')) and game.timer <= 0):
+		if (button_down(KB_BUTTON('o')) and game.timer <= 0 and game.input == False and game.debug == True and game.mouseLetGo == False):
 			if (game.scene_rot):
 				game.scene.setHpr(0, 0, 0)
 				if (game.doorRot):
-					game.doors.setHpr(0, 0, 0)
+					try:
+						game.doors.setHpr(0, 0, 0)
+					except:
+						''''''
 			else:
 				game.scene.setHpr(0, 90, 0)
 				if (game.doorRot):
-					game.doors.setHpr(0, 90, 0)
+					try:
+						game.doors.setHpr(0, 90, 0)
+					except:
+						''''''
 			game.scene_rot = not game.scene_rot
 			game.timer = 10
 		game.timer -= 1

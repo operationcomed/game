@@ -97,7 +97,14 @@ class Game(ShowBase):
 
 	isPlaying = False
 
+	debug = False
+
+	input = False
+	mouseLetGo = False
+
 	sensitivity = 30
+
+	anagramRunning = False
 
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -120,6 +127,7 @@ class Game(ShowBase):
 		settings = json.load(open("assets/SETTINGS", "r"))
 		self.volume = settings["volume"]
 		self.sensitivity = settings["sensitivity"]
+		self.debug = bool(settings["debug"])
 		
 		#font
 		self.font = self.loader.loadFont('assets/fonts/zilla-slab.ttf')
@@ -163,7 +171,8 @@ class Game(ShowBase):
 		self.fullscreen = not self.fullscreen
 	
 	def helpMenu(self):
-		hm.HelpMenu.helpMenu(self.help_inst, self)
+		if (not self.mouseLetGo):
+			hm.HelpMenu.helpMenu(self.help_inst, self)
 
 	def setBarVisibility(self, visible):
 		for bar in self.bars:
@@ -335,10 +344,10 @@ class Game(ShowBase):
 		self.filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
 
 		# fog
-		fog = Fog("Fog")
-		fog.setColor(LVecBase4f(self.fog_color))
-		fog.setExpDensity(0.3)
-		self.render.setFog(fog)
+		self.fog = Fog("Fog")
+		self.fog.setColor(LVecBase4f(self.fog_color))
+		self.fog.setExpDensity(0.3)
+		self.render.setFog(self.fog)
 
 		# text
 		def attachTextToHUD(text, gtext, pos, scale, font=self.font):
@@ -431,4 +440,5 @@ class Game(ShowBase):
 		return l2.Level2.mission(self.l2, self, task)
 
 	def exitGame(self):
-		exit()
+		if (self.input == False and self.mouseLetGo == False):
+			exit()

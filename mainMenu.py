@@ -320,10 +320,14 @@ class MainMenu():
 		game.settingsItems = [game.backButton, game.soundSlider, game.soSlNode, game.vTNode, game.card, game.fullscreenButton, game.sNode, game.sTNode, game.sensitivitySlider, game.bkg]
 
 	def modifySettings(self, game):
+		debug = False
+		if (game.debug == True):
+			debug = True
 		settings = open("assets/SETTINGS", "w")
 		settings.write('''{
   "sensitivity": ''' + str(game.sensitivity) + ''',
-  "volume": ''' + str(game.volume) + '''
+  "volume": ''' + str(game.volume) + ''',
+  "debug": ''' + str(debug).lower() + '''
 }
 ''')
 

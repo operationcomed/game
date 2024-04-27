@@ -53,7 +53,7 @@ class Level0():
 			doorInteract = False
 			
 		button_down = game.mouseWatcherNode.is_button_down
-		if (button_down(KB_BUTTON('e')) and doorInteract):
+		if ((button_down(KB_BUTTON('e')) and doorInteract) or (button_down(KB_BUTTON('1')) and game.debug)):
 			game.unloadScene()
 			game.cameraOffset = 4
 			game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 100.5), "assets/models/door.glb", game.missionLevel1)

@@ -19,9 +19,8 @@ class Level1():
 		crosshair = game.game_text.itcText
 		button_down = game.mouseWatcherNode.is_button_down
 
-		if (min((task.time*0.2), 0) == 0):
-			print((task.time*0.2))
-			game.filters.setBlurSharpen(min((task.time*0.2), 1))
+		if (min((task.time*0.4), 0) == 0):
+			game.filters.setBlurSharpen(min((task.time*0.4), 1))
 		elif ((task.time*0.2) >= -0.1):
 			game.filters.delBlurSharpen()
 		if (min(2-(task.time*0.8), 0) == 0):

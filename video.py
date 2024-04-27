@@ -18,9 +18,10 @@ class Video():
 		game.tex.read(vidFile)
 		game.sound = game.loader.loadSfx(vidFile)
 		game.sound.setVolume(game.volume)
-		game.sound.play()
+		game.tex.synchronizeTo(game.sound)
 		game.cm.setUvRange(game.tex)
 		game.video.setTexture(game.tex)
+		game.sound.play()
 
 		game.background_x = 0.115
 		game.background_y = 0.899

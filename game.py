@@ -141,6 +141,9 @@ class Game(ShowBase):
 
 		# camera
 		self.camLens.setNearFar(1, 1000)
+
+		# sound
+		self.footsteps = self.loader.loadSfx("assets/sound/footsteps.ogg")
 		#video before main menu
 		self.taskMgr.add(self.splashScreen, "splashScreen")
 
@@ -191,12 +194,20 @@ class Game(ShowBase):
 	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False, level=False):
 		self.accept("h", self.helpMenu)
 		self.stamina = self.staminaCap
+
 		self.music.stop()
 		self.music = self.loader.loadSfx("assets/sound/ambient.mp3")
 		self.music.setVolume(self.volume)
 		self.music.setLoop(True)
 		self.music.play()
+		
+		self.footsteps.stop()
+		self.footsteps.setVolume(0)
+		self.footsteps.setLoop(True)
+		self.footsteps.play()
 		self.disable_mouse()
+
+
 
 		self.accept("escape", self.settingsIG)
 		

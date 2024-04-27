@@ -96,7 +96,7 @@ class Movement():
 			self.accelX -= game.speed * cos(rot_x * (pi/180))
 			staminaGain = False
 
-		if (not staminaGain):
+		if (not staminaGain and not game.speedStop):
 			game.footsteps.setVolume(game.volume*0.4)
 		else:
 			game.footsteps.setVolume(0)

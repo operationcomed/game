@@ -11,10 +11,29 @@ class Level1():
 	initItemsDone = False
 	missionDone = False
 	itemsGotten = 0
+
+	levelDone = False
+	timeEnd = 0
+	deltaTime = 0
 	def mission(self, game, task):
 		crosshair = game.game_text.itcText
 		button_down = game.mouseWatcherNode.is_button_down
+
+		if (min((task.time*0.2), 0) == 0):
+			print((task.time*0.2))
+			game.filters.setBlurSharpen(min((task.time*0.2), 1))
+		elif ((task.time*0.2) >= -0.1):
+			game.filters.delBlurSharpen()
+		if (min(2-(task.time*0.8), 0) == 0):
+			game.fade.setColor(0, 0, 0, 2-(task.time*0.8))
+		elif (2-(task.time*0.8) >= -0.1):
+			game.fade.setColor(0, 0, 0, 0)
+			print("done")
+
 		if (not self.missionShow):
+			doorSound = game.loader.loadSfx("assets/sound/doorClose.mp3")
+			doorSound.setVolume(game.volume)
+			doorSound.play()
 			self.missionShow = True
 			game.speedStop = True
 			self.showMission(self, game)
@@ -67,17 +86,28 @@ class Level1():
 			crosshair.setTextColor(1, 1, 1, 1)
 			doorInteract = False
 
-		if ((button_down(KB_BUTTON('e')) and doorInteract) or (button_down(KB_BUTTON('2')) and game.debug)):
+		if (((button_down(KB_BUTTON('e')) and doorInteract) or (button_down(KB_BUTTON('2')) and game.debug)) and self.levelDone != True):
 			for img in game.itemsImg:
 				img.destroy()
 			if (game.debug):
 				for item in game.items:
 					item.removeNode()
-			game.unloadScene()
-			game.game_text.itmText.setTextColor(1, 1, 1, 1)
-			game.game_text.itmText.setText("Items obtained:")
-			game.loadScene("assets/models/msu.glb", (-17.0, 6.25, -0.46), (0, 0, 10.5), customTask=game.missionLevel2)
-			game.taskMgr.add(game.l2Cutscene, "l2Cutscene")
+			self.levelDone = True
+			self.timeEnd = task.time
+			doorSound = game.loader.loadSfx("assets/sound/door.mp3")
+			doorSound.setVolume(game.volume)
+			doorSound.play()
+
+		if (self.levelDone):
+			self.deltaTime = task.time - self.timeEnd
+			game.setBarVisibility(False)
+			game.fade.setColor(0, 0, 0, min(self.deltaTime*2, 1))
+			if (self.deltaTime >= 1):
+				game.unloadScene()
+				game.game_text.itmText.setTextColor(1, 1, 1, 1)
+				game.game_text.itmText.setText("Items obtained:")
+				game.loadScene("assets/models/msu.glb", (-17.0, 6.25, -0.46), (0, 0, 10.5), customTask=game.missionLevel2)
+				game.taskMgr.add(game.l2Cutscene, "l2Cutscene")
 
 		return Task.cont
 	

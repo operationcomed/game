@@ -71,14 +71,9 @@ class CharSelect():
 		
 		game.taskMgr.remove("moveBackground")
 		game.taskMgr.remove("charSelect")
-		for node in game.charNodes:
-			node.removeNode()
 
 		# bed scene
 		game.cameraOffset = 4
-		game.loadScene("assets/models/bed.glb", (3.5, 6, 1.42), (0, 0, 10), doors=False, customTask=game.bedDoor, playerRot=(180, -90, 0))
-		game.helpMenu()
-		game.itmTxtNode.hide()
 		game.taskMgr.add(game.backstory, "backstory")
 
 ch_select = CharSelect

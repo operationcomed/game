@@ -16,6 +16,7 @@ class Level2():
 		game.setBarVisibility(False)
 		if (not game.isPlaying):
 			gametext.Text.hideCH(game.game_text)
+			game.fade.setColor(0, 0, 0, 0)
 			game.speedStop = True
 			game.music.stop()
 			game.video_inst.playVid(game.video_inst, game, game.l2Video)

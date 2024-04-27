@@ -8,8 +8,21 @@ KB = KeyboardButton
 
 class Level0():
 	def backstory(self, game, task):
-		game.setBarVisibility(False)
+		button_down = game.mouseWatcherNode.is_button_down
+
+		if (task.time <= 0.5):
+			game.music.setVolume(1-task.time)
+			game.fade.setColor(0, 0, 0, task.time*2)
+			return Task.cont
+
 		if (not game.isPlaying):
+			for node in game.charNodes:
+				node.removeNode()
+			game.loadScene("assets/models/bed.glb", (3.5, 6, 1.42), (0, 0, 10), doors=False, customTask=game.bedDoor, playerRot=(180, -90, 0))
+			game.setBarVisibility(False)
+			game.helpMenu()
+			game.itmTxtNode.hide()
+			game.fade.setColor(0, 0, 0, 0)
 			gametext.Text.hideCH(game.game_text)
 			game.speedStop = True
 			game.music.stop()
@@ -28,9 +41,12 @@ class Level0():
 			game.isPlaying = False
 			game.skipText.setText("")
 			return Task.done
-		
+
 		return Task.cont
 	
+	levelDone = False
+	timeEnd = 0
+	deltaTime = 0
 	def bedDoor(self, game, task):
 		rot = game.camera.getH()
 		crosshair = game.game_text.itcText
@@ -53,10 +69,24 @@ class Level0():
 			doorInteract = False
 			
 		button_down = game.mouseWatcherNode.is_button_down
-		if ((button_down(KB_BUTTON('e')) and doorInteract) or (button_down(KB_BUTTON('1')) and game.debug)):
-			game.unloadScene()
-			game.cameraOffset = 4
-			game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 100.5), "assets/models/door.glb", game.missionLevel1)
+		if (((button_down(KB_BUTTON('e')) and doorInteract) or (button_down(KB_BUTTON('1')) and game.debug)) and self.levelDone == False):
+			self.levelDone = True
+			self.timeEnd = task.time
+			doorSound = game.loader.loadSfx("assets/sound/door.mp3")
+			doorSound.setVolume(game.volume)
+			doorSound.play()
+
+		if (self.levelDone):
+			self.deltaTime = task.time - self.timeEnd
+			game.setBarVisibility(False)
+			game.fade.setColor(0, 0, 0, min(self.deltaTime*2, 1))
+			game.filters.setBlurSharpen(max(1-(self.deltaTime*2), 0))
+			if (self.deltaTime >= 1):
+				game.fade.setColor(0, 0, 0, 0)
+				game.setBarVisibility(True)
+				game.unloadScene()
+				game.cameraOffset = 4
+				game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 100.5), "assets/models/door.glb", game.missionLevel1)
 		return Task.cont
 
 l0 = Level0

@@ -144,6 +144,12 @@ class Game(ShowBase):
 
 		# sound
 		self.footsteps = self.loader.loadSfx("assets/sound/footsteps.ogg")
+
+		# fade
+		self.fade = OnscreenImage(image='assets/backstories/black.png', scale=(512), sort=999)
+		self.fade.setTransparency(True)
+		self.fade.setColor(0, 0, 0, 0)
+
 		#video before main menu
 		self.taskMgr.add(self.splashScreen, "splashScreen")
 

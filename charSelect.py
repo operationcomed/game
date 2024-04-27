@@ -2,6 +2,14 @@ from panda3d.core import *
 from direct.gui.DirectGui import *
 
 class CharSelect():
+	buttonHoverScale = 1.2
+	def hoverEffect(characterSelect, task):
+		for button in game.buttonList:
+			if (button.node().getState() == 2):
+				button.setScale(game.buttonHoverScale*button.scale[0], game.buttonHoverScale*button.scale[1], game.buttonHoverScale*button.scale[2])
+			else:
+				button.setScale(button.scale)
+		return Task.cont
 	def characterSelect(self, game):
 		self.game_i = game
 		game.MMsensitivity = 0.005
@@ -18,8 +26,16 @@ class CharSelect():
 		game.boyPreview = (game.loader.loadTexture("assets/charselect/boy.png"))
 		game.girlPreview = (game.loader.loadTexture("assets/charselect/girl.png"))
 
-		game.boySelect = DirectButton(frameTexture=game.boyPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
-		game.girlSelect = DirectButton(frameTexture=game.girlPreview, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
+		BoyTexture = (game.loader.loadTexture("assets/charselect/boy.png"), game.loader.loadTexture("assets/charselect/boy.png"), game.loader.loadTexture("assets/charselect/girl_hover.avi"), game.loader.loadTexture("assets/charselect/boy.png"))
+		game.boySelect = DirectButton(frameTexture=BoyTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		game.boySelect.setTransparency(True)
+		game.boySelect.setSx(1024/226)
+
+		GirlTexture = (game.loader.loadTexture("assets/charselect/girl.png"), game.loader.loadTexture("assets/charselect/girl.png"), game.loader.loadTexture("assets/charselect/girl_hover.avi"), game.loader.loadTexture("assets/charselect/girl.png"))
+		game.girlSelect = DirectButton(frameTexture=GirlTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		game.girlSelect.setTransparency(True)
+		game.girlSelect.setSx(1024/226)
+
 		charDistance = 1.05
 		game.boySelect.setPos(charDistance, 0, -0.25)
 		game.girlSelect.setPos(-charDistance, 0, -0.25)
@@ -27,11 +43,14 @@ class CharSelect():
 		game.charButtons = [game.boySelect, game.girlSelect]
 		game.charNodes = [game.boySelect, game.girlSelect, game.card]
 
+
 		game.taskMgr.add(game.moveBackground, "moveBackground")
+		game.taskMgr.add(game.hoverEffect2, "charSelect")
 
 		for char in game.charButtons:
 			char.setTransparency(True)
 			char.setScale((512/640) * 0.5, 0.5, 0.5)
+			char.scale = char.getScale()
 		# i wish there was like a 'this' from js in python so i could see what the pressed thing is so i dont have to do this stupid stuff
 			# ^^^ incomprehendable
 	
@@ -54,6 +73,7 @@ class CharSelect():
 		print(game.character)
 		
 		game.taskMgr.remove("moveBackground")
+		game.taskMgr.remove("charSelect")
 		for node in game.charNodes:
 			node.removeNode()
 

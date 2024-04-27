@@ -65,7 +65,7 @@ class Game(ShowBase):
 	l1 = l1.l1
 	l2 = l2.l2
 
-	fog_color = (0.1, 0.15, 0.175)
+	fog_color = (0.1, 0.05, 0)
 	
 	scene_rot = False
 
@@ -87,7 +87,7 @@ class Game(ShowBase):
 
 	sceneScale = (1.5, 1.5, 1.5)
 
-	healthRed = (1, 0.0, 0.4, 1)
+	healthRed = (0.8, 0.2, 0.1, 1)
 
 	staminaRed = (1, 0.4, 0.2, 1)
 	staminaGreen = (0.3, 1, 0.5, 1)
@@ -403,6 +403,9 @@ class Game(ShowBase):
 	def hoverEffect(self, task):
 		return mmt.MainMenuTasks.hoverEffect(self.mainmenutasks_inst, self, task)
 
+	def hoverEffect2(self, task):
+		return mmt.MainMenuTasks.hoverEffect2(self.mainmenutasks_inst, self, task)
+	
 	def initGame(self):
 		for node in self.menuItems:
 			node.removeNode()

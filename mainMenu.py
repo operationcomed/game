@@ -32,25 +32,25 @@ class MainMenu():
 			game.musicPlaying = True
 
 		game.scaleFactor = 3
-		game.scaleFactorLogo = 0.35
+		game.scaleFactorLogo = 1
 		x_offset = -0.95
 		
 		game.cm = CardMaker('card')
 		game.card = game.aspect2d.attachNewNode(game.cm.generate())
 		game.logo = game.aspect2d.attachNewNode(game.cm.generate())
 		game.card.setScale((16/9)*game.scaleFactor, 1, 1*game.scaleFactor)
-		game.logo.setScale((746/168)*game.scaleFactorLogo, 1, 1*game.scaleFactorLogo)
+		game.logo.setScale((2640/1485)*game.scaleFactorLogo, 1, 1*game.scaleFactorLogo)
 
 		game.tex = game.loader.loadTexture('assets/media/bkgnew.png')
 		game.card.setTexture(game.tex)
-		game.tex = game.loader.loadTexture('assets/media/logo.png')
+		game.tex = game.loader.loadTexture('assets/media/logo1.png')
 		game.logo.setTexture(game.tex)
 
 		# these are the centers of the images
 		game.background_x = (-16/18)*game.scaleFactor
 		game.background_y = -0.5*game.scaleFactor
-		game.logo_x = (-746/168/2)*game.scaleFactorLogo
-		game.logo_y = -0.5*game.scaleFactorLogo
+		game.logo_x = ((-2640/1485/2)*game.scaleFactorLogo)
+		game.logo_y = (-0.4*game.scaleFactorLogo)
 
 		game.card.setPos(game.background_x, 0, game.background_y)
 		game.logo.setPos(game.logo_x + x_offset, 0, game.logo_y + 0.5)

@@ -1,6 +1,7 @@
 from direct.task import Task
 from panda3d.core import *
 from direct.gui.DirectGui import *
+from direct.interval.LerpInterval import *
 import gametext
 
 KB_BUTTON = KeyboardButton.ascii_key
@@ -15,6 +16,13 @@ class Level1():
 	levelDone = False
 	timeEnd = 0
 	deltaTime = 0
+	def fadeOut(t, self, game):
+		if (t <= 0):
+			game.missionImg.removeNode()
+			return
+		game.missionImg.setColorScale(1, 1, 1, t)
+		game.missionImg.setScale(min(16/9*t*game.scaleFactorMission, 16/9*game.scaleFactorMission), min(t*game.scaleFactorMission, 1*game.scaleFactorMission), min(t*game.scaleFactorMission, 1*game.scaleFactorMission))
+
 	def mission(self, game, task):
 		crosshair = game.game_text.itcText
 		button_down = game.mouseWatcherNode.is_button_down
@@ -41,11 +49,18 @@ class Level1():
 		if (button_down(KB_BUTTON('e')) and self.missionShow and game.speedStop == True and task.time >= 0.1):
 			game.itmTxtNode.show()
 			game.speedStop = False
-			game.missionImg.removeNode()
 			game.setBarVisibility(True)
 			for img in game.itemsImg:
 				img["scale"] = 0.15
 			gametext.Text.showText(game.game_text)
+			self.popout = LerpFunc(self.fadeOut,
+        	    extraArgs=[self, game],
+        	    fromData=1,
+        	    toData=0,
+        	    duration=0.25,
+				blendType='easeOut',
+        	    name="fadeo")
+			self.popout.start()
 			dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
 			dismiss.setVolume(game.volume)
 			dismiss.play()

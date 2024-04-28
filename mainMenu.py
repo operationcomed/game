@@ -1,5 +1,6 @@
 from panda3d.core import *
 from direct.gui.DirectGui import *
+from direct.interval.LerpInterval import *
 import json
 import gametext
 
@@ -32,7 +33,7 @@ class MainMenu():
 			game.musicPlaying = True
 
 		game.scaleFactor = 3
-		game.scaleFactorLogo = 1
+		game.scaleFactorLogo = 1.5
 		x_offset = -0.95
 		
 		game.cm = CardMaker('card')
@@ -59,7 +60,7 @@ class MainMenu():
 		# buttons
 		# play
 		playTexture = (game.loader.loadTexture("assets/buttons/play_normal.png"), game.loader.loadTexture("assets/buttons/play_normal.png"), game.loader.loadTexture("assets/buttons/play_hover.png"), game.loader.loadTexture("assets/buttons/play_normal.png"))
-		game.startGameButton = DirectButton(command=game.initGame, frameTexture=playTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		game.startGameButton = DirectButton(command=self.initGame, extraArgs=[self, game], frameTexture=playTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		game.startGameButton.setTransparency(True)
 		game.startGameButton.setSx(482/226)
 
@@ -97,17 +98,30 @@ class MainMenu():
 		game.buttonScale = 0.1
 
 		# laziness will consume
+		buttonHoverScale = 1.2
 		for button in game.buttonList:
 			button.setScale(button.getSx()*game.buttonScale, game.buttonScale, game.buttonScale)
-
-		game.startGameButton.scale = game.startGameButton.getScale()
-		game.settingsButton.scale = game.settingsButton.getScale()
-		game.exitGameButton.scale = game.exitGameButton.getScale()
-		game.muteButton.scale = game.muteButton.getScale()
+			button.scale = button.getScale()
+			button.sc1 = button.scaleInterval(0.1, button.scale)
+			button.sc2 = button.scaleInterval(0.1, button.scale*buttonHoverScale)
+			button.hover = False
 
 		game.taskMgr.add(game.moveBackground, "mainMenu")
 		game.taskMgr.add(game.hoverEffect, "mainMenu")
 
+	def initGame(self, game):
+		fade = LerpFunc(self.fadeIn,
+            extraArgs=[self, game],
+            fromData=0,
+            toData=1,
+            duration=0.5,
+            name="fade")
+		fade.start()
+
+	def fadeIn(t, self, game):
+		game.fade.setColor(0, 0, 0, t)
+		if (t >= 1):
+			game.initGame()
 	
 	def settings(self, game):
 		def toggleFullscreenViaButton():

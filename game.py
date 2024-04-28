@@ -172,8 +172,8 @@ class Game(ShowBase):
 			vd.Video.playVid(self.video_inst, self, 'assets/media/spash.avi')
 		if (self.splashDone):
 			self.deltaTime = task.time - self.timeEnd
-			self.fade.setColor(0, 0, 0, max(2-self.deltaTime, 0))
-			if (max(2-self.deltaTime, 0) == 0):
+			self.fade.setColor(0, 0, 0, max(3-self.deltaTime*2, 0))
+			if (max(3-self.deltaTime*2, 0) == 0):
 				self.fade.setColor(0, 0, 0, 0)
 				return Task.done
 

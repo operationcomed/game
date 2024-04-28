@@ -1,18 +1,38 @@
 from direct.task import Task
 from panda3d.core import *
+from direct.interval.LerpInterval import *
 from direct.gui.DirectGui import *
 
 class CharSelect():
 	buttonHoverScale = 1.2
 	def hoverEffect(self, game, task):
 		for button in game.charButtons:
-			if (button.node().getState() == 2):
-				button.setScale(game.buttonHoverScale*button.scale[0], game.buttonHoverScale*button.scale[1], game.buttonHoverScale*button.scale[2])
-			else:
-				button.setScale(button.scale)
+			if (button.node().getState() == 2 and button.hover != True):
+				self.initHover(self, button)
+			elif (button.node().getState() == 0 and button.hover != False):
+				self.deinitHover(self, button)
 		return Task.cont
 	
+	def initHover(self, button):
+		button.hover = True
+		button.sc2.start()
+
+	def deinitHover(self, button):
+		button.hover = False
+		button.sc1.start()
+		
+		
+	def fadeIn(t, self, game):
+		game.fade.setColor(0, 0, 0, t)
+	
 	def characterSelect(self, game):
+		fade = LerpFunc(self.fadeIn,
+            extraArgs=[self, game],
+            fromData=1,
+            toData=0,
+            duration=0.5,
+            name="fade")
+		fade.start()
 		self.game_i = game
 		game.MMsensitivity = 0.005
 		game.scaleFactorCS = 2.25
@@ -50,6 +70,9 @@ class CharSelect():
 			char.setTransparency(True)
 			char.setScale((512/640) * 0.5, 0.5, 0.5)
 			char.scale = char.getScale()
+			char.sc1 = char.scaleInterval(0.1, char.scale)
+			char.sc2 = char.scaleInterval(0.1, char.scale*self.buttonHoverScale)
+			char.hover = False
 	
 		def setCharacterA():
 			game.character = 1

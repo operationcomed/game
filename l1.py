@@ -122,7 +122,7 @@ class Level1():
 				game.unloadScene()
 				game.game_text.itmText.setTextColor(1, 1, 1, 1)
 				game.game_text.itmText.setText("Items obtained:")
-				game.loadScene("assets/models/msu.glb", (-17.0, 6.25, -0.46), (0, 0, 10.5), customTask=game.missionLevel2)
+				game.loadScene("assets/models/msu.glb", (-3.2, -12.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel2)
 				game.taskMgr.add(game.l2Cutscene, "l2Cutscene")
 
 		return Task.cont

@@ -55,10 +55,10 @@ class Level2():
 				self.backstoryDone = False
 		posX = game.ppnp.getX()
 		posY = game.ppnp.getY()
-		if (posX >= 20 and game.health >= 1):
+		if (posX >= 25 and game.health >= 1):
 			game.health -= 0.25
 		if (game.anagramRunning == True):
-			game.ppnp.setZ(-0.46)
+			game.ppnp.setZ(-0.45)
 		return Task.cont
 
 

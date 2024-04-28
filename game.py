@@ -43,6 +43,7 @@ loadPrcFileData("", "default-fov 60")
 loadPrcFileData("", "show-frame-rate-meter true")
 
 loadPrcFileData("", "shadow-cube-map-filter true")
+loadPrcFileData("", "icon-filename icon.ico")
 loadPrcFileData("", """
     text-minfilter linear
     text-magfilter linear
@@ -108,9 +109,6 @@ class Game(ShowBase):
 
 	def __init__(self):
 		ShowBase.__init__(self)
-		props = WindowProperties()
-		props.set_icon_filename("icon.ico")
-		self.win.request_properties(props)
 
 		self.accept("f11", self.toggleFullscreen)
 		self.accept("x", self.exitGame)

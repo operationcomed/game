@@ -48,7 +48,13 @@ loadPrcFileData("", """
     text-minfilter linear
     text-magfilter linear
     text-pixels-per-unit 32
+	text-kerning true
+	text-use-harfbuzz true
 """)
+
+loadPrcFileData("", "texture-minfilter mipmap")
+loadPrcFileData("", "texture-maxfilter trilinear")
+loadPrcFileData("", "texture-anisotropic-degree 8")
 
 class Game(ShowBase):
 

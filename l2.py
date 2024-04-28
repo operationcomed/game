@@ -13,7 +13,7 @@ class Level2():
 
 	cutsceneDone = False
 	def l2Cutscene(self, game, task):
-		game.fog.setExpDensity(0.15)
+		game.fog.setExpDensity(0.1)
 		game.setBarVisibility(False)
 		if (not game.isPlaying):
 			gametext.Text.hideCH(game.game_text)

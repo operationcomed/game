@@ -75,6 +75,9 @@ class Anagram():
 		self.anagram(self, game, l2)
 
 	def clearAnagrams(self, game):
+		dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
+		dismiss.setVolume(game.volume)
+		dismiss.play()
 		game.anagramRunning = False
 		game.mouseLetGo = False
 		gametext.Text.showText(game.game_text)

@@ -46,6 +46,9 @@ class Level1():
 			for img in game.itemsImg:
 				img["scale"] = 0.15
 			gametext.Text.showText(game.game_text)
+			dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
+			dismiss.setVolume(game.volume)
+			dismiss.play()
 		
 		if (not self.initItemsDone):
 			self.initItems(self, game)

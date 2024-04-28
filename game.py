@@ -305,8 +305,8 @@ class Game(ShowBase):
 			bar.setTexProjector(ts, self.render2d, bar)
 			bar.setTexHpr(ts, 0, -90, 0)
 			bar.setTexScale(ts, 1/2, 1, 1/0.2)
+			bar.setColorScale(1, 1, 1, 0)
 			self.sceneObjects.append(bar)
-
 
 		# lights and shadows
 		alight = AmbientLight("alight1")

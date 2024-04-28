@@ -38,7 +38,6 @@ class Level1():
 			print("done")
 
 		if (not self.missionShow):
-			game.setBarVisibility(False)
 			doorSound = game.loader.loadSfx("assets/sound/doorClose.mp3")
 			doorSound.setVolume(game.volume)
 			doorSound.play()

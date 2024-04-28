@@ -20,7 +20,6 @@ class Level0():
 			for node in game.charNodes:
 				node.removeNode()
 			game.loadScene("assets/models/bed.glb", (3.5, 6, 1.42), (0, 0, 10), doors=False, customTask=game.bedDoor, playerRot=(180, -90, 0))
-			game.setBarVisibility(False)
 			game.helpMenu()
 			game.itmTxtNode.hide()
 			game.fade.setColor(0, 0, 0, 0)

@@ -15,7 +15,6 @@ class Level2():
 	def l2Cutscene(self, game, task):
 		game.fog.setExpDensity(0.1)
 		if (not game.isPlaying):
-			game.setBarVisibility(False)
 			gametext.Text.hideCH(game.game_text)
 			game.fade.setColor(0, 0, 0, 0)
 			game.speedStop = True

@@ -114,7 +114,7 @@ class MainMenu():
             extraArgs=[self, game],
             fromData=0,
             toData=1,
-            duration=0.5,
+            duration=0.25,
             name="fade")
 		fade.start()
 
@@ -247,14 +247,14 @@ class MainMenu():
 				''''''
 			game.filters.delBlurSharpen()
 			gametext.Text.showCH(game.game_text)
-			gametext.Text.showText(game.game_text)
+			gametext.Text.showText(game.game_text, game)
 			game.speedStop = False
 			game.settingsShow = False
 
 		game.bkg = OnscreenImage(image='assets/media/semi-black.png', scale=(512))
 		game.bkg.setTransparency(True)
 		gametext.Text.hideCH(game.game_text)
-		gametext.Text.hideText(game.game_text)
+		gametext.Text.hideText(game.game_text, game)
 
 		try:
 			for img in game.itemsImg:

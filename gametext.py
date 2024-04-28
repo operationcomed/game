@@ -1,4 +1,7 @@
 from panda3d.core import *
+from panda3d.core import ColorScaleAttrib
+from direct.interval.LerpInterval import *
+from direct.interval.IntervalGlobal import *
 
 class Text():
 
@@ -25,15 +28,34 @@ class Text():
 
 	text_list = [ctlText, stmText, itmText, hltText] 
 
-	def hideText(self):
-		for node in self.text_list:
-			node.setTextColor(1, 1, 1, 0)
-			node.setShadowColor(0, 0, 0, 0)
+	def hideText(self, game):
+		hide = []
+		for node in game.textObjects:
+			hide.append(LerpFunc(self.fade,
+        	    extraArgs=[node],
+        	    fromData=node.getColorScale()[3],
+        	    toData=0,
+        	    duration=0.25,
+				blendType='easeOut',
+        	    name="fadeo"))
+		fader = Parallel(*hide, name='fader')
+		fader.start()
 
-	def showText(self):
-		for node in self.text_list:
-			node.setTextColor(1, 1, 1, 1)
-			node.setShadowColor(0, 0, 0, 1)
+	def showText(self, game):
+		show = []
+		for node in game.textObjects:
+			show.append(LerpFunc(self.fade,
+        	    extraArgs=[node],
+        	    fromData=node.getColorScale()[3],
+        	    toData=1,
+        	    duration=0.25,
+				blendType='easeOut',
+        	    name="fadei"))
+		fader = Parallel(*show, name='fader')
+		fader.start()
+
+	def fade(t, node):
+		node.setColorScale(1, 1, 1, t)
 
 	def hideCH(self):
 		self.itcText.setText("")

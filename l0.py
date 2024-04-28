@@ -53,14 +53,13 @@ class Level0():
 	def bedDoor(self, game, task):
 		if (self.backstoryDone and not self.fadeInit):
 			self.timeEnd = task.time
+			game.setBarVisibility(True)
 			self.fadeInit = True
 		elif (self.backstoryDone):
 			self.deltaTime = task.time - self.timeEnd
-			game.setBarVisibility(False)
 			game.fade.setColor(0, 0, 0, max(1-self.deltaTime*1, 0))
 			if (max(1-self.deltaTime*1, 0) == 0):
 				self.backstoryDone = False
-				game.setBarVisibility(True)
 		rot = game.camera.getH()
 		crosshair = game.game_text.itcText
 		#chnp = aspect2d.attachNewNode(game.game_text.itcText)
@@ -85,18 +84,17 @@ class Level0():
 		if (((button_down(KB_BUTTON('e')) and doorInteract) or (button_down(KB_BUTTON('1')) and game.debug)) and self.levelDone == False):
 			self.levelDone = True
 			self.timeEnd = task.time
+			game.setBarVisibility(False)
 			doorSound = game.loader.loadSfx("assets/sound/door.mp3")
 			doorSound.setVolume(game.volume)
 			doorSound.play()
 
 		if (self.levelDone):
 			self.deltaTime = task.time - self.timeEnd
-			game.setBarVisibility(False)
 			game.fade.setColor(0, 0, 0, min(self.deltaTime*2, 1))
 			game.filters.setBlurSharpen(max(1-(self.deltaTime*2), 0))
 			if (self.deltaTime >= 1):
 				game.fade.setColor(0, 0, 0, 0)
-				game.setBarVisibility(True)
 				game.unloadScene()
 				game.cameraOffset = 4
 				game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 100.5), "assets/models/door.glb", game.missionLevel1, collisionMap="assets/collisionmaps/inf.glb")

@@ -14,6 +14,7 @@ import mainMenuTasks as mmt
 import charSelect as chs
 import video as vd
 import helpmenu as hm
+import bars as bs
 import l0
 import l1
 import l2
@@ -66,6 +67,7 @@ class Game(ShowBase):
 	charsel_inst = chs.ch_select
 	video_inst = vd.video
 	help_inst = hm.hm
+	bars_inst = bs.bs
 
 	# levels
 	l0 = l0.l0
@@ -112,6 +114,8 @@ class Game(ShowBase):
 	sensitivity = 30
 
 	anagramRunning = False
+
+	barFade = False
 
 	def __init__(self):
 		ShowBase.__init__(self)
@@ -200,11 +204,7 @@ class Game(ShowBase):
 			hm.HelpMenu.helpMenu(self.help_inst, self)
 
 	def setBarVisibility(self, visible):
-		for bar in self.bars:
-			if (visible):
-				bar.show()
-			else:
-				bar.hide()
+		bs.Bars.setBarVisibility(self.bars_inst, self, visible)
 
 	settingsShow = False
 	def settingsIG(self):
@@ -383,11 +383,13 @@ class Game(ShowBase):
 		self.render.setFog(self.fog)
 
 		# text
+		self.textObjects = []
 		def attachTextToHUD(text, gtext, pos, scale, font=self.font):
 			text.setScale(scale)
 			text.setPos(pos)
 			gtext.setFont(font)
 			self.sceneObjects.append(text)
+			self.textObjects.append(text)
 
 		self.textNodePath = aspect2d.attachNewNode(self.game_text.ctlText)
 		attachTextToHUD(self.textNodePath, self.game_text.ctlText, (-1.2, 0, 0.85), 0.07)

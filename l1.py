@@ -38,13 +38,13 @@ class Level1():
 			print("done")
 
 		if (not self.missionShow):
+			game.setBarVisibility(False)
 			doorSound = game.loader.loadSfx("assets/sound/doorClose.mp3")
 			doorSound.setVolume(game.volume)
 			doorSound.play()
 			self.missionShow = True
 			game.speedStop = True
 			self.showMission(self, game)
-			game.setBarVisibility(False)
 		
 		if (button_down(KB_BUTTON('e')) and self.missionShow and game.speedStop == True and task.time >= 0.1):
 			game.itmTxtNode.show()
@@ -52,7 +52,7 @@ class Level1():
 			game.setBarVisibility(True)
 			for img in game.itemsImg:
 				img["scale"] = 0.15
-			gametext.Text.showText(game.game_text)
+			gametext.Text.showText(game.game_text, game)
 			self.popout = LerpFunc(self.fadeOut,
         	    extraArgs=[self, game],
         	    fromData=1,
@@ -110,6 +110,7 @@ class Level1():
 				for item in game.items:
 					item.removeNode()
 			self.levelDone = True
+			game.setBarVisibility(False)
 			self.timeEnd = task.time
 			doorSound = game.loader.loadSfx("assets/sound/door.mp3")
 			doorSound.setVolume(game.volume)
@@ -117,7 +118,6 @@ class Level1():
 
 		if (self.levelDone):
 			self.deltaTime = task.time - self.timeEnd
-			game.setBarVisibility(False)
 			game.fade.setColor(0, 0, 0, min(self.deltaTime*2, 1))
 			if (self.deltaTime >= 1):
 				game.unloadScene()
@@ -157,7 +157,7 @@ class Level1():
 			i += 1
 
 	def showMission(self, game):
-		gametext.Text.hideText(game.game_text)
+		gametext.Text.hideText(game.game_text, game)
 		game.scaleFactorMission = 7/4
 		game.cm = CardMaker('card')
 		game.missionImg = game.aspect2d.attachNewNode(game.cm.generate())

@@ -22,7 +22,7 @@ class Anagram():
 	def anagram(self, game, l2):
 		game.anagramRunning = True
 		game.mouseLetGo = True
-		gametext.Text.hideText(game.game_text)
+		gametext.Text.hideText(game.game_text, game)
 		game.setBarVisibility(False)
 		game.speedStop = True
 		game.scaleFactorAnagram = 7/4
@@ -96,7 +96,7 @@ class Anagram():
 		self.popout.start()
 		game.anagramRunning = False
 		game.mouseLetGo = False
-		gametext.Text.showText(game.game_text)
+		gametext.Text.showText(game.game_text, game)
 		game.setBarVisibility(True)
 		game.speedStop = False
 
@@ -112,6 +112,5 @@ class Anagram():
 
 	def setFocus(self, game, focus):
 		pass
-	#	game.answer = focus
 
 ag = Anagram

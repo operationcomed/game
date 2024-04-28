@@ -27,6 +27,8 @@ class Level0():
 			game.speedStop = True
 			game.music.stop()
 			game.video_inst.playVid(game.video_inst, game, game.backstoryVideo)
+		else:
+			game.ppnp.setPos(3.5, 6, 1.42)
 
 		button_down = game.mouseWatcherNode.is_button_down
 

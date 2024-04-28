@@ -99,7 +99,7 @@ class Level0():
 				game.setBarVisibility(True)
 				game.unloadScene()
 				game.cameraOffset = 4
-				game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 100.5), "assets/models/door.glb", game.missionLevel1)
+				game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 100.5), "assets/models/door.glb", game.missionLevel1, collisionMap="assets/collisionmaps/inf.glb")
 		return Task.cont
 
 l0 = Level0

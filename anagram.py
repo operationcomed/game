@@ -55,7 +55,15 @@ class Anagram():
 		print(answer)
 		if (answer == self.answers[self.num - 1]):
 			print("huwaw")
+			correct = game.loader.loadSfx("assets/sound/correct.mp3")
+			correct.setVolume(game.volume)
+			correct.play()
 			self.nextAnagram(self, game, l2)
+		else:
+			self.answer.enterText('')
+			wrong = game.loader.loadSfx("assets/sound/wrong.mp3")
+			wrong.setVolume(game.volume)
+			wrong.play()
 
 
 	def nextAnagram(self, game, l2):

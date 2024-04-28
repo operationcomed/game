@@ -7,6 +7,7 @@ KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
 
 class Level0():
+	backstoryDone = False
 	def backstory(self, game, task):
 		button_down = game.mouseWatcherNode.is_button_down
 
@@ -37,17 +38,29 @@ class Level0():
 			game.speedStop = False
 			game.blackBg.destroy()
 			game.sound.stop()
-			game.setBarVisibility(True)
 			game.isPlaying = False
 			game.skipText.setText("")
+			self.backstoryDone = True
+			game.fade.setColor(0, 0, 0, 1)
 			return Task.done
 
 		return Task.cont
 	
 	levelDone = False
+	fadeInit = False
 	timeEnd = 0
 	deltaTime = 0
 	def bedDoor(self, game, task):
+		if (self.backstoryDone and not self.fadeInit):
+			self.timeEnd = task.time
+			self.fadeInit = True
+		elif (self.backstoryDone):
+			self.deltaTime = task.time - self.timeEnd
+			game.setBarVisibility(False)
+			game.fade.setColor(0, 0, 0, max(1-self.deltaTime*1, 0))
+			if (max(1-self.deltaTime*1, 0) == 0):
+				self.backstoryDone = False
+				game.setBarVisibility(True)
 		rot = game.camera.getH()
 		crosshair = game.game_text.itcText
 		#chnp = aspect2d.attachNewNode(game.game_text.itcText)

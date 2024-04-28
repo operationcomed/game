@@ -97,7 +97,7 @@ class Movement():
 			staminaGain = False
 
 		if (not staminaGain and not game.speedStop):
-			game.footsteps.setVolume(game.volume*0.4)
+			game.footsteps.setVolume(game.volume*0.2)
 		else:
 			game.footsteps.setVolume(0)
 		if (game.staminaCap > game.stamina and staminaGain):

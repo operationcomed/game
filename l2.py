@@ -11,6 +11,7 @@ class Level2():
 
 	ag = ag.ag
 
+	cutsceneDone = False
 	def l2Cutscene(self, game, task):
 		game.fog.setExpDensity(0.15)
 		game.setBarVisibility(False)
@@ -23,15 +24,15 @@ class Level2():
 
 		button_down = game.mouseWatcherNode.is_button_down
 
-		if (task.time >= 36.48 or (button_down(KB_BUTTON('e')) and task.time >= 0.5)):
+		if (task.time >= 36.55 or (button_down(KB_BUTTON('e')) and task.time >= 0.5)):
 			game.music.play()
 			game.video.removeNode()
 			gametext.Text.showCH(game.game_text)
 			game.speedStop = False
 			game.blackBg.destroy()
 			game.sound.stop()
-			game.setBarVisibility(True)
 			game.isPlaying = False
+			self.cutsceneDone = True
 			game.skipText.setText("")
 			self.cutsceneOver(self, game)
 			return Task.done
@@ -41,7 +42,18 @@ class Level2():
 	def cutsceneOver(self, game):
 		ag.Anagram.anagram(self.ag, game, self)
 	
+	fadeInit = False
+	timeEnd = 0
+	deltaTime = 0
 	def mission(self, game, task):
+		if (self.cutsceneDone and not self.fadeInit):
+			self.timeEnd = task.time
+			self.fadeInit = True
+		elif (self.cutsceneDone):
+			self.deltaTime = task.time - self.timeEnd
+			game.fade.setColor(0, 0, 0, max(1-self.deltaTime*1, 0))
+			if (max(1-self.deltaTime*1, 0) == 0):
+				self.backstoryDone = False
 		posX = game.ppnp.getX()
 		posY = game.ppnp.getY()
 		if (posX >= 20 and game.health >= 1):

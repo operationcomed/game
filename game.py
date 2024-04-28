@@ -153,6 +153,9 @@ class Game(ShowBase):
 		#video before main menu
 		self.taskMgr.add(self.splashScreen, "splashScreen")
 
+	splashDone = False
+	timeEnd = 0
+	deltaTime = 0
 	def splashScreen(self, task):
 		button_down = self.mouseWatcherNode.is_button_down
 		if (task.time >= 23 or button_down(KB_BUTTON('e'))):
@@ -161,10 +164,19 @@ class Game(ShowBase):
 			self.skipText.setText("")
 			self.blackBg.destroy()
 			self.isPlaying = False
+			self.splashDone = True
+			self.timeEnd = task.time
+			self.fade.setColor(0, 0, 0, 1)
 			self.mainMenu()
-			return Task.done
-		if (not self.isPlaying):
+		if (not self.isPlaying and not self.splashDone):
 			vd.Video.playVid(self.video_inst, self, 'assets/media/spash.avi')
+		if (self.splashDone):
+			self.deltaTime = task.time - self.timeEnd
+			self.fade.setColor(0, 0, 0, max(2-self.deltaTime, 0))
+			if (max(2-self.deltaTime, 0) == 0):
+				self.fade.setColor(0, 0, 0, 0)
+				return Task.done
+
 		return Task.cont
 
 	fullscreen = False

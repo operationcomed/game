@@ -21,6 +21,7 @@ class Video():
 		game.tex.synchronizeTo(game.sound)
 		game.cm.setUvRange(game.tex)
 		game.video.setTexture(game.tex)
+		game.sound.setLoop(False)
 		game.sound.play()
 
 		game.background_x = 0.115

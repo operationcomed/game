@@ -12,7 +12,7 @@ class Level0():
 		button_down = game.mouseWatcherNode.is_button_down
 
 		if (task.time <= 0.5):
-			game.music.setVolume(1-task.time)
+			game.music.setVolume((1-task.time)*game.volume)
 			game.fade.setColor(0, 0, 0, task.time*2)
 			return Task.cont
 

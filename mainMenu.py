@@ -34,7 +34,7 @@ class MainMenu():
 
 		game.scaleFactor = 3
 		game.scaleFactorLogo = 1.5
-		x_offset = -0.95
+		x_offset = -0.75
 		
 		game.cm = CardMaker('card')
 		game.card = game.aspect2d.attachNewNode(game.cm.generate())
@@ -102,8 +102,8 @@ class MainMenu():
 		for button in game.buttonList:
 			button.setScale(button.getSx()*game.buttonScale, game.buttonScale, game.buttonScale)
 			button.scale = button.getScale()
-			button.sc1 = button.scaleInterval(0.1, button.scale)
-			button.sc2 = button.scaleInterval(0.1, button.scale*buttonHoverScale)
+			button.sc1 = button.scaleInterval(0.1, button.scale, blendType='easeOut')
+			button.sc2 = button.scaleInterval(0.1, button.scale*buttonHoverScale, blendType='easeOut')
 			button.hover = False
 
 		game.taskMgr.add(game.moveBackground, "mainMenu")

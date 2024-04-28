@@ -36,7 +36,7 @@ loadPrcFileData("", "framebuffer-multisample 1")
 loadPrcFileData("", "multisamples 4")
 
 # window
-width, height = 1366, 720
+width, height = 1280, 720
 loadPrcFileData("", "window-title Escape MSU")
 loadPrcFileData("", 'win-size ' + str(width) + ' ' + str(height)) 
 loadPrcFileData("", "default-fov 60")
@@ -158,7 +158,8 @@ class Game(ShowBase):
 	deltaTime = 0
 	def splashScreen(self, task):
 		button_down = self.mouseWatcherNode.is_button_down
-		if (task.time >= 23 or button_down(KB_BUTTON('e'))):
+		if ((task.time >= 23 or button_down(KB_BUTTON('e'))) and not self.splashDone):
+			self.fade.setColor(0, 0, 0, 1)
 			self.sound.stop()
 			self.video.removeNode()
 			self.skipText.setText("")
@@ -166,7 +167,6 @@ class Game(ShowBase):
 			self.isPlaying = False
 			self.splashDone = True
 			self.timeEnd = task.time
-			self.fade.setColor(0, 0, 0, 1)
 			self.mainMenu()
 		if (not self.isPlaying and not self.splashDone):
 			vd.Video.playVid(self.video_inst, self, 'assets/media/spash.avi')

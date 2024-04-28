@@ -30,7 +30,7 @@ class CharSelect():
             extraArgs=[self, game],
             fromData=1,
             toData=0,
-            duration=0.5,
+            duration=0.75,
             name="fade")
 		fade.start()
 		self.game_i = game
@@ -70,8 +70,8 @@ class CharSelect():
 			char.setTransparency(True)
 			char.setScale((512/640) * 0.5, 0.5, 0.5)
 			char.scale = char.getScale()
-			char.sc1 = char.scaleInterval(0.1, char.scale)
-			char.sc2 = char.scaleInterval(0.1, char.scale*self.buttonHoverScale)
+			char.sc1 = char.scaleInterval(0.1, char.scale, blendType='easeOut')
+			char.sc2 = char.scaleInterval(0.1, char.scale*self.buttonHoverScale, blendType='easeOut')
 			char.hover = False
 	
 		def setCharacterA():

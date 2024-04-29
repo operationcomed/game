@@ -17,6 +17,7 @@ class Level2():
 	def l2Cutscene(self, game, task):
 		game.fog.setExpDensity(0.1)
 		if (not game.isPlaying):
+			game.level = 2
 			game.timeStart = 0
 			gametext.Text.hideCH(game.game_text)
 			game.fade.setColor(0, 0, 0, 0)
@@ -77,8 +78,9 @@ class Level2():
 		elif ((not self.undamager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 0.1, 0, 1))):
 				self.undamager.start()
 
+		game.ppnp.setZ(-0.45)
 		if (game.anagramRunning == True or game.isPlaying):
-			game.ppnp.setZ(-0.45)
+			''''''
 		elif (not self.l2Init and self.cutsceneDone):
 			game.timeStart = task.time
 			self.timeText = TextNode('interact')

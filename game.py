@@ -119,6 +119,8 @@ class Game(ShowBase):
 	barFade = False
 	damaging = False
 
+	level = 0
+
 	def __init__(self):
 		ShowBase.__init__(self)
 
@@ -349,7 +351,7 @@ class Game(ShowBase):
 			self.camera.setHpr(playerRot)
 		self.physicsMgr.attachPhysicalNode(self.playerPhysics)
 		self.colliderNode = self.ppnp.attachNewNode(CollisionNode('colNode'))
-		self.colliderNode.node().addSolid(CollisionTube(0, 0, 0, 0, 0, 3, 0.5))
+		self.colliderNode.node().addSolid(CollisionCapsule(0, 0, 0, 0, 0, 3, 0.5))
 
 		self.gravity = ForceNode("gravity")
 		self.gnp = self.render.attachNewNode(self.gravity)

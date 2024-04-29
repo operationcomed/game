@@ -5,6 +5,7 @@ from direct.interval.LerpInterval import *
 import math
 import gametext
 import anagram as ag
+import r1
 
 KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
@@ -12,6 +13,7 @@ KB = KeyboardButton
 class Level2():
 
 	ag = ag.ag
+	r1 = r1.r1
 
 	cutsceneDone = False
 	def l2Cutscene(self, game, task):
@@ -51,7 +53,11 @@ class Level2():
 	timeEnd = 0
 	deltaTime = 0
 	timeElapsed = 0
+	minigameSelect = 0
 	def mission(self, game, task):
+		crosshair = game.game_text.itcText
+		button_down = game.mouseWatcherNode.is_button_down
+
 		if (not self.l2_1stInit):
 			self.l2_1stInit = True
 			self.damager = LerpColorScaleInterval(game.render, 0.25, (1, 0.1, 0, 1), (1, 1, 1, 1))
@@ -72,6 +78,19 @@ class Level2():
 			game.damaging = True
 		else:
 			game.damaging = False
+
+		# minigames
+		if (posX <= -32.5):
+			# minigame 1
+			if (posY <= -99 and posY >= -126):
+				crosshair.setTextColor(1, 0.5, 0, 1)
+				self.minigameSelect = 1
+		else:
+			crosshair.setTextColor(1, 1, 1, 1)
+			self.minigameSelect = 0
+
+		if (self.minigameSelect == 1 and not game.r1Done and not game.r1Running and button_down(KB_BUTTON('e'))):
+			r1.Room1.mensa(self.r1, game, self)
 
 		if ((game.damaging and not self.damager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 1, 1, 1))):
 				self.damager.start()

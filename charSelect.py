@@ -45,19 +45,17 @@ class CharSelect():
 		game.card.setTexture(game.tex)
 		game.card.setPos(game.background_x, 0, game.background_y)
 
-		BoyTexture = (game.loader.loadTexture("assets/charselect/boy.png"), game.loader.loadTexture("assets/charselect/boy.png"), game.loader.loadTexture("assets/charselect/girl_hover.avi"), game.loader.loadTexture("assets/charselect/boy.png"))
+		BoyTexture = (game.loader.loadTexture("assets/charselect/boy.png"), game.loader.loadTexture("assets/charselect/boy_hover.png"), game.loader.loadTexture("assets/charselect/boy_hover.png"), game.loader.loadTexture("assets/charselect/boy.png"))
 		game.boySelect = DirectButton(frameTexture=BoyTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		game.boySelect.setTransparency(True)
-		game.boySelect.setSx(1024/226)
 
-		GirlTexture = (game.loader.loadTexture("assets/charselect/girl.png"), game.loader.loadTexture("assets/charselect/girl.png"), game.loader.loadTexture("assets/charselect/girl_hover.avi"), game.loader.loadTexture("assets/charselect/girl.png"))
+		GirlTexture = (game.loader.loadTexture("assets/charselect/girl.png"), game.loader.loadTexture("assets/charselect/girl_hover.png"), game.loader.loadTexture("assets/charselect/girl_hover.png"), game.loader.loadTexture("assets/charselect/girl.png"))
 		game.girlSelect = DirectButton(frameTexture=GirlTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		game.girlSelect.setTransparency(True)
-		game.girlSelect.setSx(1024/226)
 
-		charDistance = 1.05
-		game.boySelect.setPos(charDistance, 0, -0.25)
-		game.girlSelect.setPos(-charDistance, 0, -0.25)
+		charDistance = 0.9
+		game.boySelect.setPos(charDistance, 0, -0.2)
+		game.girlSelect.setPos(-charDistance, 0, -0.2)
 
 		game.charButtons = [game.boySelect, game.girlSelect]
 		game.charNodes = [game.boySelect, game.girlSelect, game.card]
@@ -68,7 +66,7 @@ class CharSelect():
 
 		for char in game.charButtons:
 			char.setTransparency(True)
-			char.setScale((512/640) * 0.5, 0.5, 0.5)
+			char.setScale((530/1000) * 0.65, 0.65, 0.65)
 			char.scale = char.getScale()
 			char.sc1 = char.scaleInterval(0.1, char.scale, blendType='easeOut')
 			char.sc2 = char.scaleInterval(0.1, char.scale*self.buttonHoverScale, blendType='easeOut')

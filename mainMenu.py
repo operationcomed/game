@@ -155,7 +155,7 @@ class MainMenu():
 		game.taskMgr.add(game.moveBackground, "mainMenu")
 
 		backTexture = (game.loader.loadTexture("assets/buttons/exit_normal.png"), game.loader.loadTexture("assets/buttons/exit_normal.png"), game.loader.loadTexture("assets/buttons/exit_hover.png"), game.loader.loadTexture("assets/buttons/exit_normal.png"))
-		game.backButton = DirectButton(command=backSettings, frameTexture=backTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
+		game.backButton = DirectButton(command=backSettings, frameTexture=backTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
 		game.backButton.setTransparency(True)
 		game.backButton.setSx(482/226)
 		game.backButton.setPos(-1.2, 0, 0.6)

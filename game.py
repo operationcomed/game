@@ -114,7 +114,18 @@ class Game(ShowBase):
 
 	sensitivity = 30
 
+	# minigame
 	anagramRunning = False
+	r1Running = False
+	r2Running = False
+	r3Running = False
+	r4Running = False
+	r5Running = False
+	r1Done = False
+	r2Done = False
+	r3Done = False
+	r4Done = False
+	r5Done = False
 
 	barFade = False
 	damaging = False

@@ -68,7 +68,7 @@ class Level2():
 			game.timeStart = task.time
 			self.timeText = TextNode('interact')
 			self.timeText.setAlign(TextNode.ACenter)
-			self.timeText.setText("0:00")
+			self.timeText.setText("10:00")
 			self.timeText.setShadow(0.07, 0.07)
 			self.timeTxtNode = game.aspect2d.attachNewNode(self.timeText)
 			game.attachTextToHUD(self.timeTxtNode, self.timeText, (0, 0, 0.85), 0.15, game.font)
@@ -79,7 +79,10 @@ class Level2():
 			timeSeconds = math.floor(game.timeElapsed)
 			while (timeSeconds >= 60):
 				timeSeconds -= 60
-			self.timeText.setText(str(timeMinutes) + ":" + f"{timeSeconds:02}")
+			if (game.timeElapsed <= 600):
+				self.timeText.setText(str(9-timeMinutes) + ":" + f"{59-timeSeconds:02}")
+			else:
+				self.timeText.setText("0:00")
 		return Task.cont
 
 

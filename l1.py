@@ -83,7 +83,7 @@ class Level1():
 					game.itemsImg[i].setColorScale(1, 1, 1, 1)
 					itemPos[2] = None
 				i += 1
-
+		
 		posX = game.camera.getX()
 		posY = game.camera.getY()
 		if (self.itemsGotten >= 5 and not self.missionDone):

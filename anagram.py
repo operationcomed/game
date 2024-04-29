@@ -40,7 +40,7 @@ class Anagram():
 		game.anagramImg.setPos(game.mission_x, 0, game.mission_y)
 		game.anagramImg.setTransparency(TransparencyAttrib.MAlpha)
 
-		self.answer = DirectEntry(text="", scale=0.1, command=self.inputAnswer, extraArgs=[self, game, l2], focus=1, focusInCommand=self.setFocus, focusInExtraArgs=[self, game, True], focusOutCommand=self.setFocus, focusOutExtraArgs=[self, game, False], entryFont=game.font, width=16, text_align=TextNode.ACenter)
+		self.answer = DirectEntry(text="", scale=0.1, command=self.inputAnswer, extraArgs=[self, game, l2], focus=1, focusInCommand=self.setFocus, focusInExtraArgs=[self, game, True], focusOutCommand=self.setFocus, focusOutExtraArgs=[self, game, False], entryFont=game.font, width=16, text_align=TextNode.ACenter, frameTexture=game.loader.loadTexture("assets/img/textbox.png"))
 
 		self.answer.setPos(0, 0, -0.4)
 		self.answer.setTransparency(TransparencyAttrib.MAlpha)

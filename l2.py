@@ -66,7 +66,7 @@ class Level2():
 				self.backstoryDone = False
 		posX = game.ppnp.getX()
 		posY = game.ppnp.getY()
-		if ((posX >= 25 or posY >= 0) and game.health >= 1):
+		if ((posX >= 35 or posY >= 0) and game.health >= 1):
 			game.health -= 0.25
 			game.damaging = True
 		else:

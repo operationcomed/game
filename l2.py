@@ -91,8 +91,8 @@ class Level2():
 			self.minigameSelect = 0
 
 		if (self.minigameSelect == 1 and not game.r1Done and not game.r1Running and button_down(KB_BUTTON('e'))):
-			mov = game.ppnp.posInterval(0.5, (-34.75, -112.636, -0.477))
-			rot = game.camera.hprInterval(0.5, (270, 0, 0))
+			mov = game.ppnp.posInterval(0.5, (-34.75, -112.636, -0.477), blendType='easeIn')
+			rot = game.camera.hprInterval(0.5, (270, 0, 0), blendType='easeIn')
 			move = Parallel(mov, rot, name="move")
 			move.start()
 			r1.Room1.mensa(self.r1, game, self)

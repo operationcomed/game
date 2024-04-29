@@ -34,10 +34,10 @@ class Anagram():
 		game.anagramImg.setTexture(game.tex)
 
 		# these are the centers of the image
-		game.mission_x = (-16/9/2)*game.scaleFactorMission
-		game.mission_y = -0.5*game.scaleFactorMission
+		game.anagram_x = (-16/9/2)*game.scaleFactorAnagram
+		game.anagram_y = -0.5*game.scaleFactorAnagram
 
-		game.anagramImg.setPos(game.mission_x, 0, game.mission_y)
+		game.anagramImg.setPos(game.anagram_x, 0, game.anagram_y)
 		game.anagramImg.setTransparency(TransparencyAttrib.MAlpha)
 
 		self.answer = DirectEntry(text="", scale=0.1, command=self.inputAnswer, extraArgs=[self, game, l2], focus=1, focusInCommand=self.setFocus, focusInExtraArgs=[self, game, True], focusOutCommand=self.setFocus, focusOutExtraArgs=[self, game, False], entryFont=game.font, width=16, text_align=TextNode.ACenter, frameTexture=game.loader.loadTexture("assets/img/textbox.png"))
@@ -108,7 +108,7 @@ class Anagram():
 			return
 		for node in self.anagramItems:
 			node.setColorScale(1, 1, 1, t)
-		game.anagramImg.setScale(min(16/9*t*game.scaleFactorMission, 16/9*game.scaleFactorMission), min(t*game.scaleFactorMission, 1*game.scaleFactorMission), min(t*game.scaleFactorMission, 1*game.scaleFactorMission))
+		game.anagramImg.setScale(min(16/9*t*game.scaleFactorAnagram, 16/9*game.scaleFactorAnagram), min(t*game.scaleFactorAnagram, 1*game.scaleFactorAnagram), min(t*game.scaleFactorAnagram, 1*game.scaleFactorAnagram))
 
 	def setFocus(self, game, focus):
 		pass

@@ -127,6 +127,8 @@ class Game(ShowBase):
 	r4Done = False
 	r5Done = False
 
+	mistakes = 0
+
 	barFade = False
 	damaging = False
 

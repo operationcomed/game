@@ -83,12 +83,28 @@ class Level0():
 			
 		button_down = game.mouseWatcherNode.is_button_down
 		if (((button_down(KB_BUTTON('e')) and doorInteract) or (button_down(KB_BUTTON('1')) and game.debug)) and self.levelDone == False):
+			if (game.helpDisplay):
+				game.helpMenu()
 			self.levelDone = True
 			self.timeEnd = task.time
 			game.setBarVisibility(False)
 			doorSound = game.loader.loadSfx("assets/sound/door.mp3")
 			doorSound.setVolume(game.volume)
 			doorSound.play()
+		if ((button_down(KB_BUTTON('2')) and game.debug)):
+			game.itmTxtNode.show()
+			if (game.helpDisplay):
+				game.helpMenu()
+			self.timeEnd = task.time
+			game.setBarVisibility(False)
+			doorSound = game.loader.loadSfx("assets/sound/door.mp3")
+			doorSound.setVolume(game.volume)
+			doorSound.play()
+			game.unloadScene()
+			game.game_text.itmText.setTextColor(1, 1, 1, 1)
+			game.game_text.itmText.setText("Items obtained:")
+			game.loadScene("assets/models/msu.glb", (-3.2, -12.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel2, collisionMap="assets/collisionmaps/msu.glb")
+			game.taskMgr.add(game.l2Cutscene, "l2Cutscene")
 
 		if (self.levelDone):
 			self.deltaTime = task.time - self.timeEnd

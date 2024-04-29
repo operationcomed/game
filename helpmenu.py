@@ -5,6 +5,7 @@ class HelpMenu():
 	helpDisplay = False
 	def helpMenu(self, game):
 		self.helpDisplay = not self.helpDisplay
+		game.helpDisplay = self.helpDisplay
 		self.popout = LerpFunc(self.fadeOut,
             extraArgs=[self, game],
             fromData=1,

@@ -74,13 +74,41 @@ class Room1():
 			for ans in self.orders:
 				if (self.answer == ans):
 					print("yay")
+					dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
+					dismiss.setVolume(game.volume)
+					dismiss.play()
 					self.cleanUpGame(self, game)
 					return
+			
+			for node in game.mensaButtons:
+				pos = node.getPos()
+				left = (node.getPos()[0]-0.15, node.getPos()[1], node.getPos()[2])
+				right = (node.getPos()[0]+0.15, node.getPos()[1], node.getPos()[2])
+				shake1 = node.posInterval(0.1, left, pos, blendType='easeIn')
+				shake2 = node.posInterval(0.1, right, left, blendType='easeIn')
+				shake3 = node.posInterval(0.1, left, right, blendType='easeIn')
+				shake4 = node.posInterval(0.05, pos, right, blendType='easeIn')
+				shake = Sequence(shake1, shake2, shake3, shake2, shake4)
+				shake.start()
 			self.answerNum = 0
 			self.answer = ''
 			print("naur")
+			wrong = game.loader.loadSfx("assets/sound/wrong.mp3")
+			wrong.setVolume(game.volume)
+			wrong.play()
+			game.mistakes += 1
+			print(game.mistakes)
+			return
+		pickup = game.loader.loadSfx('assets/sound/pickup.wav')
+		pickup.setLoop(False)
+		pickup.setVolume(game.volume)
+		pickup.play()
 			
 	def cleanUpGame(self, game):
+		correct = game.loader.loadSfx("assets/sound/correct.mp3")
+		correct.setVolume(game.volume)
+		correct.play()
+		game.game_text.itcText.setTextColor(1, 1, 1, 1)
 		self.answerNum = 0
 		self.answer = ''
 		self.gameFinished = True
@@ -93,7 +121,7 @@ class Room1():
             name="fadeo")
 		self.popout.start()
 		game.r1Running = False
-		game.r1Done = False
+		game.r1Done = True
 		game.mouseLetGo = False
 		game.speedStop = False
 		gametext.Text.showText(game.game_text, game)

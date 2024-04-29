@@ -16,6 +16,7 @@ class Level1():
 	levelDone = False
 	timeEnd = 0
 	deltaTime = 0
+	jumpscared = False
 	def fadeOut(t, self, game):
 		if (t <= 0):
 			game.missionImg.removeNode()
@@ -23,6 +24,7 @@ class Level1():
 		game.missionImg.setColorScale(1, 1, 1, t)
 		game.missionImg.setScale(min(16/9*t*game.scaleFactorMission, 16/9*game.scaleFactorMission), min(t*game.scaleFactorMission, 1*game.scaleFactorMission), min(t*game.scaleFactorMission, 1*game.scaleFactorMission))
 
+	jsCleanup = False
 	def mission(self, game, task):
 		crosshair = game.game_text.itcText
 		button_down = game.mouseWatcherNode.is_button_down
@@ -43,6 +45,7 @@ class Level1():
 			doorSound.play()
 			self.missionShow = True
 			game.speedStop = True
+			self.timeEnd = 0
 			self.showMission(self, game)
 		
 		if (button_down(KB_BUTTON('e')) and self.missionShow and game.speedStop == True and task.time >= 0.1):
@@ -95,6 +98,29 @@ class Level1():
 			game.game_text.itmText.setText(game.game_text.itmText.getText() + "\n\n\n\n" + "You can escape through the door now!")
 			for img in game.itemsImg:
 				img.setColorScale(0, 1, 0.5, 1)
+
+		if (posX >= -13 and not self.jumpscared and not game.isPlaying and self.jsCleanup == False):
+			self.jumpscared = True
+			self.timeEnd = task.time
+			for node in game.charNodes:
+				node.removeNode()
+			gametext.Text.hideCH(game.game_text)
+			game.speedStop = True
+			rotToScare = game.camera.hprInterval(0.75, (270, 0, 0), blendType='easeIn')
+			rotToScare.start()
+
+		if (task.time - self.timeEnd >= 0.75 and self.jumpscared and not game.isPlaying and self.jsCleanup == False):
+			game.video_inst.playVid(game.video_inst, game, 'assets/media/jumpscare1.avi')
+
+		if (task.time - self.timeEnd >= 0.667+0.75 and self.jumpscared and self.jsCleanup == False):
+			game.video.removeNode()
+			gametext.Text.showCH(game.game_text)
+			game.speedStop = False
+			game.blackBg.destroy()
+			game.sound.stop()
+			game.isPlaying = False
+			self.jsCleanup = True
+
 		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 5):
 			crosshair.setTextColor(1, 0.5, 0, 1)
 			doorInteract = True

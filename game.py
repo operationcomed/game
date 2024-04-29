@@ -282,6 +282,8 @@ class Game(ShowBase):
 			self.collisionMap.setShaderOff()
 			self.collisionMap.hide()
 			self.collisionMap.setCollideMask(BitMask32.bit(0))
+			if (self.scene_rot == True):
+				self.collisionMap.setHpr(0, 90, 0)
 		self.enableParticles()
 
 		# https://discourse.panda3d.org/t/directgui-directwaitbar/1761/2 (from 2006!)

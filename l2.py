@@ -1,6 +1,7 @@
 from direct.task import Task
 from panda3d.core import *
 from direct.gui.DirectGui import *
+from direct.interval.LerpInterval import *
 import math
 import gametext
 import anagram as ag
@@ -45,10 +46,16 @@ class Level2():
 	
 	fadeInit = False
 	l2Init = False
+	l2_1stInit = False # :)
 	timeEnd = 0
 	deltaTime = 0
 	timeElapsed = 0
 	def mission(self, game, task):
+		if (not self.l2_1stInit):
+			self.l2_1stInit = True
+			self.damager = LerpColorScaleInterval(game.render, 0.25, (1, 0.1, 0, 1), (1, 1, 1, 1))
+			self.undamager = LerpColorScaleInterval(game.render, 0.25, (1, 1, 1, 1), (1, 0.1, 0, 1))
+
 		if (self.cutsceneDone and not self.fadeInit):
 			self.timeEnd = task.time
 			self.fadeInit = True
@@ -59,8 +66,16 @@ class Level2():
 				self.backstoryDone = False
 		posX = game.ppnp.getX()
 		posY = game.ppnp.getY()
-		if (posX >= 25 and game.health >= 1):
+		if ((posX >= 25 or posY >= 0) and game.health >= 1):
 			game.health -= 0.25
+			game.damaging = True
+		else:
+			game.damaging = False
+
+		if ((game.damaging and not self.damager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 1, 1, 1))):
+				self.damager.start()
+		elif ((not self.undamager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 0.1, 0, 1))):
+				self.undamager.start()
 
 		if (game.anagramRunning == True or game.isPlaying):
 			game.ppnp.setZ(-0.45)

@@ -5,6 +5,7 @@ from direct.filter.CommonFilters import CommonFilters
 from panda3d.core import *
 from direct.gui.DirectGui import *
 from panda3d.physics import ActorNode, ForceNode, LinearVectorForce, PhysicsCollisionHandler
+from direct.interval.LerpInterval import *
 import json
 import gametext
 import direct.particles
@@ -116,6 +117,7 @@ class Game(ShowBase):
 	anagramRunning = False
 
 	barFade = False
+	damaging = False
 
 	def __init__(self):
 		ShowBase.__init__(self)

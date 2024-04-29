@@ -2,6 +2,7 @@ from direct.task import Task
 from panda3d.core import *
 from direct.gui.DirectGui import *
 from direct.interval.LerpInterval import *
+from direct.interval.IntervalGlobal import *
 import math
 import gametext
 import anagram as ag
@@ -82,7 +83,7 @@ class Level2():
 		# minigames
 		if (posX <= -32.5):
 			# minigame 1
-			if (posY <= -99 and posY >= -126):
+			if (posY <= -99 and posY >= -126 and not game.r1Done and not game.r1Running):
 				crosshair.setTextColor(1, 0.5, 0, 1)
 				self.minigameSelect = 1
 		else:
@@ -90,6 +91,10 @@ class Level2():
 			self.minigameSelect = 0
 
 		if (self.minigameSelect == 1 and not game.r1Done and not game.r1Running and button_down(KB_BUTTON('e'))):
+			mov = game.ppnp.posInterval(0.5, (-34.75, -112.636, -0.477))
+			rot = game.camera.hprInterval(0.5, (270, 0, 0))
+			move = Parallel(mov, rot, name="move")
+			move.start()
 			r1.Room1.mensa(self.r1, game, self)
 
 		if ((game.damaging and not self.damager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 1, 1, 1))):

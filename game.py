@@ -384,29 +384,31 @@ class Game(ShowBase):
 
 		# text
 		self.textObjects = []
-		def attachTextToHUD(text, gtext, pos, scale, font=self.font):
-			text.setScale(scale)
-			text.setPos(pos)
-			gtext.setFont(font)
-			self.sceneObjects.append(text)
-			self.textObjects.append(text)
 
 		self.textNodePath = aspect2d.attachNewNode(self.game_text.ctlText)
-		attachTextToHUD(self.textNodePath, self.game_text.ctlText, (-1.2, 0, 0.85), 0.07)
+		self.attachTextToHUD(self.textNodePath, self.game_text.ctlText, (-1.2, 0, 0.85), 0.07, self.font)
 		
 		self.stmTxtNode = aspect2d.attachNewNode(self.game_text.stmText)
-		attachTextToHUD(self.stmTxtNode, self.game_text.stmText, (-1.2, 0, -0.73), 0.07)
+		self.attachTextToHUD(self.stmTxtNode, self.game_text.stmText, (-1.2, 0, -0.73), 0.07, self.font)
 
 		self.hltTxtNode = aspect2d.attachNewNode(self.game_text.hltText)
-		attachTextToHUD(self.hltTxtNode, self.game_text.hltText, (-1.2, 0, -0.53), 0.07)
+		self.attachTextToHUD(self.hltTxtNode, self.game_text.hltText, (-1.2, 0, -0.53), 0.07, self.font)
 
 		self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
-		attachTextToHUD(self.interactNode, self.game_text.itcText, (0, 0, 0), 0.14)
+		self.attachTextToHUD(self.interactNode, self.game_text.itcText, (0, 0, 0), 0.14, self.font)
 
 		self.itmTxtNode = aspect2d.attachNewNode(self.game_text.itmText)
-		attachTextToHUD(self.itmTxtNode, self.game_text.itmText, (1, 0, 0.85), 0.07)
+		self.attachTextToHUD(self.itmTxtNode, self.game_text.itmText, (1, 0, 0.85), 0.07, self.font)
 
 		print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
+
+	
+	def attachTextToHUD(self, text, gtext, pos, scale, font):
+		text.setScale(scale)
+		text.setPos(pos)
+		gtext.setFont(font)
+		self.sceneObjects.append(text)
+		self.textObjects.append(text)
 
 	def unloadScene(self):
 		self.accelX = 0

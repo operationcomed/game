@@ -238,8 +238,7 @@ class MainMenu():
 		def backSettings():
 			for node in game.settingsItems:
 				node.removeNode()
-			for bar in game.bars:
-				bar.setScale(0.4)
+			game.setBarVisibility(True)
 			try:
 				for img in game.itemsImg:
 					img["scale"] = 0.15
@@ -264,9 +263,7 @@ class MainMenu():
 
 		game.speedStop = True
 
-		for bar in game.bars:
-			# setting it to 0 crashes the game
-			bar.setScale(0.001)
+		game.setBarVisibility(False)
 
 		game.settingsShow = True
 

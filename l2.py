@@ -1,6 +1,7 @@
 from direct.task import Task
 from panda3d.core import *
 from direct.gui.DirectGui import *
+import math
 import gametext
 import anagram as ag
 
@@ -15,6 +16,7 @@ class Level2():
 	def l2Cutscene(self, game, task):
 		game.fog.setExpDensity(0.1)
 		if (not game.isPlaying):
+			game.timeStart = 0
 			gametext.Text.hideCH(game.game_text)
 			game.fade.setColor(0, 0, 0, 0)
 			game.speedStop = True
@@ -42,8 +44,10 @@ class Level2():
 		ag.Anagram.anagram(self.ag, game, self)
 	
 	fadeInit = False
+	l2Init = False
 	timeEnd = 0
 	deltaTime = 0
+	timeElapsed = 0
 	def mission(self, game, task):
 		if (self.cutsceneDone and not self.fadeInit):
 			self.timeEnd = task.time
@@ -57,8 +61,25 @@ class Level2():
 		posY = game.ppnp.getY()
 		if (posX >= 25 and game.health >= 1):
 			game.health -= 0.25
-		if (game.anagramRunning == True):
+
+		if (game.anagramRunning == True or game.isPlaying):
 			game.ppnp.setZ(-0.45)
+		elif (not self.l2Init and self.cutsceneDone):
+			game.timeStart = task.time
+			self.timeText = TextNode('interact')
+			self.timeText.setAlign(TextNode.ACenter)
+			self.timeText.setText("0:00")
+			self.timeText.setShadow(0.07, 0.07)
+			self.timeTxtNode = game.aspect2d.attachNewNode(self.timeText)
+			game.attachTextToHUD(self.timeTxtNode, self.timeText, (0, 0, 0.85), 0.15, game.font)
+			self.l2Init = True
+		if (self.l2Init):
+			game.timeElapsed = task.time - game.timeStart
+			timeMinutes = math.floor(game.timeElapsed/60)
+			timeSeconds = math.floor(game.timeElapsed)
+			while (timeSeconds >= 60):
+				timeSeconds -= 60
+			self.timeText.setText(str(timeMinutes) + ":" + f"{timeSeconds:02}")
 		return Task.cont
 
 

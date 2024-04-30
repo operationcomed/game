@@ -230,7 +230,7 @@ class Game(ShowBase):
 			mm.MainMenu.settingsIG(self.mainmenu_inst, self)
 
 	# scene loading
-	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False, level=False):
+	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False, level=False, noCache=False):
 		self.accept("h", self.helpMenu)
 		self.stamina = self.staminaCap
 
@@ -261,7 +261,7 @@ class Game(ShowBase):
 		self.camLens.setNearFar(0.1, 10000000)
 
 		# scene
-		self.scene = self.loader.loadModel(scene)
+		self.scene = self.loader.loadModel(scene, noCache=noCache)
 		self.sceneObjects.append(self.scene)
 		self.scene.reparentTo(self.render)
 		self.scene.setScale(self.sceneScale)

@@ -105,6 +105,7 @@ class Room1():
 		pickup.play()
 			
 	def cleanUpGame(self, game):
+		game.itemsCollected.append(game.itemsRequired[0])
 		correct = game.loader.loadSfx("assets/sound/correct.mp3")
 		correct.setVolume(game.volume)
 		correct.play()

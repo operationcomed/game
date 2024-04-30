@@ -27,6 +27,8 @@ class Level2():
 			game.speedStop = True
 			game.music.stop()
 			game.video_inst.playVid(game.video_inst, game, game.l2Video)
+			game.itemsCollected = []
+			game.itemsRequired = ['buhok ni hannah', 'ilong ni dwein', 'mata ni david', 'grades ni randler', 'paa ni emman']
 
 		button_down = game.mouseWatcherNode.is_button_down
 

@@ -16,8 +16,6 @@ class MainMenu():
 			game.musicActive = not game.musicActive
 			print(game.musicActive)
 		game.MMsensitivity = 0.025
-		game.scaleFactor = 3
-		game.scaleFactorLogo = 0.2
 	
 		game.cm = CardMaker('video')
 		#game.video = game.aspect2d.attachNewNode(game.cm.generate())
@@ -32,7 +30,7 @@ class MainMenu():
 			game.music.play()
 			game.musicPlaying = True
 
-		game.scaleFactor = 3
+		game.scaleFactor = 2.25
 		game.scaleFactorLogo = 1.5
 		x_offset = -0.75
 		

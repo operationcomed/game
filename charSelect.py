@@ -53,7 +53,7 @@ class CharSelect():
 		game.girlSelect = DirectButton(frameTexture=GirlTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		game.girlSelect.setTransparency(True)
 
-		charDistance = 0.9
+		charDistance = 0.75
 		game.boySelect.setPos(charDistance, 0, -0.2)
 		game.girlSelect.setPos(-charDistance, 0, -0.2)
 

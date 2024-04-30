@@ -102,8 +102,12 @@ class Level1():
 		if (posX >= -13 and not self.jumpscared and not game.isPlaying and self.jsCleanup == False):
 			self.jumpscared = True
 			self.timeEnd = task.time
+			for img in game.itemsImg:
+				img.setColorScale(1, 1, 1, 0)
 			for node in game.charNodes:
 				node.removeNode()
+			game.setBarVisibility(False)
+			gametext.Text.hideText(game.game_text, game)
 			gametext.Text.hideCH(game.game_text)
 			game.speedStop = True
 			rotToScare = game.camera.hprInterval(0.75, (270, 0, 0), blendType='easeIn')
@@ -111,6 +115,7 @@ class Level1():
 
 		if (task.time - self.timeEnd >= 0.75 and self.jumpscared and not game.isPlaying and self.jsCleanup == False):
 			game.video_inst.playVid(game.video_inst, game, 'assets/media/jumpscare1.avi')
+			game.skipText.setText('')
 
 		if (task.time - self.timeEnd >= 0.667+0.75 and self.jumpscared and self.jsCleanup == False):
 			game.video.removeNode()
@@ -118,6 +123,10 @@ class Level1():
 			game.speedStop = False
 			game.blackBg.destroy()
 			game.sound.stop()
+			game.setBarVisibility(True)
+			gametext.Text.showText(game.game_text, game)
+			for img in game.itemsImg:
+				img.setColorScale(0.25, 0.25, 0.25, 0.5)
 			game.isPlaying = False
 			self.jsCleanup = True
 

@@ -77,14 +77,14 @@ class Room3():
 	def nextPic(self, game, l2):
 		self.num += 1
 		if (self.num > len(self.ans)):
-			self.cleanUpGame(self, game)
+			self.cleanUpGame(self, game, l2)
 			return
 		for node in self.fourPicsItems:
 			node.remove_node()
 		self.fourPics(self, game, l2)
 		
-	def cleanUpGame(self, game):
-		game.itemsCollected.append(game.itemsRequired[2])
+	def cleanUpGame(self, game, l2):
+		l2.addItem(l2, game, 'SHELL')
 		dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
 		dismiss.setVolume(game.volume)
 		dismiss.play()

@@ -54,18 +54,18 @@ class Room2():
 		anim = Parallel(*animItem, name="anim")
 		anim.start()
 
-	def checkAnswer(input, self, game, i):
+	def checkAnswer(input, self, game, l2):
 		if (input.lower() == self.ans):
 			print("yay")
 			dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
 			dismiss.setVolume(game.volume)
 			dismiss.play()
-			game.itemsCollected.append(game.itemsRequired[0])
 			correct = game.loader.loadSfx("assets/sound/correct.mp3")
 			correct.setVolume(game.volume)
 			correct.play()
 			game.r2Done = True
-			self.cleanUpGame(self, game)
+			l2.addItem(l2, game, 'MANDRAKE')
+			self.cleanUpGame(self, game, l2)
 			return
 		
 		shake = Sequence(self.pos1, self.pos2, self.pos1, self.pos2, self.pos3, name="shake")
@@ -79,7 +79,7 @@ class Room2():
 		print(game.mistakes)
 		return
 			
-	def cleanUpGame(self, game):
+	def cleanUpGame(self, game, l2):
 		game.game_text.itcText.setTextColor(1, 1, 1, 1)
 		self.popout = LerpFunc(self.fadeOut,
             extraArgs=[self, game],
@@ -92,7 +92,7 @@ class Room2():
 		game.r2Running = False
 		game.mouseLetGo = False
 		game.speedStop = False
-		game.r1Done = True
+		game.r2Done = True
 		gametext.Text.showText(game.game_text, game)
 		game.setBarVisibility(True)
 

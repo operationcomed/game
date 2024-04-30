@@ -155,5 +155,12 @@ class Level2():
 				self.timeText.setText("0:00")
 		return Task.cont
 
+	itemNo = 0
+	itemsImg = []
+	def addItem(self, game, item):
+		self.itemNo += 1
+		image = OnscreenImage(image='assets/img/l2/collect/' + item +'.png', pos=(-0.07+(self.itemNo*0.25), 0, 0.7), scale=(0.15))
+		image.setTransparency(TransparencyAttrib.MAlpha)
+		self.itemsImg.append(image)
 
 l2 = Level2

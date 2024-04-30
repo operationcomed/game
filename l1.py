@@ -101,6 +101,9 @@ class Level1():
 
 		if (posX >= -13 and not self.jumpscared and not game.isPlaying and self.jsCleanup == False):
 			self.jumpscared = True
+			doneSound = game.loader.loadSfx('assets/sound/scream.mp3')
+			doneSound.setLoop(False)
+			doneSound.play()
 			self.timeEnd = task.time
 			for img in game.itemsImg:
 				img.setColorScale(1, 1, 1, 0)

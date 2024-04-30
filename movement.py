@@ -121,6 +121,8 @@ class Movement():
 						game.doors.setHpr(0, 0, 0)
 					except:
 						''''''
+				if (game.collisionMap != False):
+					game.collisionMap.setHpr(0, 0, 0)
 			else:
 				game.scene.setHpr(0, 90, 0)
 				if (game.doorRot):
@@ -128,6 +130,8 @@ class Movement():
 						game.doors.setHpr(0, 90, 0)
 					except:
 						''''''
+				if (game.collisionMap != False):
+					game.collisionMap.setHpr(0, 90, 0)
 			game.scene_rot = not game.scene_rot
 			game.timer = 10
 		game.timer -= 1

@@ -289,6 +289,7 @@ class Game(ShowBase):
 		else:
 			print("no rot")
 
+		self.collisionMap = False
 		if (collisionMap == False):
 			self.scene.setCollideMask(BitMask32.bit(0))
 		else:

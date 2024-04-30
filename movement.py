@@ -10,6 +10,8 @@ class Movement():
 	accelX = 0
 	accelY = 0
 	staminaDecay = 0.05
+	sprint = 0.1
+
 	def movement(self, game):
 		button_down = game.mouseWatcherNode.is_button_down
 
@@ -59,9 +61,10 @@ class Movement():
 
 		if (game.debug):
 			self.staminaDecay = 0.001
+			self.sprint = 1
 		# sprinting and stamina
 		if (button_down(KB.shift()) and game.stamina >= 0 and game.sprintable):
-			game.speed = 0.1
+			game.speed = self.sprint
 			if (button_down(KB_BUTTON('w')) or button_down(KB_BUTTON('a')) or button_down(KB_BUTTON('s')) or button_down(KB_BUTTON('d'))):
 				game.stamina -= self.staminaDecay
 		if (game.stamina <= 0.01):

@@ -8,7 +8,7 @@ import gametext
 import anagram as ag
 import r1
 import r2
-#import r3
+import r3
 #import r4
 #import r5
 
@@ -20,7 +20,7 @@ class Level2():
 	ag = ag.ag
 	r1 = r1.r1
 	r2 = r2.r2
-	#r3 = r3.r3
+	r3 = r3.r3
 	#r4 = r4.r4
 	#r5 = r5.r5
 
@@ -100,6 +100,10 @@ class Level2():
 			if (posY <= -147 and posY >= -171 and not game.r2Done and not game.r2Running):
 				crosshair.setTextColor(1, 0.5, 0, 1)
 				self.minigameSelect = 2
+			# minigame 3
+			if (posY <= -185 and posY >= -213 and not game.r3Done and not game.r3Running):
+				crosshair.setTextColor(1, 0.5, 0, 1)
+				self.minigameSelect = 3
 		else:
 			crosshair.setTextColor(1, 1, 1, 1)
 			self.minigameSelect = 0
@@ -111,12 +115,17 @@ class Level2():
 			move.start()
 			r1.Room1.mensa(self.r1, game, self)
 		elif (self.minigameSelect == 2 and not game.r2Done and not game.r2Running and button_down(KB_BUTTON('e'))):
-			# X: -34.558 Y: -162.878 Z: -0.462 H: 271.192 P: -2.206 R: 0.0
 			mov = game.ppnp.posInterval(0.5, (-34.55, -162.878, -0.46), blendType='easeIn')
 			rot = game.camera.hprInterval(0.5, (270, 0, 0), blendType='easeIn')
 			move = Parallel(mov, rot, name="move")
 			move.start()
 			r2.Room2.padlock(self.r2, game, self)
+		elif (self.minigameSelect == 3 and not game.r3Done and not game.r3Running and button_down(KB_BUTTON('e'))):
+			mov = game.ppnp.posInterval(0.5, (-34.55, -198.555, -0.46), blendType='easeIn')
+			rot = game.camera.hprInterval(0.5, (270, 0, 0), blendType='easeIn')
+			move = Parallel(mov, rot, name="move")
+			move.start()
+			r3.Room3.fourPics(self.r3, game, self)
 
 		if ((game.damaging and not self.damager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 1, 1, 1))):
 				self.damager.start()

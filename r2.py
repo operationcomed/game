@@ -11,107 +11,73 @@ KB = KeyboardButton
 
 class Room2():
 
-	numPics = 6
-	orders = ['356']
-	answerNum = 0
-	answer = ''
-	ansLen = 3
+	ans = 'msu'
 	gameFinished = False
 
-	def mensa(self, game, l2):
+	def padlock(self, game, l2):
 		game.r2Running = True
 		game.mouseLetGo = True
 		game.speedStop = True
 		gametext.Text.hideText(game.game_text, game)
 		game.setBarVisibility(False)
-		game.scaleFactorMensa = 2
+		game.scaleFactorpadlock = 2
 		game.cm = CardMaker('card')
-		game.mensaImg = game.aspect2d.attachNewNode(game.cm.generate())
-		game.mensaImg.setScale((16/9)*game.scaleFactorMensa, 1, game.scaleFactorMensa)
+		game.padlockImg = game.aspect2d.attachNewNode(game.cm.generate())
+		game.padlockImg.setScale((16/9)*game.scaleFactorpadlock, 1, game.scaleFactorpadlock)
 
-		game.tex = game.loader.loadTexture('assets/img/l2/mensa/bkg.png')
-		game.mensaImg.setTexture(game.tex)
-		game.mensaImg.setColorScale(1, 1, 1, 0)
-		game.mensaImg.setTransparency(True)
-
-		game.mensaButtons = []
-
-		i = 1
-		n = 0.2
-		while (i <= self.numPics):
-			if (i >= 4):
-				n = -0.5
-				hi = i - 3
-			else:
-				hi = i
-			image = DirectButton(command=self.checkAnswer, extraArgs=[self, game, i], frameTexture=game.loader.loadTexture('assets/img/l2/mensa/' + str(i) + '.png'), pos=((hi*0.7)-1.4, 0, n), scale=(0.33), relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
-			image.setTransparency(True)
-			image.setColorScale(1, 1, 1, 0)
-			game.mensaButtons.append(image)
-			i += 1
-
+		game.tex = game.loader.loadTexture('assets/img/l2/padlock/bkg.png')
+		game.padlockImg.setTexture(game.tex)
+		game.padlockImg.setColorScale(1, 1, 1, 0)
+		game.padlockImg.setTransparency(True)
 
 		# these are the centers of the image
-		game.mensa_x = (-16/9/2)*game.scaleFactorMensa
-		game.mensa_y = -0.5*game.scaleFactorMensa
+		game.padlock_x = (-16/9/2)*game.scaleFactorpadlock
+		game.padlock_y = -0.5*game.scaleFactorpadlock
 
-		game.mensaImg.setPos(game.mensa_x, 0, game.mensa_y)
-		game.mensaImg.setTransparency(TransparencyAttrib.MAlpha)
+		game.padlockImg.setPos(game.padlock_x, 0, game.padlock_y)
+		game.padlockImg.setTransparency(TransparencyAttrib.MAlpha)
 
-		self.mensaItems = [game.mensaImg, *game.mensaButtons]
+		self.answer = DirectEntry(text="", scale=(0.325, 0.325, 0.225), text_scale=(1, 0.325/0.225), command=self.checkAnswer, extraArgs=[self, game, l2], entryFont=game.font, width=2.25, frameTexture=game.loader.loadTexture("assets/img/blank.png"), text_fg=(1,1,1,1))
+
+		self.answer.setPos(-1.25, 0, -0.45)
+		self.answer.setTransparency(TransparencyAttrib.MAlpha)
+
+		self.pos1 = self.answer.posInterval(0.1, Point3(self.answer.getX()+0.1, 0, self.answer.getZ()), blendType='easeIn')
+		self.pos2 = self.answer.posInterval(0.1, Point3(self.answer.getX()-0.1, 0, self.answer.getZ()), blendType='easeIn')
+		self.pos3 = self.answer.posInterval(0.05, Point3(self.answer.getX(), 0, self.answer.getZ()), blendType='easeIn')
+
+		self.padlockItems = [game.padlockImg, self.answer]
 
 		animItem = []
-		for node in self.mensaItems:
+		for node in self.padlockItems:
 			animItem.append(LerpColorScaleInterval(node, 1.5, (1, 1, 1, 1), (1, 1, 1, 0)))
 		anim = Parallel(*animItem, name="anim")
 		anim.start()
 
-	def checkAnswer(self, game, i):
-		self.answerNum += 1
-		self.answer += str(i)
-		print(self.answer)
-		if (self.answerNum >= self.ansLen):
-			for ans in self.orders:
-				if (self.answer == ans):
-					print("yay")
-					dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
-					dismiss.setVolume(game.volume)
-					dismiss.play()
-					game.itemsCollected.append(game.itemsRequired[0])
-					correct = game.loader.loadSfx("assets/sound/correct.mp3")
-					correct.setVolume(game.volume)
-					correct.play()
-					self.answerNum = 0
-					self.answer = ''
-					self.gameFinished = True
-					game.r2Done = True
-					self.cleanUpGame(self, game)
-					return
-			
-			for node in game.mensaButtons:
-				pos = node.getPos()
-				left = (node.getPos()[0]-0.15, node.getPos()[1], node.getPos()[2])
-				right = (node.getPos()[0]+0.15, node.getPos()[1], node.getPos()[2])
-				shake1 = node.posInterval(0.1, left, pos, blendType='easeIn')
-				shake2 = node.posInterval(0.1, right, left, blendType='easeIn')
-				shake3 = node.posInterval(0.1, left, right, blendType='easeIn')
-				shake4 = node.posInterval(0.05, pos, right, blendType='easeIn')
-				shake = Sequence(shake1, shake2, shake3, shake2, shake4)
-				shake.start()
-			self.answerNum = 0
-			self.answer = ''
-			print("naur")
-			wrong = game.loader.loadSfx("assets/sound/wrong.mp3")
-			wrong.setVolume(game.volume)
-			wrong.play()
-			game.mistakes += 1
-			print(game.mistakes)
+	def checkAnswer(input, self, game, i):
+		if (input.lower() == self.ans):
+			print("yay")
+			dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
+			dismiss.setVolume(game.volume)
+			dismiss.play()
+			game.itemsCollected.append(game.itemsRequired[0])
+			correct = game.loader.loadSfx("assets/sound/correct.mp3")
+			correct.setVolume(game.volume)
+			correct.play()
+			game.r2Done = True
 			self.cleanUpGame(self, game)
 			return
-		pickup = game.loader.loadSfx('assets/sound/pickup.wav')
-		pickup.setLoop(False)
-		pickup.setVolume(game.volume)
-		pickup.play()
+		
+		shake = Sequence(self.pos1, self.pos2, self.pos1, self.pos2, self.pos3, name="shake")
+		shake.start()
+		self.answer.enterText('')
+		print("naur")
+		wrong = game.loader.loadSfx("assets/sound/wrong.mp3")
+		wrong.setVolume(game.volume)
+		wrong.play()
+		game.mistakes += 1
+		print(game.mistakes)
+		return
 			
 	def cleanUpGame(self, game):
 		game.game_text.itcText.setTextColor(1, 1, 1, 1)
@@ -126,6 +92,7 @@ class Room2():
 		game.r2Running = False
 		game.mouseLetGo = False
 		game.speedStop = False
+		game.r1Done = True
 		gametext.Text.showText(game.game_text, game)
 		game.setBarVisibility(True)
 
@@ -149,10 +116,10 @@ class Room2():
 	
 	def fadeOut(t, self, game):
 		if (t <= 0):
-			for node in self.mensaItems:
+			for node in self.padlockItems:
 				node.removeNode()
 			return
-		for node in self.mensaItems:
+		for node in self.padlockItems:
 			node.setColorScale(1, 1, 1, t)
 
 	#def setFocus(self, game, focus):

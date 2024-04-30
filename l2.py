@@ -116,7 +116,7 @@ class Level2():
 			rot = game.camera.hprInterval(0.5, (270, 0, 0), blendType='easeIn')
 			move = Parallel(mov, rot, name="move")
 			move.start()
-			r2.Room2.mensa(self.r2, game, self)
+			r2.Room2.padlock(self.r2, game, self)
 
 		if ((game.damaging and not self.damager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 1, 1, 1))):
 				self.damager.start()

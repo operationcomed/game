@@ -7,6 +7,10 @@ import math
 import gametext
 import anagram as ag
 import r1
+import r2
+#import r3
+#import r4
+#import r5
 
 KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
@@ -15,6 +19,10 @@ class Level2():
 
 	ag = ag.ag
 	r1 = r1.r1
+	r2 = r2.r2
+	#r3 = r3.r3
+	#r4 = r4.r4
+	#r5 = r5.r5
 
 	cutsceneDone = False
 	def l2Cutscene(self, game, task):
@@ -88,6 +96,10 @@ class Level2():
 			if (posY <= -99 and posY >= -126 and not game.r1Done and not game.r1Running):
 				crosshair.setTextColor(1, 0.5, 0, 1)
 				self.minigameSelect = 1
+			# minigame 2
+			if (posY <= -147 and posY >= -171 and not game.r2Done and not game.r2Running):
+				crosshair.setTextColor(1, 0.5, 0, 1)
+				self.minigameSelect = 2
 		else:
 			crosshair.setTextColor(1, 1, 1, 1)
 			self.minigameSelect = 0
@@ -98,6 +110,13 @@ class Level2():
 			move = Parallel(mov, rot, name="move")
 			move.start()
 			r1.Room1.mensa(self.r1, game, self)
+		elif (self.minigameSelect == 2 and not game.r2Done and not game.r2Running and button_down(KB_BUTTON('e'))):
+			# X: -34.558 Y: -162.878 Z: -0.462 H: 271.192 P: -2.206 R: 0.0
+			mov = game.ppnp.posInterval(0.5, (-34.55, -162.878, -0.46), blendType='easeIn')
+			rot = game.camera.hprInterval(0.5, (270, 0, 0), blendType='easeIn')
+			move = Parallel(mov, rot, name="move")
+			move.start()
+			r2.Room2.mensa(self.r2, game, self)
 
 		if ((game.damaging and not self.damager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 1, 1, 1))):
 				self.damager.start()

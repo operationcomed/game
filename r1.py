@@ -12,7 +12,7 @@ KB = KeyboardButton
 class Room1():
 
 	numPics = 6
-	orders = ['136', '356']
+	orders = ['356']
 	answerNum = 0
 	answer = ''
 	ansLen = 3
@@ -77,6 +77,14 @@ class Room1():
 					dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
 					dismiss.setVolume(game.volume)
 					dismiss.play()
+					game.itemsCollected.append(game.itemsRequired[0])
+					correct = game.loader.loadSfx("assets/sound/correct.mp3")
+					correct.setVolume(game.volume)
+					correct.play()
+					self.answerNum = 0
+					self.answer = ''
+					self.gameFinished = True
+					game.r1Done = True
 					self.cleanUpGame(self, game)
 					return
 			
@@ -98,6 +106,7 @@ class Room1():
 			wrong.play()
 			game.mistakes += 1
 			print(game.mistakes)
+			self.cleanUpGame(self, game)
 			return
 		pickup = game.loader.loadSfx('assets/sound/pickup.wav')
 		pickup.setLoop(False)
@@ -105,14 +114,7 @@ class Room1():
 		pickup.play()
 			
 	def cleanUpGame(self, game):
-		game.itemsCollected.append(game.itemsRequired[0])
-		correct = game.loader.loadSfx("assets/sound/correct.mp3")
-		correct.setVolume(game.volume)
-		correct.play()
 		game.game_text.itcText.setTextColor(1, 1, 1, 1)
-		self.answerNum = 0
-		self.answer = ''
-		self.gameFinished = True
 		self.popout = LerpFunc(self.fadeOut,
             extraArgs=[self, game],
             fromData=1,
@@ -122,7 +124,6 @@ class Room1():
             name="fadeo")
 		self.popout.start()
 		game.r1Running = False
-		game.r1Done = True
 		game.mouseLetGo = False
 		game.speedStop = False
 		gametext.Text.showText(game.game_text, game)

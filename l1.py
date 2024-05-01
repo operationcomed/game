@@ -92,6 +92,7 @@ class Level1():
 		if (self.itemsGotten >= 5 and not self.missionDone):
 			doneSound = game.loader.loadSfx('assets/sound/done.mp3')
 			doneSound.setLoop(False)
+			doneSound.setVolume(game.volume)
 			doneSound.play()
 			self.missionDone = True
 			game.game_text.itmText.setTextColor(0, 1, 0.5, 1)
@@ -101,9 +102,10 @@ class Level1():
 
 		if (posX >= -13 and not self.jumpscared and not game.isPlaying and self.jsCleanup == False):
 			self.jumpscared = True
-			doneSound = game.loader.loadSfx('assets/sound/scream.mp3')
-			doneSound.setLoop(False)
-			doneSound.play()
+			scream = game.loader.loadSfx('assets/sound/scream.mp3')
+			scream.setLoop(False)
+			scream.setVolume(game.volume)
+			scream.play()
 			self.timeEnd = task.time
 			for img in game.itemsImg:
 				img.setColorScale(1, 1, 1, 0)

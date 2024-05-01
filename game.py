@@ -238,7 +238,7 @@ class Game(ShowBase):
 
 		self.music.stop()
 		self.music = self.loader.loadSfx("assets/sound/ambient.mp3")
-		self.music.setVolume(9999)
+		self.music.setVolume(self.volume)
 		self.music.setLoop(True)
 		self.music.play()
 		

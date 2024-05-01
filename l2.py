@@ -10,7 +10,7 @@ import r1
 import r2
 import r3
 import r4
-#import r5
+import r5
 
 KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
@@ -22,7 +22,7 @@ class Level2():
 	r2 = r2.r2
 	r3 = r3.r3
 	r4 = r4.r4
-	#r5 = r5.r5
+	r5 = r5.r5
 
 	cutsceneDone = False
 	def l2Cutscene(self, game, task):
@@ -109,6 +109,10 @@ class Level2():
 			if (posY <= -220 and posY >= -245 and not game.r4Done and not game.r4Running):
 				crosshair.setTextColor(1, 0.5, 0, 1)
 				self.minigameSelect = 4
+			# minigame 5
+			if (posY <= -289 and posY >= -317 and not game.r5Done and not game.r5Running):
+				crosshair.setTextColor(1, 0.5, 0, 1)
+				self.minigameSelect = 5
 		else:
 			crosshair.setTextColor(1, 1, 1, 1)
 			self.minigameSelect = 0
@@ -137,6 +141,12 @@ class Level2():
 			move = Parallel(mov, rot, name="move")
 			move.start()
 			r4.Room4.wordSearch(self.r4, game, self)
+		elif (self.minigameSelect == 5 and not game.r5Done and not game.r5Running and button_down(KB_BUTTON('e'))):
+			mov = game.ppnp.posInterval(0.5, (-34.75, -303.154, -0.477), blendType='easeIn')
+			rot = game.camera.hprInterval(0.5, (180, 0, 0), blendType='easeIn')
+			move = Parallel(mov, rot, name="move")
+			move.start()
+			r5.Room5.wordSearch(self.r4, game, self)
 
 		if ((game.damaging and not self.damager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 1, 1, 1))):
 				self.damager.start()

@@ -76,7 +76,7 @@ class Game(ShowBase):
 	l1 = l1.l1
 	l2 = l2.l2
 
-	fog_color = (0.1, 0.05, 0)
+	fog_color = (0.15, 0.05, 0)
 	
 	scene_rot = False
 

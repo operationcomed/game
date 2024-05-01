@@ -57,6 +57,7 @@ loadPrcFileData("", """
 loadPrcFileData("", "texture-minfilter mipmap")
 loadPrcFileData("", "texture-maxfilter trilinear")
 loadPrcFileData("", "texture-anisotropic-degree 8")
+loadPrcFileData("", "threading-model Cull/Draw")
 
 class Game(ShowBase):
 

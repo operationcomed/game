@@ -2,6 +2,7 @@ from direct.task import Task
 from panda3d.core import *
 from direct.gui.DirectGui import *
 from direct.interval.LerpInterval import *
+from direct.interval.IntervalGlobal import *
 import gametext
 
 KB_BUTTON = KeyboardButton.ascii_key
@@ -120,9 +121,11 @@ class Level1():
 
 		if (task.time - self.timeEnd >= 0.75 and self.jumpscared and not game.isPlaying and self.jsCleanup == False):
 			game.video_inst.playVid(game.video_inst, game, 'assets/media/jumpscare1.avi')
+			game.video.setPos(0.5, 0, 0.1)
+			game.video.setScale(game.scaleFactorVid, 1, game.scaleFactorVid/1.8)
 			game.skipText.setText('')
 
-		if (task.time - self.timeEnd >= 0.667+0.75 and self.jumpscared and self.jsCleanup == False):
+		if (task.time - self.timeEnd >= 1.35+0.75 and self.jumpscared and self.jsCleanup == False):
 			game.video.removeNode()
 			gametext.Text.showCH(game.game_text)
 			game.speedStop = False
@@ -133,6 +136,13 @@ class Level1():
 			for img in game.itemsImg:
 				img.setColorScale(0.25, 0.25, 0.25, 0.5)
 			game.isPlaying = False
+			self.hallText = TextNode('hallucinate')
+			self.hallText.setAlign(TextNode.ACenter)
+			self.hallText.setText("HALLUCINATION\nMY HEAD HURTS!")
+			self.hallText.setShadow(0.07, 0.07)
+			self.hallTxtNode = game.aspect2d.attachNewNode(self.hallText)
+			game.attachTextToHUD(self.hallTxtNode, self.hallText, (0, 0, 0), 0.15, game.font)
+			fadeout = Sequence(Wait(2.5), LerpColorScaleInterval(self.hallTxtNode, 2.5, (1, 1, 1, 0), blendType='easeIn')).start()
 			self.jsCleanup = True
 
 		if ((posX >= 11 and posX <= 17) and posY <= -20 and self.itemsGotten >= 5):

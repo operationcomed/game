@@ -127,6 +127,17 @@ class Game(ShowBase):
 	r3Done = False
 	r4Done = False
 	r5Done = False
+	def resetMinigames(self):
+		self.r1Running = False
+		self.r2Running = False
+		self.r3Running = False
+		self.r4Running = False
+		self.r5Running = False
+		self.r1Done = False
+		self.r2Done = False
+		self.r3Done = False
+		self.r4Done = False
+		self.r5Done = False
 
 	mistakes = 0
 
@@ -383,13 +394,6 @@ class Game(ShowBase):
 			if (self.scene_rot == True):
 				self.doors.setHpr(0, 90, 0)
 
-		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
-		if (self.scene_rot == True):
-			print("rot")
-			model.setHpr(0, 90, 0)
-		else:
-			print("no rot")
-
 		# lights and shadows
 		alight = AmbientLight("alight1")
 		alnp = self.render.attachNewNode(alight)
@@ -408,15 +412,21 @@ class Game(ShowBase):
 		self.render.setLight(alnp)
 		self.setBackgroundColor(self.fog_color)
 
-		self.sunActor = Actor("assets/models/ball.glb")
+
+		self.sunActor = self.loader.loadModel("assets/models/ball.glb")
 		self.sceneObjects.append(self.sunActor)
 
 		self.sunActor.reparentTo(self.slnp)
 		self.sunActor.setColor(600, 600, 600)
 
-		# remove the shader for the sun because the sun shouldnt have a shadow
 		self.sunActor.setShaderOff()
-
+		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
+		if (self.scene_rot == True):
+			print("rot")
+			self.scene.setHpr(0, 90, 0)
+			self.sunActor.reparentTo(self.slnp)
+		else:
+			print("no rot")
 		# tasks
 		self.taskMgr.add(self.moveTask, "moveTask")
 		if (customTask != False):

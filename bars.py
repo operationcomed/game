@@ -7,9 +7,9 @@ class Bars():
 		anim = []
 		for bar in game.bars:
 			if (visible):
-				anim.append(LerpColorScaleInterval(bar, 0.25, (1, 1, 1, 1), bar.getColorScale()))
+				anim.append(LerpColorScaleInterval(bar, 0.25, (1, 1, 1, 1), bar.getColorScale(), blendType='easeOut'))
 			else:
-				anim.append(LerpColorScaleInterval(bar, 0.25, (1, 1, 1, 0), bar.getColorScale()))
+				anim.append(LerpColorScaleInterval(bar, 0.25, (1, 1, 1, 0), bar.getColorScale(), blendType='easeOut'))
 		fader = Parallel(*anim, name="fade")
 		fader.start()
 

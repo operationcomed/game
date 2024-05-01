@@ -23,7 +23,8 @@ class MainMenu():
 		#game.tex = game.loader.loadTexture('assets/media/helloworld.avi')
 		#game.video.setTexture(game.tex)
 		
-		if (game.musicPlaying == False):
+		if (game.musicPlaying == False or game.level == 2):
+			game.level = 0
 			game.music = game.loader.loadSfx("assets/sound/main_menu.mp3")
 			game.music.setVolume(game.volume)
 			game.music.setLoop(True)

@@ -174,6 +174,14 @@ class Level2():
 				self.timeText.setText(str(9-timeMinutes) + ":" + f"{59-timeSeconds:02}")
 			else:
 				self.timeText.setText("0:00")
+				props = WindowProperties()
+				props.setCursorHidden(False)
+				game.win.requestProperties(props)
+				props = game.win.getProperties()
+				game.music.stop()
+				game.resetMinigames()
+				game.unloadScene()
+				game.mainMenu()
 		return Task.cont
 
 	itemNo = 0

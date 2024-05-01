@@ -11,9 +11,9 @@ KB = KeyboardButton
 
 class Room4():
 
-	ans = ['escape', 'curse', 'ghost']
+	ans = ['justice', 'answers', 'revenge', 'cursed', 'abused', 'escape']
 	finished = []
-	num = 1
+	num = 0
 	gameFinished = False
 
 	def wordSearch(self, game, l2):
@@ -45,11 +45,11 @@ class Room4():
 							 text_align=TextNode.ACenter, 
 							 extraArgs=[self, game, l2], 
 							 entryFont=game.font, 
-							 width=12, 
+							 width=6, 
 							 frameTexture=game.loader.loadTexture("assets/img/textbox.png"), 
-							 text_fg=(1,0.2,0.2,1))
+							 text_fg=(1,1,1,1))
 
-		self.answer.setPos(0, 0, -0.67)
+		self.answer.setPos(1.3, 0, -0.67)
 		self.answer.setTransparency(TransparencyAttrib.MAlpha)
 
 		self.pos1 = self.answer.posInterval(0.1, Point3(self.answer.getX()+0.1, 0, self.answer.getZ()), blendType='easeIn')
@@ -65,15 +65,28 @@ class Room4():
 		anim.start()
 
 	def checkAnswer(input, self, game, l2):
+		i = 0
+		if (self.num > len(self.ans)):
+			self.cleanUpGame(self, game, l2)
+			return
 		for ans in self.ans:
 			if (input.lower() == ans):
 				print("yay", ans)
+				self.num += 1
 				correct = game.loader.loadSfx("assets/sound/correct.mp3")
 				correct.setVolume(game.volume)
 				correct.play()
 				self.answer.enterText('')
 				self.finished.append(ans)
 				print(self.finished)
+				self.ans.remove(ans)
+				guess = TextNode('thing')
+				guess.setAlign(TextNode.ACenter)
+				guess.setText(ans)
+				guess.setShadow(0.07, 0.07)
+				guessText = game.aspect2d.attachNewNode(guess)
+				game.attachTextToHUD(guessText, guess, (0.5, 0, (-self.num*0.1)+1), 0.15, game.font)
+				self.wordSearchItems.append(guess)
 				return
 			else:
 				shake = Sequence(self.pos1, self.pos2, self.pos1, self.pos2, self.pos3, name="shake")
@@ -82,22 +95,14 @@ class Room4():
 				print("naur")
 				game.mistakes += 1
 				print(game.mistakes)
+			i += 1
 			
 		wrong = game.loader.loadSfx("assets/sound/wrong.mp3")
 		wrong.setVolume(game.volume)
 		wrong.play()
-			
-	def nextPic(self, game, l2):
-		self.num += 1
-		if (self.num > len(self.ans)):
-			self.cleanUpGame(self, game, l2)
-			return
-		for node in self.wordSearchItems:
-			node.remove_node()
-		self.wordSearch(self, game, l2)
 		
 	def cleanUpGame(self, game, l2):
-		l2.addItem(l2, game, 'SHELL')
+		l2.addItem(l2, game, 'SPOON')
 		dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
 		dismiss.setVolume(game.volume)
 		dismiss.play()

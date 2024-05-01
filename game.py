@@ -245,64 +245,25 @@ class Game(ShowBase):
 		self.footsteps.setLoop(True)
 		self.footsteps.play()
 		self.disable_mouse()
-
-
-
-		self.accept("escape", self.settingsIG)
 		
 		self.sceneObjects = []
-
-		# antialiasing
-		self.render.setAntialias(AntialiasAttrib.MAuto)
 		
-		self.render.setShaderAuto()
+		# player + physics
+		self.playerCharacter = Actor()
+		self.sceneObjects.append(self.playerCharacter)
 
-		# camera
-		self.camLens.setNearFar(0.1, 10000000)
-
-		# scene
-		self.scene = self.loader.loadModel(scene, noCache=noCache)
-		self.sceneObjects.append(self.scene)
-		self.scene.reparentTo(self.render)
-		self.scene.setScale(self.sceneScale)
-		self.scene.setShaderOff()
-		#self.scene.applyTextureColors()
-		self.scene.setTwoSided(False)
-
-
-		if (doors != False):
-			self.doorRot = True
-			self.doors = self.loader.loadModel(doors)
-			self.sceneObjects.append(self.doors)
-			self.doors.reparentTo(self.render)
-			self.doors.setScale(self.sceneScale)
-			self.doors.setShaderOff()
-
-			# booleans are a mystery to humankind
-			if (self.scene_rot == True):
-				self.doors.setHpr(0, 90, 0)
-
-		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
-		if (self.scene_rot == True):
-			print("rot")
-			self.scene.setHpr(0, 90, 0)
-		else:
-			print("no rot")
+		self.playerPhysics = ActorNode("player-physics")
+		self.ppnp = self.render.attachNewNode(self.playerPhysics)
+		if (playerRot != False):
+			self.camera.setHpr(playerRot)
+		
+		self.ppnp.setPos(playerPos)
+		self.playerCharacter.loop("walk")
 
 		self.collisionMap = False
-		if (collisionMap == False):
-			self.scene.setCollideMask(BitMask32.bit(0))
-		else:
-			self.collisionMap = self.loader.loadModel(collisionMap)
-			self.sceneObjects.append(self.collisionMap)
-			self.collisionMap.reparentTo(self.render)
-			self.collisionMap.setScale(self.sceneScale)
-			self.collisionMap.setShaderOff()
-			self.collisionMap.hide()
-			self.collisionMap.setCollideMask(BitMask32.bit(0))
-			if (self.scene_rot == True):
-				self.collisionMap.setHpr(0, 90, 0)
-		self.enableParticles()
+		if (collisionMap != False):
+			self.collisionMap = self.loader.loadModel(collisionMap, callback=self.finishLoadCollision, extraArgs=[playerRot, playerPos])
+		self.scene = self.loader.loadModel(scene, noCache=noCache, callback=self.finishLoadScene, extraArgs=[lightPos, doors, customTask, collisionMap, level])
 
 		# https://discourse.panda3d.org/t/directgui-directwaitbar/1761/2 (from 2006!)
 		barBg = loader.loadTexture("assets/buttons/stm_bkg.png")
@@ -327,6 +288,102 @@ class Game(ShowBase):
 			bar.setTexScale(ts, 1/2, 1, 1/0.2)
 			bar.setColorScale(1, 1, 1, 0)
 			self.sceneObjects.append(bar)
+
+		# fog
+		self.fog = Fog("Fog")
+		self.fog.setColor(LVecBase4f(self.fog_color))
+		self.fog.setExpDensity(0.3)
+		self.render.setFog(self.fog)
+
+		# text
+		self.textObjects = []
+
+		self.textNodePath = aspect2d.attachNewNode(self.game_text.ctlText)
+		self.attachTextToHUD(self.textNodePath, self.game_text.ctlText, (-1.2, 0, 0.85), 0.07, self.font)
+		
+		self.stmTxtNode = aspect2d.attachNewNode(self.game_text.stmText)
+		self.attachTextToHUD(self.stmTxtNode, self.game_text.stmText, (-1.2, 0, -0.73), 0.07, self.font)
+
+		self.hltTxtNode = aspect2d.attachNewNode(self.game_text.hltText)
+		self.attachTextToHUD(self.hltTxtNode, self.game_text.hltText, (-1.2, 0, -0.53), 0.07, self.font)
+
+		self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
+		self.attachTextToHUD(self.interactNode, self.game_text.itcText, (0, 0, 0), 0.14, self.font)
+
+		self.itmTxtNode = aspect2d.attachNewNode(self.game_text.itmText)
+		self.attachTextToHUD(self.itmTxtNode, self.game_text.itmText, (1, 0, 0.85), 0.07, self.font)
+
+		self.accept("escape", self.settingsIG)
+
+		# antialiasing
+		self.render.setAntialias(AntialiasAttrib.MAuto)
+		
+		self.render.setShaderAuto()
+
+		# camera
+		self.camLens.setNearFar(0.1, 10000000)
+
+	def finishLoadCollision(self, model, playerRot, playerPos):
+		self.sceneObjects.append(model)
+		model.reparentTo(self.render)
+		model.setScale(self.sceneScale)
+		model.setShaderOff()
+		model.hide()
+		if (self.scene_rot == True):
+			model.setHpr(0, 90, 0)
+		model.setCollideMask(BitMask32.bit(0))
+		self.enableParticles()
+
+		self.gravity = ForceNode("gravity")
+		self.gnp = self.render.attachNewNode(self.gravity)
+		self.gravity_amt = LinearVectorForce(0, 0, -10)
+		self.gravity.addForce(self.gravity_amt)
+		self.physicsMgr.addLinearForce(self.gravity_amt)
+		self.physicsMgr.attachPhysicalNode(self.playerPhysics)
+		self.colliderNode = self.ppnp.attachNewNode(CollisionNode('colNode'))
+		self.colliderNode.node().addSolid(CollisionCapsule(0, 0, 0, 0, 0, 3, 0.5))
+
+		self.playerPhysics.getPhysicsObject().setMass(45)
+
+		self.playerCharacter.reparentTo(self.ppnp)
+
+		# https://arsthaumaturgis.github.io/Panda3DTutorial.io/tutorial/tut_lesson06.html
+		self.cTrav = CollisionTraverser()
+		self.pusher = PhysicsCollisionHandler()
+		self.pusher.addCollider(self.colliderNode, self.ppnp)
+		self.cTrav.addCollider(self.colliderNode, self.pusher)
+
+		print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
+
+	def finishLoadScene(self, model, lightPos, doors, customTask, collisionMap, level):
+		# scene
+		self.sceneObjects.append(model)
+		model.reparentTo(self.render)
+		model.setScale(self.sceneScale)
+		model.setShaderOff()
+		#model.applyTextureColors()
+		model.setTwoSided(False)
+		if (collisionMap == False):
+			model.setCollideMask(BitMask32.bit(0))
+
+		if (doors != False):
+			self.doorRot = True
+			self.doors = self.loader.loadModel(doors)
+			self.sceneObjects.append(self.doors)
+			self.doors.reparentTo(self.render)
+			self.doors.setScale(self.sceneScale)
+			self.doors.setShaderOff()
+
+			# booleans are a mystery to humankind
+			if (self.scene_rot == True):
+				self.doors.setHpr(0, 90, 0)
+
+		# for some reason the scene is rotated 90 degrees on one computer but normal on the other
+		if (self.scene_rot == True):
+			print("rot")
+			model.setHpr(0, 90, 0)
+		else:
+			print("no rot")
 
 		# lights and shadows
 		alight = AmbientLight("alight1")
@@ -355,38 +412,6 @@ class Game(ShowBase):
 		# remove the shader for the sun because the sun shouldnt have a shadow
 		self.sunActor.setShaderOff()
 
-		# player + physics
-		self.playerCharacter = Actor()
-		self.sceneObjects.append(self.playerCharacter)
-
-		self.playerPhysics = ActorNode("player-physics")
-		self.ppnp = self.render.attachNewNode(self.playerPhysics)
-		if (playerRot != False):
-			self.camera.setHpr(playerRot)
-		self.physicsMgr.attachPhysicalNode(self.playerPhysics)
-		self.colliderNode = self.ppnp.attachNewNode(CollisionNode('colNode'))
-		self.colliderNode.node().addSolid(CollisionCapsule(0, 0, 0, 0, 0, 3, 0.5))
-
-		self.gravity = ForceNode("gravity")
-		self.gnp = self.render.attachNewNode(self.gravity)
-		self.gravity_amt = LinearVectorForce(0, 0, -10)
-		self.gravity.addForce(self.gravity_amt)
-		self.physicsMgr.addLinearForce(self.gravity_amt)
-		self.playerPhysics.getPhysicsObject().setMass(45)
-
-		self.playerCharacter.reparentTo(self.ppnp)
-		
-		self.ppnp.setPos(playerPos)
-		self.playerCharacter.loop("walk")
-
-		# https://arsthaumaturgis.github.io/Panda3DTutorial.io/tutorial/tut_lesson06.html
-		self.cTrav = CollisionTraverser()
-		self.pusher = PhysicsCollisionHandler()
-		self.pusher.addCollider(self.colliderNode, self.ppnp)
-		self.cTrav.addCollider(self.colliderNode, self.pusher)
-		
-		#self.colliderNode.show()
-
 		# tasks
 		self.taskMgr.add(self.moveTask, "moveTask")
 		if (customTask != False):
@@ -395,33 +420,6 @@ class Game(ShowBase):
 		# filters 
 		self.filters = CommonFilters(self.win, self.cam)
 		self.filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
-
-		# fog
-		self.fog = Fog("Fog")
-		self.fog.setColor(LVecBase4f(self.fog_color))
-		self.fog.setExpDensity(0.3)
-		self.render.setFog(self.fog)
-
-		# text
-		self.textObjects = []
-
-		self.textNodePath = aspect2d.attachNewNode(self.game_text.ctlText)
-		self.attachTextToHUD(self.textNodePath, self.game_text.ctlText, (-1.2, 0, 0.85), 0.07, self.font)
-		
-		self.stmTxtNode = aspect2d.attachNewNode(self.game_text.stmText)
-		self.attachTextToHUD(self.stmTxtNode, self.game_text.stmText, (-1.2, 0, -0.73), 0.07, self.font)
-
-		self.hltTxtNode = aspect2d.attachNewNode(self.game_text.hltText)
-		self.attachTextToHUD(self.hltTxtNode, self.game_text.hltText, (-1.2, 0, -0.53), 0.07, self.font)
-
-		self.interactNode = aspect2d.attachNewNode(self.game_text.itcText)
-		self.attachTextToHUD(self.interactNode, self.game_text.itcText, (0, 0, 0), 0.14, self.font)
-
-		self.itmTxtNode = aspect2d.attachNewNode(self.game_text.itmText)
-		self.attachTextToHUD(self.itmTxtNode, self.game_text.itmText, (1, 0, 0.85), 0.07, self.font)
-
-		print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
-
 	
 	def attachTextToHUD(self, text, gtext, pos, scale, font):
 		text.setScale(scale)

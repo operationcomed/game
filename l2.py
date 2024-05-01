@@ -131,7 +131,7 @@ class Level2():
 			move.start()
 			r3.Room3.fourPics(self.r3, game, self)
 		elif (self.minigameSelect == 4 and not game.r4Done and not game.r4Running and button_down(KB_BUTTON('e'))):
-			mov = game.ppnp.posInterval(0.5, (-47.55, -140.674, -0.46), blendType='easeIn')
+			mov = game.ppnp.posInterval(0.5, (-46.685, -242.674, -0.46), blendType='easeIn')
 			rot = game.camera.hprInterval(0.5, (180, 0, 0), blendType='easeIn')
 			move = Parallel(mov, rot, name="move")
 			move.start()

@@ -49,7 +49,7 @@ class Room4():
 							 frameTexture=game.loader.loadTexture("assets/img/textbox.png"), 
 							 text_fg=(1,1,1,1))
 
-		self.answer.setPos(1.3, 0, -0.67)
+		self.answer.setPos(1, 0, -0.67)
 		self.answer.setTransparency(TransparencyAttrib.MAlpha)
 
 		self.pos1 = self.answer.posInterval(0.1, Point3(self.answer.getX()+0.1, 0, self.answer.getZ()), blendType='easeIn')
@@ -65,6 +65,7 @@ class Room4():
 		anim.start()
 
 	def checkAnswer(input, self, game, l2):
+		print(self.num)
 		i = 0
 		if (self.num > len(self.ans)):
 			self.cleanUpGame(self, game, l2)
@@ -85,7 +86,9 @@ class Room4():
 				guess.setText(ans)
 				guess.setShadow(0.07, 0.07)
 				guessText = game.aspect2d.attachNewNode(guess)
-				game.attachTextToHUD(guessText, guess, (0.5, 0, (-self.num*0.1)+1), 0.15, game.font)
+				game.attachTextToHUD(guessText, guess, (0.5, 0, (-self.num*0.125)+0.6), 0.15, game.font)
+				self.wordSearchItems.remove(guessText)
+				self.wordSearchItems.remove(guessText)
 				self.wordSearchItems.append(guess)
 				return
 			else:

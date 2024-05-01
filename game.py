@@ -327,14 +327,15 @@ class Game(ShowBase):
 		self.camLens.setNearFar(0.1, 10000000)
 
 	def finishLoadCollision(self, model, playerRot, playerPos):
-		self.sceneObjects.append(model)
-		model.reparentTo(self.render)
-		model.setScale(self.sceneScale)
-		model.setShaderOff()
-		model.hide()
+		self.collisionMap = model
+		self.sceneObjects.append(self.collisionMap)
+		self.collisionMap.reparentTo(self.render)
+		self.collisionMap.setScale(self.sceneScale)
+		self.collisionMap.setShaderOff()
+		self.collisionMap.hide()
 		if (self.scene_rot == True):
-			model.setHpr(0, 90, 0)
-		model.setCollideMask(BitMask32.bit(0))
+			self.collisionMap.setHpr(0, 90, 0)
+		self.collisionMap.setCollideMask(BitMask32.bit(0))
 		self.enableParticles()
 
 		self.gravity = ForceNode("gravity")
@@ -360,14 +361,15 @@ class Game(ShowBase):
 
 	def finishLoadScene(self, model, lightPos, doors, customTask, collisionMap, level):
 		# scene
-		self.sceneObjects.append(model)
-		model.reparentTo(self.render)
-		model.setScale(self.sceneScale)
-		model.setShaderOff()
-		#model.applyTextureColors()
-		model.setTwoSided(False)
+		self.scene = model
+		self.sceneObjects.append(self.scene)
+		self.scene.reparentTo(self.render)
+		self.scene.setScale(self.sceneScale)
+		self.scene.setShaderOff()
+		#self.scene.applyTextureColors()
+		self.scene.setTwoSided(False)
 		if (collisionMap == False):
-			model.setCollideMask(BitMask32.bit(0))
+			self.scene.setCollideMask(BitMask32.bit(0))
 
 		if (doors != False):
 			self.doorRot = True

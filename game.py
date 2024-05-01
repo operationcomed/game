@@ -230,7 +230,9 @@ class Game(ShowBase):
 			mm.MainMenu.settingsIG(self.mainmenu_inst, self)
 
 	# scene loading
-	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False, level=False, noCache=False):
+	def loadScene(self, scene, playerPos, lightPos, doors=False, customTask=False, playerRot=False, collisionMap=False, level=False, noCache=False, startDark=False):
+		if (startDark):
+			self.fade.setColor(0, 0, 0, 1)
 		self.accept("h", self.helpMenu)
 		self.stamina = self.staminaCap
 

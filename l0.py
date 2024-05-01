@@ -19,7 +19,7 @@ class Level0():
 		if (not game.isPlaying):
 			for node in game.charNodes:
 				node.removeNode()
-			game.loadScene("assets/models/bed.glb", (3.5, 6, 1.42), (0, 0, 10), doors=False, customTask=game.bedDoor, collisionMap="assets/models/bed.glb", playerRot=(180, -90, 0))
+			game.loadScene("assets/models/bed.glb", (3.5, 6, 1.42), (0, 0, 10), doors=False, customTask=game.bedDoor, collisionMap="assets/models/bed.glb", playerRot=(180, -90, 0), startDark=True)
 			game.helpMenu()
 			game.itmTxtNode.hide()
 			game.fade.setColor(0, 0, 0, 0)
@@ -111,7 +111,6 @@ class Level0():
 			game.fade.setColor(0, 0, 0, min(self.deltaTime*2, 1))
 			game.filters.setBlurSharpen(max(1-(self.deltaTime*2), 0))
 			if (self.deltaTime >= 1):
-				game.fade.setColor(0, 0, 0, 0)
 				game.unloadScene()
 				game.cameraOffset = 4
 				game.loadScene("assets/models/inf.glb", (-17.0, 6.25, 5.414), (0, 0, 100.5), "assets/models/door.glb", game.missionLevel1, collisionMap="assets/collisionmaps/inf.glb")

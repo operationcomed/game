@@ -40,7 +40,6 @@ class Level1():
 			print("done")
 
 		if (not self.missionShow):
-			game.fade.setColor(0, 0, 0, 1)
 			doorSound = game.loader.loadSfx("assets/sound/doorClose.mp3")
 			doorSound.setVolume(game.volume)
 			doorSound.play()

@@ -12,6 +12,7 @@ KB = KeyboardButton
 class Room4():
 
 	ans = ['justice', 'answers', 'revenge', 'cursed', 'abused', 'escape']
+	ansOrig = ['justice', 'answers', 'revenge', 'cursed', 'abused', 'escape']
 	finished = []
 	num = 0
 	gameFinished = False
@@ -65,11 +66,7 @@ class Room4():
 		anim.start()
 
 	def checkAnswer(input, self, game, l2):
-		print(self.num)
 		i = 0
-		if (self.num > len(self.ans)):
-			self.cleanUpGame(self, game, l2)
-			return
 		for ans in self.ans:
 			if (input.lower() == ans):
 				print("yay", ans)
@@ -86,20 +83,22 @@ class Room4():
 				guess.setText(ans)
 				guess.setShadow(0.07, 0.07)
 				guessText = game.aspect2d.attachNewNode(guess)
-				game.attachTextToHUD(guessText, guess, (0.5, 0, (-self.num*0.125)+0.6), 0.15, game.font)
-				self.wordSearchItems.remove(guessText)
-				self.wordSearchItems.remove(guessText)
-				self.wordSearchItems.append(guess)
+				game.attachTextToHUD(guessText, guess, (1, 0, (-self.num*0.125)+0.425), 0.15, game.font)
+				game.sceneObjects.remove(guessText)
+				game.textObjects.remove(guessText)
+				self.wordSearchItems.append(guessText)
+				print("aftuh: ",self.num)
+				if (self.num >= len(self.ansOrig)):
+					self.cleanUpGame(self, game, l2)
 				return
-			else:
-				shake = Sequence(self.pos1, self.pos2, self.pos1, self.pos2, self.pos3, name="shake")
-				shake.start()
-				self.answer.enterText('')
-				print("naur")
-				game.mistakes += 1
-				print(game.mistakes)
 			i += 1
 			
+		shake = Sequence(self.pos1, self.pos2, self.pos1, self.pos2, self.pos3, name="shake")
+		shake.start()
+		self.answer.enterText('')
+		print(game.mistakes)
+		print("naur")
+		game.mistakes += 1
 		wrong = game.loader.loadSfx("assets/sound/wrong.mp3")
 		wrong.setVolume(game.volume)
 		wrong.play()

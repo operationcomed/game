@@ -9,7 +9,7 @@ import anagram as ag
 import r1
 import r2
 import r3
-#import r4
+import r4
 #import r5
 
 KB_BUTTON = KeyboardButton.ascii_key
@@ -21,7 +21,7 @@ class Level2():
 	r1 = r1.r1
 	r2 = r2.r2
 	r3 = r3.r3
-	#r4 = r4.r4
+	r4 = r4.r4
 	#r5 = r5.r5
 
 	cutsceneDone = False
@@ -104,6 +104,10 @@ class Level2():
 			if (posY <= -185 and posY >= -213 and not game.r3Done and not game.r3Running):
 				crosshair.setTextColor(1, 0.5, 0, 1)
 				self.minigameSelect = 3
+			# minigame 4
+			if (posY <= -220 and posY >= -245 and not game.r4Done and not game.r4Running):
+				crosshair.setTextColor(1, 0.5, 0, 1)
+				self.minigameSelect = 4
 		else:
 			crosshair.setTextColor(1, 1, 1, 1)
 			self.minigameSelect = 0
@@ -126,6 +130,12 @@ class Level2():
 			move = Parallel(mov, rot, name="move")
 			move.start()
 			r3.Room3.fourPics(self.r3, game, self)
+		elif (self.minigameSelect == 4 and not game.r4Done and not game.r4Running and button_down(KB_BUTTON('e'))):
+			mov = game.ppnp.posInterval(0.5, (-47.55, -140.674, -0.46), blendType='easeIn')
+			rot = game.camera.hprInterval(0.5, (180, 0, 0), blendType='easeIn')
+			move = Parallel(mov, rot, name="move")
+			move.start()
+			r4.Room4.wordSearch(self.r4, game, self)
 
 		if ((game.damaging and not self.damager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 1, 1, 1))):
 				self.damager.start()

@@ -165,10 +165,17 @@ class Movement():
 		game.healthBar["value"] = game.health
 
 		if (game.health <= 1):
-			game.speedStop = True
-			pickup = game.loader.loadSfx('assets/sound/pickup.wav')
+			pickup = game.loader.loadSfx('assets/sound/scream.mp3')
 			pickup.setLoop(False)
 			pickup.setVolume(game.volume)
 			pickup.play()
+			props = WindowProperties()
+			props.setCursorHidden(False)
+			game.win.requestProperties(props)
+			props = game.win.getProperties()
+			game.music.stop()
+			game.resetMinigames()
+			game.unloadScene()
+			game.mainMenu()
 
 movement = Movement

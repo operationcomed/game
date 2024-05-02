@@ -19,6 +19,7 @@ import bars as bs
 import l0
 import l1
 import l2
+import l3
 # i don't ever plan on using tkinter (for gui purposes) lol
 import tkinter as tk
 
@@ -75,6 +76,7 @@ class Game(ShowBase):
 	l0 = l0.l0
 	l1 = l1.l1
 	l2 = l2.l2
+	l3 = l3.l3
 
 	fog_color = (0.1, 0.05, 0)
 	
@@ -127,6 +129,7 @@ class Game(ShowBase):
 	r3Done = False
 	r4Done = False
 	r5Done = False
+	doneLevels = [r1Done, r2Done, r3Done, r4Done, r5Done]
 	def resetMinigames(self):
 		self.r1Running = False
 		self.r2Running = False
@@ -276,7 +279,7 @@ class Game(ShowBase):
 
 		self.collisionMap = False
 		if (collisionMap != False):
-			self.collisionMap = self.loader.loadModel(collisionMap, callback=self.finishLoadCollision, extraArgs=[playerRot, playerPos])
+			self.collisionMap = self.loader.loadModel(collisionMap, noCache=noCache, callback=self.finishLoadCollision, extraArgs=[playerRot, playerPos])
 		self.scene = self.loader.loadModel(scene, noCache=noCache, callback=self.finishLoadScene, extraArgs=[lightPos, doors, customTask, collisionMap, level])
 
 		# https://discourse.panda3d.org/t/directgui-directwaitbar/1761/2 (from 2006!)
@@ -508,6 +511,13 @@ class Game(ShowBase):
 	
 	def missionLevel2(self, task):
 		return l2.Level2.mission(self.l2, self, task)
+
+	# level 3
+	def l3Cutscene(self, task):
+		return l3.Level3.l3Cutscene(self.l3, self, task)
+	
+	def missionLevel3(self, task):
+		return l3.Level3.mission(self.l3, self, task)
 
 	def exitGame(self):
 		if (self.input == False and self.mouseLetGo == False):

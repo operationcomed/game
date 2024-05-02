@@ -143,10 +143,10 @@ class Level2():
 			r4.Room4.wordSearch(self.r4, game, self)
 		elif (self.minigameSelect == 5 and not game.r5Done and not game.r5Running and button_down(KB_BUTTON('e'))):
 			mov = game.ppnp.posInterval(0.5, (-34.75, -303.154, -0.477), blendType='easeIn')
-			rot = game.camera.hprInterval(0.5, (180, 0, 0), blendType='easeIn')
+			rot = game.camera.hprInterval(0.5, (270, 0, 0), blendType='easeIn')
 			move = Parallel(mov, rot, name="move")
 			move.start()
-			r5.Room5.wordSearch(self.r4, game, self)
+			r5.Room5.wordSearch(self.r5, game, self)
 
 		if ((game.damaging and not self.damager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 1, 1, 1))):
 				self.damager.start()
@@ -182,6 +182,18 @@ class Level2():
 				game.resetMinigames()
 				game.unloadScene()
 				game.mainMenu()
+		willProceed = True
+		for item in game.doneLevels:
+			if (item == False):
+				willProceed = False
+		if (willProceed == True or game.r5Done == True):
+			for img in game.itemsImg:
+				img.removeNode()
+			game.itemsImg = []
+			game.setBarVisibility(True)
+			game.unloadScene()
+			game.loadScene("assets/models/msu.glb", (16.47, -78.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/models/msu.glb", noCache=True)
+			game.taskMgr.add(game.l3Cutscene, "l3Cutscene")
 		return Task.cont
 
 	itemNo = 0

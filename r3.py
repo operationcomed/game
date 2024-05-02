@@ -38,9 +38,9 @@ class Room3():
 		game.fourPicsImg.setPos(game.fourPics_x, 0, game.fourPics_y)
 		game.fourPicsImg.setTransparency(TransparencyAttrib.MAlpha)
 
-		self.answer = DirectEntry(text="", scale=0.2, command=self.checkAnswer, text_align=TextNode.ACenter, extraArgs=[self, game, self.num, l2], entryFont=game.font, width=12, frameTexture=game.loader.loadTexture("assets/img/textbox.png"), text_fg=(1,0.2,0.2,1))
+		self.answer = DirectEntry(text="", scale=0.2, command=self.checkAnswer, text_align=TextNode.ACenter, extraArgs=[self, game, self.num, l2], entryFont=game.font, width=12, frameTexture=game.loader.loadTexture("assets/img/blank.png"), text_fg=(1,0.2,0.2,1))
 
-		self.answer.setPos(0, 0, -0.67)
+		self.answer.setPos(0, 0, -0.6)
 		self.answer.setTransparency(TransparencyAttrib.MAlpha)
 
 		self.pos1 = self.answer.posInterval(0.1, Point3(self.answer.getX()+0.1, 0, self.answer.getZ()), blendType='easeIn')

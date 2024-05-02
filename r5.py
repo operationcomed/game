@@ -11,8 +11,7 @@ KB = KeyboardButton
 
 class Room5():
 
-	ans = ['justice', 'answers', 'revenge', 'cursed', 'abused', 'escape']
-	ansOrig = ['justice', 'answers', 'revenge', 'cursed', 'abused', 'escape']
+	ans = ['escape', 'flower', 'diary', 'choke']
 	finished = []
 	num = 0
 	gameFinished = False
@@ -28,7 +27,7 @@ class Room5():
 		game.wordSearchImg = game.aspect2d.attachNewNode(game.cm.generate())
 		game.wordSearchImg.setScale((16/9)*game.scaleFactorwordSearch, 1, game.scaleFactorwordSearch)
 
-		game.tex = game.loader.loadTexture('assets/img/l2/wordSearch/bkg.png')
+		game.tex = game.loader.loadTexture('assets/img/l2/room5/'+str(self.num+1)+'.png')
 		game.wordSearchImg.setTexture(game.tex)
 		game.wordSearchImg.setColorScale(1, 1, 1, 0)
 		game.wordSearchImg.setTransparency(True)
@@ -44,13 +43,13 @@ class Room5():
 							 scale=0.2, 
 							 command=self.checkAnswer, 
 							 text_align=TextNode.ACenter, 
-							 extraArgs=[self, game, l2], 
+							 extraArgs=[self, game, self.num, l2], 
 							 entryFont=game.font, 
 							 width=6, 
 							 frameTexture=game.loader.loadTexture("assets/img/textbox.png"), 
 							 text_fg=(1,1,1,1))
 
-		self.answer.setPos(1, 0, -0.67)
+		self.answer.setPos(0.9, 0, -0.67)
 		self.answer.setTransparency(TransparencyAttrib.MAlpha)
 
 		self.pos1 = self.answer.posInterval(0.1, Point3(self.answer.getX()+0.1, 0, self.answer.getZ()), blendType='easeIn')
@@ -65,43 +64,34 @@ class Room5():
 		anim = Parallel(*animItem, name="anim")
 		anim.start()
 
-	def checkAnswer(input, self, game, l2):
-		i = 0
-		for ans in self.ans:
-			if (input.lower() == ans):
-				print("yay", ans)
-				self.num += 1
-				correct = game.loader.loadSfx("assets/sound/correct.mp3")
-				correct.setVolume(game.volume)
-				correct.play()
-				self.answer.enterText('')
-				self.finished.append(ans)
-				print(self.finished)
-				self.ans.remove(ans)
-				guess = TextNode('thing')
-				guess.setAlign(TextNode.ACenter)
-				guess.setText(ans)
-				guess.setShadow(0.07, 0.07)
-				guessText = game.aspect2d.attachNewNode(guess)
-				game.attachTextToHUD(guessText, guess, (1, 0, (-self.num*0.125)+0.425), 0.15, game.font)
-				game.sceneObjects.remove(guessText)
-				game.textObjects.remove(guessText)
-				self.wordSearchItems.append(guessText)
-				print("aftuh: ",self.num)
-				if (self.num >= len(self.ansOrig)):
-					self.cleanUpGame(self, game, l2)
+	def checkAnswer(input, self, game, i, l2):
+		print(input, self.ans[i])
+		if (input == "uwu"):
+			self.cleanUpGame(self, game, l2)
+			return
+		if (input.lower() == self.ans[i]):
+			print("yay")
+			correct = game.loader.loadSfx("assets/sound/correct.mp3")
+			correct.setVolume(game.volume)
+			correct.play()
+			self.answer.enterText('')
+			self.num += 1
+			if (input.lower() == 'choke'):
+				self.cleanUpGame(self, game, l2)
 				return
-			i += 1
-			
-		shake = Sequence(self.pos1, self.pos2, self.pos1, self.pos2, self.pos3, name="shake")
-		shake.start()
-		self.answer.enterText('')
-		print(game.mistakes)
-		print("naur")
-		game.mistakes += 1
-		wrong = game.loader.loadSfx("assets/sound/wrong.mp3")
-		wrong.setVolume(game.volume)
-		wrong.play()
+			for node in self.wordSearchItems:
+				node.remove_node()
+			self.wordSearch(self, game, l2)
+		else:
+			shake = Sequence(self.pos1, self.pos2, self.pos1, self.pos2, self.pos3, name="shake")
+			shake.start()
+			self.answer.enterText('')
+			print("naur")
+			wrong = game.loader.loadSfx("assets/sound/wrong.mp3")
+			wrong.setVolume(game.volume)
+			wrong.play()
+			game.mistakes += 1
+			print(game.mistakes)
 		
 	def cleanUpGame(self, game, l2):
 		l2.addItem(l2, game, 'DOG FANGS')

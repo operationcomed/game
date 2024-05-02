@@ -11,7 +11,7 @@ KB = KeyboardButton
 
 class Room5():
 
-	ans = ['escape', 'flower', 'diary', 'choke']
+	ans = ['escape', 'flower', 'journal', 'choke']
 	finished = []
 	num = 0
 	gameFinished = False

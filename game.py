@@ -277,11 +277,6 @@ class Game(ShowBase):
 		self.ppnp.setPos(playerPos)
 		self.playerCharacter.loop("walk")
 
-		self.collisionMap = False
-		if (collisionMap != False):
-			self.collisionMap = self.loader.loadModel(collisionMap, noCache=noCache, callback=self.finishLoadCollision, extraArgs=[playerRot, playerPos])
-		self.scene = self.loader.loadModel(scene, noCache=noCache, callback=self.finishLoadScene, extraArgs=[lightPos, doors, customTask, collisionMap, level])
-
 		# https://discourse.panda3d.org/t/directgui-directwaitbar/1761/2 (from 2006!)
 		barBg = loader.loadTexture("assets/buttons/stm_bkg.png")
 		barFg = loader.loadTexture("assets/buttons/stm_fg.png")
@@ -305,6 +300,13 @@ class Game(ShowBase):
 			bar.setTexScale(ts, 1/2, 1, 1/0.2)
 			bar.setColorScale(1, 1, 1, 0)
 			self.sceneObjects.append(bar)
+		
+		self.setBarVisibility(False)
+
+		self.collisionMap = False
+		if (collisionMap != False):
+			self.collisionMap = self.loader.loadModel(collisionMap, noCache=noCache, callback=self.finishLoadCollision, extraArgs=[playerRot, playerPos])
+		self.scene = self.loader.loadModel(scene, noCache=noCache, callback=self.finishLoadScene, extraArgs=[lightPos, doors, customTask, collisionMap, level])
 
 		# fog
 		self.fog = Fog("Fog")
@@ -415,6 +417,8 @@ class Game(ShowBase):
 		self.render.setLight(alnp)
 		self.setBackgroundColor(self.fog_color)
 
+		if (not self.isPlaying and not (self.input == False or self.mouseLetGo == False)):
+			self.setBarVisibility(True)
 
 		self.sunActor = self.loader.loadModel("assets/models/ball.glb")
 		self.sceneObjects.append(self.sunActor)

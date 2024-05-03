@@ -31,7 +31,6 @@ class Text():
 	def hideText(self, game):
 		hide = []
 		for node in game.textObjects:
-			node.hide()
 			hide.append(LerpFunc(self.fade,
         	    extraArgs=[node],
         	    fromData=node.getColorScale()[3],
@@ -43,19 +42,14 @@ class Text():
 		fader.start()
 
 	def showText(self, game):
-		#show = []
+		show = []
 		for node in game.textObjects:
-			node.show()
-			node.setColorScale(1,1,1,1)
-			#show.append(LerpFunc(self.fade,
-        	#    extraArgs=[node],
-        	#    fromData=node.getColorScale()[3],
-        	#    toData=1,
-        	#    duration=0.25,
-			#	blendType='easeOut',
-        	#    name="fadei"))
-		#fader = Parallel(*show, name='fader')
-		#fader.start()
+			try:
+				show.append(LerpColorScaleInterval(node, 0.25, (1, 1, 1, 1), node.getColorScale(), blendType='easeOut'))
+			except:
+				print("oh")
+		fader = Parallel(*show, name='fader')
+		fader.start()
 
 	def fade(t, node):
 		node.setColorScale(1, 1, 1, t)

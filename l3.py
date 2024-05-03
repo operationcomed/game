@@ -111,9 +111,10 @@ class Level3():
 				game.resetMinigames()
 				game.unloadScene()
 				game.mainMenu()
-		if (posX >= 40):
+		if (posX >= 40 and game.isPlaying == False):
+			game.ppnp.setX(41)
+			self.timeEnd = task.time
 			game.setBarVisibility(False)
-			game.unloadScene()
 			game.level = 3
 			game.timeStart = 0
 			gametext.Text.hideCH(game.game_text)
@@ -121,9 +122,14 @@ class Level3():
 			game.speedStop = True
 			game.music.stop()
 			game.camera.setHpr(270, 0, 0)
+			game.isPlaying = True
 			game.video_inst.playVid(game.video_inst, game, game.esVideo)
 			game.skipText.setText('')
-			if (not game.video.isPlaying):
+		if (game.isPlaying):
+			self.deltaTime = task.time - self.timeEnd
+			print('wow', self.deltaTime)
+			if (self.deltaTime >= 37):
+				game.isPlaying == False
 				props = WindowProperties()
 				props.setCursorHidden(False)
 				game.win.requestProperties(props)

@@ -105,6 +105,17 @@ class Level0():
 			game.game_text.itmText.setText("Items obtained:")
 			game.loadScene("assets/models/msu.glb", (-3.2, -12.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel2, collisionMap="assets/collisionmaps/msu.glb", noCache=True)
 			game.taskMgr.add(game.l2Cutscene, "l2Cutscene")
+		if ((button_down(KB_BUTTON('3')) and game.debug)):
+			game.itmTxtNode.show()
+			if (game.helpDisplay):
+				game.helpMenu()
+			self.timeEnd = task.time
+			doorSound = game.loader.loadSfx("assets/sound/door.mp3")
+			doorSound.setVolume(game.volume)
+			doorSound.play()
+			game.unloadScene()
+			game.loadScene("assets/models/msu.glb", (16.47, -78.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/models/msu.glb", noCache=True)
+			game.taskMgr.add(game.l3Cutscene, "l3Cutscene")
 
 		if (self.levelDone):
 			self.deltaTime = task.time - self.timeEnd

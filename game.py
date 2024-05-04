@@ -3,6 +3,7 @@ from direct.task import Task
 from direct.actor.Actor import Actor
 from direct.filter.CommonFilters import CommonFilters
 from panda3d.core import *
+from panda3d.ai import *
 from direct.gui.DirectGui import *
 from panda3d.physics import ActorNode, ForceNode, LinearVectorForce, PhysicsCollisionHandler
 from direct.interval.LerpInterval import *
@@ -48,9 +49,9 @@ loadPrcFileData("", "show-frame-rate-meter true")
 loadPrcFileData("", "shadow-cube-map-filter true")
 loadPrcFileData("", "icon-filename icon.ico")
 loadPrcFileData("", """
-    text-minfilter linear
-    text-magfilter linear
-    text-pixels-per-unit 32
+	text-minfilter linear
+	text-magfilter linear
+	text-pixels-per-unit 32
 	text-kerning true
 	text-use-harfbuzz true
 """)
@@ -306,7 +307,7 @@ class Game(ShowBase):
 		self.collisionMap = False
 		if (collisionMap != False):
 			self.collisionMap = self.loader.loadModel(collisionMap, noCache=noCache, callback=self.finishLoadCollision, extraArgs=[playerRot, playerPos])
-		self.scene = self.loader.loadModel(scene, noCache=noCache, callback=self.finishLoadScene, extraArgs=[lightPos, doors, customTask, collisionMap, level])
+		self.scene = self.loader.loadModel(scene, noCache=noCache, callback=self.finishLoadScene, extraArgs=[lightPos, doors, customTask])
 
 		# fog
 		self.fog = Fog("Fog")
@@ -348,6 +349,7 @@ class Game(ShowBase):
 		self.collisionMap.reparentTo(self.render)
 		self.collisionMap.setScale(self.sceneScale)
 		self.collisionMap.setShaderOff()
+		self.collisionMap.setTextureOff()
 		self.collisionMap.hide()
 		if (self.scene_rot == True):
 			self.collisionMap.setHpr(0, 90, 0)
@@ -375,7 +377,7 @@ class Game(ShowBase):
 
 		print("X:", round(self.ppnp.getX(), 3), "Y:", round(self.ppnp.getY(), 3), "Z:", round(self.ppnp.getZ(), 3))
 
-	def finishLoadScene(self, model, lightPos, doors, customTask, collisionMap, level):
+	def finishLoadScene(self, model, lightPos, doors, customTask):
 		# scene
 		self.scene = model
 		self.sceneObjects.append(self.scene)
@@ -384,8 +386,6 @@ class Game(ShowBase):
 		self.scene.setShaderOff()
 		#self.scene.applyTextureColors()
 		self.scene.setTwoSided(False)
-		if (collisionMap == False):
-			self.scene.setCollideMask(BitMask32.bit(0))
 
 		if (doors != False):
 			self.doorRot = True
@@ -441,7 +441,30 @@ class Game(ShowBase):
 		
 		# filters 
 		self.filters = CommonFilters(self.win, self.cam)
-		self.filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
+	#	
+	#	ralphStartPos = Vec3(-10, 0, 0)
+	#	self.seeker = Actor("models/camera")
+	#	self.seeker.reparentTo(self.render)
+	#	self.seeker.setScale(0.5)
+	#	self.seeker.setPos(ralphStartPos)
+#
+	#	self.filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
+#
+	#	self.AIworld = AIWorld(self.render)
+#
+	#	self.AIchar = AICharacter("seeker", self.seeker, 100, 0.05, 5)
+	#	self.AIworld.addAiChar(self.AIchar)
+	#	self.AIbehaviors = self.AIchar.getAiBehaviors()
+#
+	#	#AI World update
+	#	self.taskMgr.add(self.AIUpdate, "AIUpdate")
+	#	self.AIbehaviors.pursue(self.ppnp)
+	#	self.seeker.loop("run")
+#
+	##to update the AIWorld
+	#def AIUpdate(self, task):
+	#	self.AIworld.update()
+	#	return Task.cont
 	
 	def attachTextToHUD(self, text, gtext, pos, scale, font):
 		text.setScale(scale)

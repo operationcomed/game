@@ -99,7 +99,7 @@ class Level3():
 			timeSeconds = math.floor(game.timeElapsed)
 			while (timeSeconds >= 60):
 				timeSeconds -= 60
-			if (game.timeElapsed <= 60):
+			if (game.timeElapsed <= 120):
 				self.timeText.setText(str(1-timeMinutes) + ":" + f"{59-timeSeconds:02}")
 			else:
 				self.timeText.setText("0:00")

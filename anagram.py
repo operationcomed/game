@@ -71,6 +71,7 @@ class Anagram():
 			wrong = game.loader.loadSfx("assets/sound/wrong.mp3")
 			wrong.setVolume(game.volume)
 			wrong.play()
+			self.answer.setFocus()
 
 
 	def nextAnagram(self, game, l2):

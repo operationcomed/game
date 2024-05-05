@@ -37,7 +37,7 @@ class Room2():
 		game.padlockImg.setPos(game.padlock_x, 0, game.padlock_y)
 		game.padlockImg.setTransparency(TransparencyAttrib.MAlpha)
 
-		self.answer = DirectEntry(text="", scale=(0.325, 0.325, 0.225), text_scale=(1, 0.325/0.225), command=self.checkAnswer, extraArgs=[self, game, l2], entryFont=game.font, width=2.25, frameTexture=game.loader.loadTexture("assets/img/blank.png"), text_fg=(1,1,1,1))
+		self.answer = DirectEntry(text="", scale=(0.325, 0.325, 0.225), text_scale=(1, 0.325/0.225), command=self.checkAnswer, extraArgs=[self, game, l2], entryFont=game.font, width=2.25, frameTexture=game.loader.loadTexture("assets/img/blank.png"), text_fg=(1,1,1,1), focus=1)
 
 		self.answer.setPos(-1.25, 0, -0.45)
 		self.answer.setTransparency(TransparencyAttrib.MAlpha)
@@ -77,6 +77,7 @@ class Room2():
 		wrong.play()
 		game.mistakes += 1
 		print(game.mistakes)
+		self.answer.setFocus()
 		return
 			
 	def cleanUpGame(self, game, l2):

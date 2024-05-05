@@ -48,7 +48,8 @@ class Room4():
 							 entryFont=game.font, 
 							 width=6, 
 							 frameTexture=game.loader.loadTexture("assets/img/textbox.png"), 
-							 text_fg=(1,1,1,1))
+							 text_fg=(1,1,1,1),
+							 focus=1)
 
 		self.answer.setPos(1, 0, -0.67)
 		self.answer.setTransparency(TransparencyAttrib.MAlpha)
@@ -87,7 +88,7 @@ class Room4():
 				game.sceneObjects.remove(guessText)
 				game.textObjects.remove(guessText)
 				self.wordSearchItems.append(guessText)
-				print("aftuh: ",self.num)
+				self.answer.setFocus()
 				if (self.num >= len(self.ansOrig)):
 					self.cleanUpGame(self, game, l2)
 				return
@@ -102,6 +103,7 @@ class Room4():
 		wrong = game.loader.loadSfx("assets/sound/wrong.mp3")
 		wrong.setVolume(game.volume)
 		wrong.play()
+		self.answer.setFocus()
 		
 	def cleanUpGame(self, game, l2):
 		l2.addItem(l2, game, 'SPOON')

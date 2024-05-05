@@ -47,7 +47,8 @@ class Room5():
 							 entryFont=game.font, 
 							 width=6, 
 							 frameTexture=game.loader.loadTexture("assets/img/textbox.png"), 
-							 text_fg=(1,1,1,1))
+							 text_fg=(1,1,1,1),
+							 focus=1)
 
 		self.answer.setPos(0.9, 0, -0.67)
 		self.answer.setTransparency(TransparencyAttrib.MAlpha)
@@ -92,6 +93,7 @@ class Room5():
 			wrong.play()
 			game.mistakes += 1
 			print(game.mistakes)
+			self.answer.setFocus()
 		
 	def cleanUpGame(self, game, l2):
 		l2.addItem(l2, game, 'DOG FANGS')

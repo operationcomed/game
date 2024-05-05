@@ -208,7 +208,7 @@ class Level2():
 			self.timeText.setAlign(TextNode.ACenter)
 			self.timeText.setText("10:00")
 			self.timeText.setShadow(0.07, 0.07)
-			self.timeTxtNode = game.aspect2d.attachNewNode(self.timeText)
+			self.timeTxtNode = game.aspect2d.attachNewNode(self.timeText, sort=67000)
 			game.attachTextToHUD(self.timeTxtNode, self.timeText, (0, 0, 0.85), 0.15, game.font)
 			game.textObjects.remove(self.timeTxtNode)
 			self.l2Init = True
@@ -234,6 +234,8 @@ class Level2():
 		return Task.cont
 
 	def nextLevel(self, game):
+		game.game_text.itmText.setTextColor(1, 1, 1, 1)
+		game.game_text.itmText.setText("Items Obtained:")
 		game.textObjects.append(self.timeTxtNode)
 		game.render.setColorScale(1, 1, 1, 1)
 		game.unloadScene()

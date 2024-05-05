@@ -129,24 +129,6 @@ class Room1():
 		game.speedStop = False
 		gametext.Text.showText(game.game_text, game)
 		game.setBarVisibility(True)
-
-	#def clearAnagrams(self, game):
-	#	dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
-	#	dismiss.setVolume(game.volume)
-	#	dismiss.play()
-	#	self.popout = LerpFunc(self.fadeOut,
-    #        extraArgs=[self, game],
-    #        fromData=1,
-    #        toData=0,
-    #        duration=0.25,
-	#		blendType='easeOut',
-    #        name="fadeo")
-	#	self.popout.start()
-	#	game.r1Running = False
-	#	game.mouseLetGo = False
-	#	gametext.Text.showText(game.game_text, game)
-	#	game.setBarVisibility(True)
-	#	game.speedStop = False
 	
 	def fadeOut(t, self, game):
 		if (t <= 0):

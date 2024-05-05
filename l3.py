@@ -26,9 +26,11 @@ class Level3():
 		button_down = game.mouseWatcherNode.is_button_down
 
 		if (task.time >= 36.55 or (button_down(KB_BUTTON('e')) and task.time >= 0.5)):
+			game.health = 100
 			game.music.play()
 			game.video.removeNode()
 			gametext.Text.showCH(game.game_text)
+			gametext.Text.showText(game.game_text, game)
 			game.speedStop = False
 			game.blackBg.destroy()
 			game.sound.stop()

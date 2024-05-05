@@ -130,7 +130,6 @@ class Game(ShowBase):
 	r3Done = False
 	r4Done = False
 	r5Done = False
-	doneLevels = [r1Done, r2Done, r3Done, r4Done, r5Done]
 	def resetMinigames(self):
 		self.r1Running = False
 		self.r2Running = False
@@ -547,5 +546,9 @@ class Game(ShowBase):
 		return l3.Level3.mission(self.l3, self, task)
 
 	def exitGame(self):
+		try:
+			self.scene.cancel()
+		except:
+			pass
 		if (self.input == False and self.mouseLetGo == False):
 			exit()

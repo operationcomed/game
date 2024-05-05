@@ -59,6 +59,7 @@ class Level2():
 	def cutsceneOver(self, game):
 		ag.Anagram.anagram(self.ag, game, self)
 	
+	# AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH
 	fadeInit = False
 	l2Init = False
 	l2_1stInit = False # :)
@@ -66,9 +67,56 @@ class Level2():
 	deltaTime = 0
 	timeElapsed = 0
 	minigameSelect = 0
+	missionDone = False
+	willProceed = False
+	levelDone = False
+	inKubo = False
+	cutsceneDoneDone = False # ::))
 	def mission(self, game, task):
 		crosshair = game.game_text.itcText
 		button_down = game.mouseWatcherNode.is_button_down
+		posX = game.ppnp.getX()
+		posY = game.ppnp.getY()
+		
+		if (self.willProceed == False and self.missionDone == False):
+			proceed = True
+			doneLevels = [game.r1Done, game.r2Done, game.r3Done, game.r4Done, game.r5Done]
+			for item in doneLevels:
+				if (item == False):
+					proceed = False
+			self.willProceed = proceed
+		elif (self.willProceed == True and self.missionDone == False):
+			doneSound = game.loader.loadSfx('assets/sound/done.mp3')
+			doneSound.setLoop(False)
+			doneSound.setVolume(game.volume)
+			doneSound.play()
+			self.missionDone = True
+			game.timeStart += 60
+			game.game_text.itmText.setTextColor(0, 1, 0.5, 1)
+			game.game_text.itmText.setText(game.game_text.itmText.getText() + "\n\n\n\n" + "Go to the kubo and craft the potion!")
+			for img in game.itemsImg:
+				img.setColorScale(0, 1, 0.5, 1)
+		if (((self.willProceed == True and self.missionDone == True) or game.debug) and self.levelDone == False):
+			if (posX >= -2 and posX <= 11 and posY <= -70 and posY >= -80):
+				self.inKubo = True
+				crosshair.setTextColor(1, 0.5, 0, 1)
+				if (button_down(KB_BUTTON('e'))):
+					self.levelDone = True
+					self.timeEnd = task.time
+					for img in game.itemsImg:
+						img.removeNode()
+					game.itemsImg = []
+					game.setBarVisibility(False)
+					LerpColorScaleInterval(game.render, 0.25, (0, 0, 0, 1), (1, 1, 1, 1)).start()
+					gametext.Text.hideText(game.game_text, game)
+			elif (self.minigameSelect == 0):
+				self.inKubo = False
+				crosshair.setTextColor(1, 1, 1, 1)
+		
+		if (self.levelDone):
+			self.deltaTime = task.time - self.timeEnd
+			if (self.deltaTime >= 1):
+				self.nextLevel(self, game)
 
 		if (not self.l2_1stInit):
 			self.l2_1stInit = True
@@ -78,13 +126,12 @@ class Level2():
 		if (self.cutsceneDone and not self.fadeInit):
 			self.timeEnd = task.time
 			self.fadeInit = True
-		elif (self.cutsceneDone):
+		elif (self.cutsceneDone and not self.cutsceneDoneDone):
 			self.deltaTime = task.time - self.timeEnd
-			game.fade.setColor(0, 0, 0, max(1-self.deltaTime*1, 0))
+			game.fade.setColorScale(1, 1, 1, max(1-self.deltaTime*1, 0))
 			if (max(1-self.deltaTime*1, 0) == 0):
-				self.backstoryDone = False
-		posX = game.ppnp.getX()
-		posY = game.ppnp.getY()
+				self.cutsceneDoneDone = True
+
 		if ((posX >= 35 or (posY >= 0 or posY <= -320)) and game.health >= 1):
 			game.health -= 0.25
 			game.damaging = True
@@ -113,7 +160,7 @@ class Level2():
 			if (posY <= -289 and posY >= -317 and not game.r5Done and not game.r5Running):
 				crosshair.setTextColor(1, 0.5, 0, 1)
 				self.minigameSelect = 5
-		else:
+		elif (self.inKubo == False):
 			crosshair.setTextColor(1, 1, 1, 1)
 			self.minigameSelect = 0
 
@@ -163,7 +210,9 @@ class Level2():
 			self.timeText.setShadow(0.07, 0.07)
 			self.timeTxtNode = game.aspect2d.attachNewNode(self.timeText)
 			game.attachTextToHUD(self.timeTxtNode, self.timeText, (0, 0, 0.85), 0.15, game.font)
+			game.textObjects.remove(self.timeTxtNode)
 			self.l2Init = True
+
 		if (self.l2Init):
 			game.timeElapsed = task.time - game.timeStart
 			timeMinutes = math.floor(game.timeElapsed/60)
@@ -182,25 +231,19 @@ class Level2():
 				game.resetMinigames()
 				game.unloadScene()
 				game.mainMenu()
-		willProceed = True
-		for item in game.doneLevels:
-			if (item == False):
-				willProceed = False
-		if (willProceed == True or game.r5Done == True):
-			for img in game.itemsImg:
-				img.removeNode()
-			game.itemsImg = []
-			game.setBarVisibility(True)
-			gametext.Text.showText(game.game_text, game)
-			game.unloadScene()
-			game.loadScene("assets/models/msu3.glb", (16.47, -78.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/models/msu3.glb", noCache=True)
-			game.taskMgr.add(game.l3Cutscene, "l3Cutscene")
 		return Task.cont
+
+	def nextLevel(self, game):
+		game.textObjects.append(self.timeTxtNode)
+		game.render.setColorScale(1, 1, 1, 1)
+		game.unloadScene()
+		game.loadScene("assets/models/msu3.glb", (16.47, -78.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/models/msu3.glb", noCache=True)
+		game.taskMgr.add(game.l3Cutscene, "l3Cutscene")
 
 	itemNo = 0
 	def addItem(self, game, item):
 		self.itemNo += 1
-		image = OnscreenImage(image='assets/img/l2/collect/' + item +'.png', pos=(-0.07+(self.itemNo*0.25), 0, 0.7), scale=(0.15))
+		image = OnscreenImage(image='assets/img/l2/collect/' + item +'.png', pos=(1.18-(self.itemNo*0.25), 0, 0.7), scale=(0.15))
 		image.setTransparency(TransparencyAttrib.MAlpha)
 		game.itemsImg.append(image)
 

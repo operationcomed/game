@@ -114,7 +114,7 @@ class Level0():
 			doorSound.setVolume(game.volume)
 			doorSound.play()
 			game.unloadScene()
-			game.loadScene("assets/models/msu.glb", (16.47, -78.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/models/msu.glb", noCache=True)
+			game.loadScene("assets/models/msu3.glb", (16.47, -78.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/collisionmaps/msu3.glb", noCache=True)
 			game.taskMgr.add(game.l3Cutscene, "l3Cutscene")
 
 		if (self.levelDone):

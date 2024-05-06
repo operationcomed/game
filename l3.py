@@ -113,7 +113,7 @@ class Level3():
 				game.resetMinigames()
 				game.unloadScene()
 				game.mainMenu()
-		if (posX >= 40 and game.isPlaying == False):
+		if (posX >= 326 and game.isPlaying == False):
 			game.ppnp.setX(41)
 			self.timeEnd = task.time
 			game.setBarVisibility(False)

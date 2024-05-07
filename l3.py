@@ -13,7 +13,6 @@ class Level3():
 
 	cutsceneDone = False
 	def l3Cutscene(self, game, task):
-		game.fog.setExpDensity(0.05)
 		if (not game.isPlaying):
 			game.itemList = [['1', (-40, -60, 0), 'Key 1'], ['2', (-58, -786, 0), 'Key 2'], ['3', (286, -78, 0), 'Key 3']]
 			game.level = 3
@@ -24,6 +23,9 @@ class Level3():
 			game.music.stop()
 			game.camera.setHpr(270, 0, 0)
 			game.video_inst.playVid(game.video_inst, game, game.l3Video)
+			game.speed1 = 0.05
+			game.fog.setExpDensity(0.035)
+			game.alight.setColor((.15, .25, .35, 1))
 		button_down = game.mouseWatcherNode.is_button_down
 
 		if (task.time >= 36.55 or (button_down(KB_BUTTON('e')) and task.time >= 0.5)):

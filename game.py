@@ -84,6 +84,7 @@ class Game(ShowBase):
 	scene_rot = False
 
 	speedStop = False
+	speed1 = 0.025
 
 	# 0: none
 	# 1: girl
@@ -399,9 +400,9 @@ class Game(ShowBase):
 				self.doors.setHpr(0, 90, 0)
 
 		# lights and shadows
-		alight = AmbientLight("alight1")
-		alnp = self.render.attachNewNode(alight)
-		alight.setColor((.35, .45, .5, 1))
+		self.alight = AmbientLight("self.alight1")
+		alnp = self.render.attachNewNode(self.alight)
+		self.alight.setColor((.35, .45, .5, 1))
 		self.sceneObjects.append(alnp)
 
 		self.slight = PointLight('slight')

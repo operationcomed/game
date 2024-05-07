@@ -57,7 +57,7 @@ class Movement():
 		posX = game.ppnp.getX()
 		posY = game.ppnp.getY()
 
-		game.speed = 0.025
+		game.speed = game.speed1
 
 		if (game.debug):
 			self.staminaDecay = 0.001

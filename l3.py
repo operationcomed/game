@@ -14,7 +14,7 @@ class Level3():
 	cutsceneDone = False
 	def l3Cutscene(self, game, task):
 		if (not game.isPlaying):
-			game.itemList = [['1', (-40, -60, 0), 'Key 1'], ['2', (-58, -786, 0), 'Key 2'], ['3', (286, -78, 0), 'Key 3']]
+			game.itemList = [['1', (-40, -60, 0), 'Key 1'], ['2', (-58, -786, 0), 'Key 2'], ['3', (234, -78, 0), 'Key 3']]
 			game.level = 3
 			game.timeStart = 0
 			gametext.Text.hideCH(game.game_text)
@@ -174,7 +174,7 @@ class Level3():
 				game.unloadScene()
 				game.mainMenu()
 
-		if (posX >= 322 and posY >= -328 and posY <= -273 and game.isPlaying == False and self.missionDone):
+		if (posX >= 270 and posY >= -328 and posY <= -273 and game.isPlaying == False and self.missionDone):
 			crosshair.setTextColor(1, 0.5, 0, 1)
 			if (button_down(KB_BUTTON('e'))):
 				self.timeEnd = task.time

@@ -88,6 +88,20 @@ class Room4():
 				game.sceneObjects.remove(guessText)
 				game.textObjects.remove(guessText)
 				self.wordSearchItems.append(guessText)
+				highlight = game.aspect2d.attachNewNode(game.cm.generate())
+				highlight.setScale((16/9)*game.scaleFactorwordSearch, 1, game.scaleFactorwordSearch)
+
+				if (ans != 'justice'):
+					highlight.setTexture(game.loader.loadTexture('assets/img/l2/wordSearch/' + ans + '.png'))
+				highlight.setTransparency(True)
+
+				highlightx = (-16/9/2)*game.scaleFactorwordSearch
+				highlighty = -0.5*game.scaleFactorwordSearch
+		
+				highlight.setPos(highlightx, 0, highlighty)
+				highlight.setTransparency(TransparencyAttrib.MAlpha)
+				self.wordSearchItems.append(highlight)
+
 				self.answer.setFocus()
 				if (self.num >= len(self.ansOrig)):
 					self.cleanUpGame(self, game, l2)

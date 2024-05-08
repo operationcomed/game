@@ -81,6 +81,7 @@ class Level3():
 			game.items.append(item)
 			game.itemsImg.append(image)
 			i += 1
+		
 	
 	fadeInit = False
 	l3Init = False

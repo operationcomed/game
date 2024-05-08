@@ -11,6 +11,7 @@ import r2
 import r3
 import r4
 import r5
+import potion as pt
 
 KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
@@ -23,6 +24,7 @@ class Level2():
 	r3 = r3.r3
 	r4 = r4.r4
 	r5 = r5.r5
+	pt = pt.pt
 
 	cutsceneDone = False
 	def l2Cutscene(self, game, task):
@@ -115,8 +117,9 @@ class Level2():
 		
 		if (self.levelDone):
 			self.deltaTime = task.time - self.timeEnd
-			if (self.deltaTime >= 1):
-				self.nextLevel(self, game)
+			if (self.deltaTime >= 1 and not game.ptRunning and not game.ptDone):
+				#self.nextLevel(self, game)
+				pt.Potion.potion(self.pt, game, self)
 
 		if (not self.l2_1stInit):
 			self.l2_1stInit = True
@@ -213,7 +216,7 @@ class Level2():
 			game.textObjects.remove(self.timeTxtNode)
 			self.l2Init = True
 
-		if (self.l2Init):
+		if (self.l2Init and not game.ptRunning and not game.ptDone):
 			game.timeElapsed = task.time - game.timeStart
 			timeMinutes = math.floor(game.timeElapsed/60)
 			timeSeconds = math.floor(game.timeElapsed)
@@ -237,8 +240,7 @@ class Level2():
 
 	def nextLevel(self, game):
 		game.game_text.itmText.setTextColor(1, 1, 1, 1)
-		game.game_text.itmText.setText("Items Obtained:")
-		game.textObjects.append(self.timeTxtNode)
+		game.game_text.itmText.setText("Keys Obtained:")
 		game.render.setColorScale(1, 1, 1, 1)
 		game.unloadScene()
 		game.loadScene("assets/models/msu3.glb", (16.47, -78.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/collisionmaps/msu3.glb", noCache=True)
@@ -247,7 +249,7 @@ class Level2():
 	itemNo = 0
 	def addItem(self, game, item):
 		self.itemNo += 1
-		image = OnscreenImage(image='assets/img/l2/collect/' + item +'.png', pos=(1.18-(self.itemNo*0.25), 0, 0.7), scale=(0.15))
+		image = OnscreenImage(image='assets/img/l2/collect/' + item +'.png', pos=(1.18-(self.itemNo*0.25), 0, 0.7), scale=(0.125))
 		image.setTransparency(TransparencyAttrib.MAlpha)
 		game.itemsImg.append(image)
 

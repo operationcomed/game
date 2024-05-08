@@ -237,7 +237,8 @@ class MainMenu():
 		def backSettings():
 			for node in game.settingsItems:
 				node.removeNode()
-			game.setBarVisibility(True)
+			if (self.barsVisible):
+				game.setBarVisibility(True)
 			try:
 				for img in game.itemsImg:
 					img["scale"] = 0.15
@@ -262,6 +263,7 @@ class MainMenu():
 
 		game.speedStop = True
 
+		self.barsVisible = game.barsVisible
 		game.setBarVisibility(False)
 
 		game.settingsShow = True

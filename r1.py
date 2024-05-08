@@ -44,7 +44,8 @@ class Room1():
 				hi = i - 3
 			else:
 				hi = i
-			image = DirectButton(command=self.checkAnswer, extraArgs=[self, game, i, l2], frameTexture=game.loader.loadTexture('assets/img/l2/mensa/' + str(i) + '.png'), pos=((hi*0.7)-1.4, 0, n), scale=(0.33), relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
+			tex = (game.loader.loadTexture('assets/img/l2/mensa/' + str(i) + '.png'), game.loader.loadTexture('assets/img/l2/mensa/' + str(i) + 'h.png'), game.loader.loadTexture('assets/img/l2/mensa/' + str(i) + 'h.png'), game.loader.loadTexture('assets/img/l2/mensa/' + str(i) + '.png'))
+			image = DirectButton(command=self.checkAnswer, extraArgs=[self, game, i, l2], frameTexture=tex, pos=((hi*0.7)-1.4, 0, n), scale=(0.33), relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
 			image.setTransparency(True)
 			image.setColorScale(1, 1, 1, 0)
 			game.mensaButtons.append(image)

@@ -85,6 +85,7 @@ class Game(ShowBase):
 
 	speedStop = False
 	speed1 = 0.025
+	barsVisible = False
 
 	# 0: none
 	# 1: girl
@@ -126,22 +127,26 @@ class Game(ShowBase):
 	r3Running = False
 	r4Running = False
 	r5Running = False
+	ptRunning = False
 	r1Done = False
 	r2Done = False
 	r3Done = False
 	r4Done = False
 	r5Done = False
+	ptDone = False
 	def resetMinigames(self):
 		self.r1Running = False
 		self.r2Running = False
 		self.r3Running = False
 		self.r4Running = False
 		self.r5Running = False
+		self.ptRunning = False
 		self.r1Done = False
 		self.r2Done = False
 		self.r3Done = False
 		self.r4Done = False
 		self.r5Done = False
+		self.ptDone = False
 
 	mistakes = 0
 

@@ -77,11 +77,32 @@ class Anagram():
 	def nextAnagram(self, game, l2):
 		self.num += 1
 		if (self.num > len(self.answers)):
-			self.clearAnagrams(self, game)
+			self.finalAnagram(self, game)
 			return
 		for node in self.anagramItems:
 			node.remove_node()
 		self.anagram(self, game, l2)
+
+	def finalAnagram(self, game):
+		game.acceptOnce("e", self.clearAnagrams, [self, game])
+		for node in self.anagramItems:
+			node.remove_node()
+		game.scaleFactorAnagram = 7/4
+		game.cm = CardMaker('card')
+		game.anagramImg = game.aspect2d.attachNewNode(game.cm.generate())
+		game.anagramImg.setScale((16/9)*game.scaleFactorAnagram, 1, game.scaleFactorAnagram)
+
+		game.tex = game.loader.loadTexture('assets/media/l2/6.png')
+		game.anagramImg.setTexture(game.tex)
+
+		# these are the centers of the image
+		game.anagram_x = (-16/9/2)*game.scaleFactorAnagram
+		game.anagram_y = -0.5*game.scaleFactorAnagram
+
+		game.anagramImg.setPos(game.anagram_x, 0, game.anagram_y)
+		game.anagramImg.setTransparency(TransparencyAttrib.MAlpha)
+
+		self.anagramItems = [game.anagramImg]
 
 	def clearAnagrams(self, game):
 		dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")

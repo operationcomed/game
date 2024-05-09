@@ -56,11 +56,16 @@ class Level3():
 		game.setBarVisibility(False)
 		game.speedStop = True
 		game.scaleFactorNote = 7/4
+		game.note_x = (-16/9/2)*game.scaleFactorNote
+		game.note_y = -0.5*game.scaleFactorNote
+		if (self.note2 or self.note2Done):
+			self.note2Done = True
+			game.scaleFactorNote = 1
+			game.note_x = game.scaleFactorNote-1.1
+			game.note_y = -0.22*game.scaleFactorNote
 		game.noteImg = game.aspect2d.attachNewNode(game.cm.generate())
 		game.noteImg.setScale((16/9)*game.scaleFactorNote, 1, game.scaleFactorNote)
 		# these are the centers of the image
-		game.note_x = (-16/9/2)*game.scaleFactorNote
-		game.note_y = -0.5*game.scaleFactorNote
 		game.noteImg.setPos(game.note_x, 0, game.note_y)
 		game.noteImg.setTexture(game.loader.loadTexture('assets/img/l3/' + str(note) + '.png'))
 
@@ -75,6 +80,11 @@ class Level3():
 		game.noteImg.setScale(min(16/9*t*game.scaleFactorNote, 16/9*game.scaleFactorNote), min(t*game.scaleFactorNote, 1*game.scaleFactorNote), min(t*game.scaleFactorNote, 1*game.scaleFactorNote))
 
 	def hideNote(self, game):
+		if (self.note2 == True):
+			self.note2 = False
+			self.ghostSound.setLoop(True)
+			self.ghostSound.play()
+			self.monsterPursue = True
 		dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
 		dismiss.setVolume(game.volume)
 		dismiss.play()
@@ -174,6 +184,8 @@ class Level3():
 	gameOverDone = False
 	scene2Playing = False
 	scene2Done = False
+	note2 = False
+	note2Done = False
 	def mission(self, game, task):
 		crosshair = game.game_text.itcText
 		button_down = game.mouseWatcherNode.is_button_down
@@ -241,7 +253,7 @@ class Level3():
 			game.unloadScene()
 			game.mainMenu()
 
-		if (self.scene2Playing and not self.scene2Done and (task.time - self.timeEnd) >= 5):
+		if (self.scene2Playing and not self.scene2Done and ((task.time - self.timeEnd) >= 2 or button_down(KB_BUTTON('e')))):
 			self.scene2Playing = False
 			self.scene2Done = True
 			game.video.removeNode()
@@ -251,21 +263,21 @@ class Level3():
 			game.sound.stop()
 			game.setBarVisibility(True)
 			gametext.Text.showText(game.game_text, game)
+			self.showNote(self, game, 2)
+			game.skipText.setText('')
 
 		i = 0
 		for itemPos in game.itemList:
 			if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
 				if (itemPos[i][0] == '1'):
+					self.note2 = True
 					self.scene2Playing = True
 					self.timeEnd = task.time
-					self.ghostSound.setLoop(True)
-					self.ghostSound.play()
-					self.monsterPursue = True
 					game.taskMgr.add(game.AIUpdate, "AIUpdate")
 					game.music.stop()
+					game.setBarVisibility(False)
 					game.video_inst.playVid(game.video_inst, game, game.ghVideo)
-				self.itemsGotten += 1
-				if (not (self.itemsGotten >= len(game.itemList))):
+				elif (not (self.itemsGotten >= len(game.itemList))):
 					self.showNote(self, game, itemPos[3])
 				pickup = game.loader.loadSfx('assets/sound/pickup.wav')
 				pickup.setLoop(False)

@@ -540,6 +540,8 @@ class Game(ShowBase):
 	def exitGame(self):
 		try:
 			self.scene.cancel()
+			self.collisionMap.cancel()
+			exit()
 		except:
 			pass
 		if (self.input == False and self.mouseLetGo == False):

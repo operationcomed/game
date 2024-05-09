@@ -246,8 +246,6 @@ class Level2():
 		game.cameraOffset = 2.75
 		game.speed1 = 0.06
 		game.speed2 = 0.2
-		game.staminaCap = 25
-		game.stamina = 25
 		game.staminaDecay = 0.025
 		game.staminaGain = 0.075
 		game.loadScene("assets/models/msu3.glb", (13.47, -61.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/collisionmaps/msu3.glb", noCache=True)

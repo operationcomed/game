@@ -26,11 +26,10 @@ class Level3():
 			game.camera.setHpr(270, 0, 0)
 			game.video_inst.playVid(game.video_inst, game, game.l3Video)
 			game.speed1 = 0.05
-			if (game.debug):
-				game.fog.setExpDensity(0.0)
-			else:
-				game.fog.setExpDensity(0.035)
-			game.alight.setColor((.15, .25, .35, 1))
+			game.fog.setExpDensity(0.035)
+			#if (game.debug):
+			#	game.fog.setExpDensity(0.0)
+			game.alight.setColor((.1, .2, .3, 1))
 		button_down = game.mouseWatcherNode.is_button_down
 
 		if (task.time >= 36.55 or (button_down(KB_BUTTON('e')) and task.time >= 0.5)):
@@ -108,12 +107,11 @@ class Level3():
 		self.ghostSound = game.audio3d.loadSfx('assets/sound/horror.mp3')
 		self.ghostSound.setVolume(game.volume)
 
-		ghostStartPos = Vec3(-21.93, -207.53, 0)
-		self.seeker = Actor("models/camera")
+		ghostStartPos = Vec3(-23.93, -207.53, -0.5)
+		self.seeker = Actor("assets/models/girl.glb")
 		self.seeker.reparentTo(game.render)
-		self.seeker.setScale(0.5)
 		self.seeker.setPos(ghostStartPos)
-		self.seeker.setH(180)
+		game.sceneObjects.append(self.seeker)
 
 		game.audio3d.attachSoundToObject(self.ghostSound, self.seeker)
 		game.audio3d.setDropOffFactor(1)
@@ -171,6 +169,9 @@ class Level3():
 	missionDone = False
 	taskTime = 0
 	note1Showing = False
+	monsterPursue = False
+	gameOver = False
+	gameOverDone = False
 	def mission(self, game, task):
 		crosshair = game.game_text.itcText
 		button_down = game.mouseWatcherNode.is_button_down
@@ -197,12 +198,57 @@ class Level3():
 		elif ((not self.undamager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 0.1, 0, 1))):
 			self.undamager.start()
 
+
+		if (self.monsterPursue == False):
+			pass
+		else:
+			mPosX = self.seeker.getX()
+			mPosY = self.seeker.getY()
+			if (abs(mPosX - posX) <= 1 and abs(mPosY - posY) <= 1):
+				self.ghostSound.stop()
+				self.monsterPursue = False
+				self.gameOver = True
+				self.timeEnd = task.time
+				scream = game.loader.loadSfx('assets/sound/scream.mp3')
+				scream.setLoop(False)
+				scream.setVolume(game.volume)
+				scream.play()
+				game.setBarVisibility(False)
+				gametext.Text.hideText(game.game_text, game)
+				gametext.Text.hideCH(game.game_text)
+				game.speedStop = True
+				game.video_inst.playVid(game.video_inst, game, 'assets/media/jumpscare1.avi')
+				game.video.setPos(0.5, 0, 0.1)
+				game.video.setScale(game.scaleFactorVid, 1, game.scaleFactorVid/1.8)
+				game.skipText.setText('')
+
+		if (self.gameOver and self.gameOverDone == False and (task.time - self.timeEnd) >= 2):
+			self.gameOverDone = True
+			game.video.removeNode()
+			gametext.Text.showCH(game.game_text)
+			game.speedStop = False
+			game.blackBg.destroy()
+			game.sound.stop()
+			game.setBarVisibility(True)
+			gametext.Text.showText(game.game_text, game)
+			for img in game.itemsImg:
+				img.setColorScale(1, 1, 1, 0)
+			props = WindowProperties()
+			props.setCursorHidden(False)
+			game.win.requestProperties(props)
+			props = game.win.getProperties()
+			game.music.stop()
+			game.resetMinigames()
+			game.unloadScene()
+			game.mainMenu()
+
 		i = 0
 		for itemPos in game.itemList:
 			if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
 				if (itemPos[i][0] == '1'):	
 					self.ghostSound.setLoop(True)
 					self.ghostSound.play()
+					self.monsterPursue = True
 					game.taskMgr.add(game.AIUpdate, "AIUpdate")
 				self.itemsGotten += 1
 				if (not (self.itemsGotten >= len(game.itemList))):
@@ -266,6 +312,8 @@ class Level3():
 			crosshair.setTextColor(1, 0.5, 0, 1)
 			if (button_down(KB_BUTTON('e'))):
 				self.timeEnd = task.time
+				self.monsterPursue == False
+				game.taskMgr.remove("AIUpdate")
 				game.setBarVisibility(False)
 				game.level = 3
 				game.timeStart = 0

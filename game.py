@@ -21,6 +21,7 @@ import l0
 import l1
 import l2
 import l3
+from direct.showbase import Audio3DManager
 # i don't ever plan on using tkinter (for gui purposes) lol
 import tkinter as tk
 
@@ -161,6 +162,7 @@ class Game(ShowBase):
 
 	def __init__(self):
 		ShowBase.__init__(self)
+		self.audio3d = Audio3DManager.Audio3DManager(self.sfxManagerList[0], self.camera)
 
 		self.accept("f11", self.toggleFullscreen)
 		self.accept("x", self.exitGame)

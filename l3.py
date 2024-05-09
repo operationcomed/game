@@ -105,12 +105,17 @@ class Level3():
 		self.note1Showing = True
 		self.showNote(self, game, 0)
 
+		self.ghostSound = game.audio3d.loadSfx('assets/sound/horror.mp3')
+
 		ghostStartPos = Vec3(-21.93, -207.53, 0)
 		self.seeker = Actor("models/camera")
 		self.seeker.reparentTo(game.render)
 		self.seeker.setScale(0.5)
 		self.seeker.setPos(ghostStartPos)
-		self.seeker.setR(180)
+		self.seeker.setH(180)
+
+		game.audio3d.attachSoundToObject(self.ghostSound, self.seeker)
+		game.audio3d.setDropOffFactor(1)
 
 		self.AIworld = AIWorld(game.render)
 
@@ -187,14 +192,16 @@ class Level3():
 		posY = game.ppnp.getY()
 
 		if ((game.damaging and not self.damager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 1, 1, 1))):
-				self.damager.start()
+			self.damager.start()
 		elif ((not self.undamager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 0.1, 0, 1))):
-				self.undamager.start()
+			self.undamager.start()
 
 		i = 0
 		for itemPos in game.itemList:
 			if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
 				if (itemPos[i][0] == '1'):	
+					self.ghostSound.setLoop(True)
+					self.ghostSound.play()
 					game.taskMgr.add(game.AIUpdate, "AIUpdate")
 				self.itemsGotten += 1
 				if (not (self.itemsGotten >= len(game.itemList))):

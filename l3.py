@@ -106,6 +106,7 @@ class Level3():
 		self.showNote(self, game, 0)
 
 		self.ghostSound = game.audio3d.loadSfx('assets/sound/horror.mp3')
+		self.ghostSound.setVolume(game.volume)
 
 		ghostStartPos = Vec3(-21.93, -207.53, 0)
 		self.seeker = Actor("models/camera")

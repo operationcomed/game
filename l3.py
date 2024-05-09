@@ -16,7 +16,7 @@ class Level3():
 	cutsceneDone = False
 	def l3Cutscene(self, game, task):
 		if (not game.isPlaying):
-			game.itemList = [['1', (-32, -50, 0), 'Key 1'], ['2', (-50, -633, 0), 'Key 2'], ['3', (185, -64, 0), 'Key 3']]
+			game.itemList = [['1', (-32, -50, 0), 'Key 1', 2], ['2', (-50, -633, 0), 'Key 2', 1], ['3', (185, -64, 0), 'Key 3', 0]]
 			game.level = 3
 			game.timeStart = 0
 			gametext.Text.hideCH(game.game_text)
@@ -51,15 +51,59 @@ class Level3():
 		
 		return Task.cont
 	
+	def showNote(self, game, note):
+		game.mouseLetGo = True
+		gametext.Text.hideText(game.game_text, game)
+		game.setBarVisibility(False)
+		game.speedStop = True
+		game.scaleFactorNote = 7/4
+		game.noteImg = game.aspect2d.attachNewNode(game.cm.generate())
+		game.noteImg.setScale((16/9)*game.scaleFactorNote, 1, game.scaleFactorNote)
+		# these are the centers of the image
+		game.note_x = (-16/9/2)*game.scaleFactorNote
+		game.note_y = -0.5*game.scaleFactorNote
+		game.noteImg.setPos(game.note_x, 0, game.note_y)
+		game.noteImg.setTexture(game.loader.loadTexture('assets/img/l3/' + str(note) + '.png'))
+
+		game.noteImg.setTransparency(TransparencyAttrib.MAlpha)
+		game.acceptOnce("e", self.hideNote, [self, game])
+
+	def fadeOut(t, self, game):
+		if (t <= 0):
+			game.noteImg.removeNode()
+			return
+		game.noteImg.setColorScale(1, 1, 1, t)
+		game.noteImg.setScale(min(16/9*t*game.scaleFactorNote, 16/9*game.scaleFactorNote), min(t*game.scaleFactorNote, 1*game.scaleFactorNote), min(t*game.scaleFactorNote, 1*game.scaleFactorNote))
+
+	def hideNote(self, game):
+		dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
+		dismiss.setVolume(game.volume)
+		dismiss.play()
+		self.popout = LerpFunc(self.fadeOut,
+            extraArgs=[self, game],
+            fromData=1,
+            toData=0,
+            duration=0.25,
+			blendType='easeOut',
+            name="fadeo")
+		self.popout.start()
+		game.mouseLetGo = False
+		gametext.Text.showText(game.game_text, game)
+		game.setBarVisibility(True)
+		game.speedStop = False
+		self.note1Showing = False
+	
 	def cutsceneOver(self, game):
-		self.hallText = TextNode('escapenow')
-		self.hallText.setAlign(TextNode.ACenter)
-		self.hallText.setText("ESCAPE MSU\nNOW!")
-		self.hallText.setShadow(0.07, 0.07)
-		self.hallTxtNode = game.aspect2d.attachNewNode(self.hallText)
-		game.attachTextToHUD(self.hallTxtNode, self.hallText, (0, 0, 0), 0.15, game.font)
-		fadeout = Sequence(Wait(2.5), LerpColorScaleInterval(self.hallTxtNode, 2.5, (1, 1, 1, 0), blendType='easeIn')).start()
+		#self.hallText = TextNode('escapenow')
+		#self.hallText.setAlign(TextNode.ACenter)
+		#self.hallText.setText("ESCAPE MSU\nNOW!")
+		#self.hallText.setShadow(0.07, 0.07)
+		#self.hallTxtNode = game.aspect2d.attachNewNode(self.hallText)
+		#game.attachTextToHUD(self.hallTxtNode, self.hallText, (0, 0, 0), 0.15, game.font)
+		#fadeout = Sequence(Wait(2.5), LerpColorScaleInterval(self.hallTxtNode, 2.5, (1, 1, 1, 0), blendType='easeIn')).start()
 		self.initItems(self, game)
+		self.note1Showing = True
+		self.showNote(self, game, 0)
 
 		ghostStartPos = Vec3(-21.93, -207.53, 0)
 		self.seeker = Actor("models/camera")
@@ -119,6 +163,8 @@ class Level3():
 	minigameSelect = 0
 	itemsGotten = 0
 	missionDone = False
+	taskTime = 0
+	note1Showing = False
 	def mission(self, game, task):
 		crosshair = game.game_text.itcText
 		button_down = game.mouseWatcherNode.is_button_down
@@ -150,12 +196,14 @@ class Level3():
 			if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
 				if (itemPos[i][0] == '1'):	
 					game.taskMgr.add(game.AIUpdate, "AIUpdate")
+				self.itemsGotten += 1
+				if (not (self.itemsGotten >= len(game.itemList))):
+					self.showNote(self, game, itemPos[3])
 				pickup = game.loader.loadSfx('assets/sound/pickup.wav')
 				pickup.setLoop(False)
 				pickup.setVolume(game.volume)
 				pickup.play()
 				game.items[i].removeNode()
-				self.itemsGotten += 1
 				game.itemsImg[i].setColorScale(1, 1, 1, 1)
 				itemPos[2] = None
 				game.timeStart += 60
@@ -176,16 +224,16 @@ class Level3():
 
 		if (game.anagramRunning == True or game.isPlaying):
 			game.ppnp.setZ(-0.45)
-		elif (not self.l3Init and self.cutsceneDone):
+		elif (not self.l3Init and self.cutsceneDone and not self.note1Showing):
 			game.timeStart = task.time
 			self.timeText = TextNode('interact')
 			self.timeText.setAlign(TextNode.ACenter)
-			self.timeText.setText("1:00")
+			self.timeText.setText("5:00")
 			self.timeText.setShadow(0.07, 0.07)
 			self.timeTxtNode = game.aspect2d.attachNewNode(self.timeText)
 			game.attachTextToHUD(self.timeTxtNode, self.timeText, (0, 0, 0.85), 0.15, game.font)
 			self.l3Init = True
-		if (self.l3Init):
+		if (self.l3Init and not self.note1Showing):
 			game.timeElapsed = task.time - game.timeStart
 			timeMinutes = math.floor(game.timeElapsed/60)
 			timeSeconds = math.floor(game.timeElapsed)

@@ -243,13 +243,20 @@ class Level2():
 		game.game_text.itmText.setText("Keys Obtained:")
 		game.render.setColorScale(1, 1, 1, 1)
 		game.unloadScene()
-		game.loadScene("assets/models/msu3.glb", (16.47, -78.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/collisionmaps/msu3.glb", noCache=True)
+		game.cameraOffset = 2.75
+		game.speed1 = 0.06
+		game.speed2 = 0.2
+		game.staminaCap = 25
+		game.stamina = 25
+		game.staminaDecay = 0.025
+		game.staminaGain = 0.075
+		game.loadScene("assets/models/msu3.glb", (13.47, -61.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/collisionmaps/msu3.glb", noCache=True)
 		game.taskMgr.add(game.l3Cutscene, "l3Cutscene")
 
 	itemNo = 0
 	def addItem(self, game, item):
 		self.itemNo += 1
-		image = OnscreenImage(image='assets/img/l2/collect/' + item +'.png', pos=(1.18-(self.itemNo*0.25), 0, 0.7), scale=(0.125))
+		image = OnscreenImage(image='assets/img/l2/collect/' + item +'.png', pos=(1.18-(self.itemNo*0.25), 0, 0.7), scale=(0.1))
 		image.setTransparency(TransparencyAttrib.MAlpha)
 		game.itemsImg.append(image)
 

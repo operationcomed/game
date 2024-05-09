@@ -9,7 +9,6 @@ class Movement():
 	accelZ = 0
 	accelX = 0
 	accelY = 0
-	staminaDecay = 0.05
 	sprint = 0.1
 
 	def movement(self, game):
@@ -57,16 +56,17 @@ class Movement():
 		posX = game.ppnp.getX()
 		posY = game.ppnp.getY()
 
+		self.sprint = game.speed2
 		game.speed = game.speed1
 
-		if (game.debug):
-			self.staminaDecay = 0.001
-			self.sprint = 1
+		#if (game.debug):
+		#	game.staminaDecay = 0.001
+		#	self.sprint = 1
 		# sprinting and stamina
 		if (button_down(KB.shift()) and game.stamina >= 0 and game.sprintable):
 			game.speed = self.sprint
 			if (button_down(KB_BUTTON('w')) or button_down(KB_BUTTON('a')) or button_down(KB_BUTTON('s')) or button_down(KB_BUTTON('d'))):
-				game.stamina -= self.staminaDecay
+				game.stamina -= game.staminaDecay
 		if (game.stamina <= 0.01):
 			game.sprintable = False
 
@@ -107,7 +107,7 @@ class Movement():
 		else:
 			game.footsteps.setVolume(0)
 		if (game.staminaCap > game.stamina and staminaGain):
-			game.stamina += 0.025
+			game.stamina += game.staminaGain
 		elif (game.stamina >= game.staminaCap):
 			game.stamina = game.staminaCap
 			game.sprintable = True

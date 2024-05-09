@@ -114,7 +114,15 @@ class Level0():
 			doorSound.setVolume(game.volume)
 			doorSound.play()
 			game.unloadScene()
-			game.loadScene("assets/models/msu3.glb", (16.47, -78.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/collisionmaps/msu3.glb", noCache=True)
+			game.game_text.itmText.setText("Keys obtained:")
+			game.cameraOffset = 2.75
+			game.speed1 = 0.06
+			game.speed2 = 0.2
+			game.staminaCap = 25
+			game.stamina = 25
+			game.staminaDecay = 0.025
+			game.staminaGain = 0.075
+			game.loadScene("assets/models/msu3.glb", (13.47, -61.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel3, collisionMap="assets/collisionmaps/msu3.glb", noCache=True)
 			game.taskMgr.add(game.l3Cutscene, "l3Cutscene")
 
 		if (self.levelDone):

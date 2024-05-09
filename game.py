@@ -85,6 +85,8 @@ class Game(ShowBase):
 
 	speedStop = False
 	speed1 = 0.025
+	speed2 = 0.1
+
 	barsVisible = False
 
 	# 0: none
@@ -97,6 +99,8 @@ class Game(ShowBase):
 
 	stamina = 10
 	staminaCap = 10
+	staminaDecay = 0.05
+	staminaGain = 0.025
 
 	health = 100
 	healthCap = 100
@@ -446,30 +450,10 @@ class Game(ShowBase):
 		
 		# filters 
 		self.filters = CommonFilters(self.win, self.cam)
-	#	
-	#	ralphStartPos = Vec3(-10, 0, 0)
-	#	self.seeker = Actor("models/camera")
-	#	self.seeker.reparentTo(self.render)
-	#	self.seeker.setScale(0.5)
-	#	self.seeker.setPos(ralphStartPos)
-#
-	#	self.filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
-#
-	#	self.AIworld = AIWorld(self.render)
-#
-	#	self.AIchar = AICharacter("seeker", self.seeker, 100, 0.05, 5)
-	#	self.AIworld.addAiChar(self.AIchar)
-	#	self.AIbehaviors = self.AIchar.getAiBehaviors()
-#
-	#	#AI World update
-	#	self.taskMgr.add(self.AIUpdate, "AIUpdate")
-	#	self.AIbehaviors.pursue(self.ppnp)
-	#	self.seeker.loop("run")
-#
-	##to update the AIWorld
-	#def AIUpdate(self, task):
-	#	self.AIworld.update()
-	#	return Task.cont
+		self.filters.setAmbientOcclusion(numsamples=128, amount=2, strength=5)
+
+	def AIUpdate(self, task):
+		return l3.Level3.AIUpdate(self.l3, self, task)
 	
 	def attachTextToHUD(self, text, gtext, pos, scale, font):
 		text.setScale(scale)

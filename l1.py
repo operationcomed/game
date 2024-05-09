@@ -49,7 +49,7 @@ class Level1():
 			self.timeEnd = 0
 			self.showMission(self, game)
 		
-		if (button_down(KB_BUTTON('e')) and self.missionShow and game.speedStop == True and task.time >= 0.1):
+		if (button_down(KB_BUTTON('e')) and self.missionShow and game.speedStop == True and task.time >= 0.1 and not self.jumpscared and not game.isPlaying):
 			game.itmTxtNode.show()
 			game.speedStop = False
 			game.setBarVisibility(True)
@@ -171,6 +171,7 @@ class Level1():
 			if (self.deltaTime >= 1):
 				game.unloadScene()
 				game.game_text.itmText.setTextColor(1, 1, 1, 1)
+				game.speed2 = 0.2
 				game.game_text.itmText.setText("Items obtained:")
 				game.loadScene("assets/models/msu.glb", (-3.2, -12.8, -0.45), (0, 0, 1000.5), customTask=game.missionLevel2, collisionMap="assets/collisionmaps/msu.glb", noCache=True)
 				game.taskMgr.add(game.l2Cutscene, "l2Cutscene")

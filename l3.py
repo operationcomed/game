@@ -3,6 +3,8 @@ from panda3d.core import *
 from direct.gui.DirectGui import *
 from direct.interval.LerpInterval import *
 from direct.interval.IntervalGlobal import *
+from direct.actor.Actor import Actor
+from panda3d.ai import *
 import math
 import gametext
 
@@ -14,7 +16,7 @@ class Level3():
 	cutsceneDone = False
 	def l3Cutscene(self, game, task):
 		if (not game.isPlaying):
-			game.itemList = [['1', (-40, -60, 0), 'Key 1'], ['2', (-58, -786, 0), 'Key 2'], ['3', (234, -78, 0), 'Key 3']]
+			game.itemList = [['1', (-32, -50, 0), 'Key 1'], ['2', (-50, -633, 0), 'Key 2'], ['3', (185, -64, 0), 'Key 3']]
 			game.level = 3
 			game.timeStart = 0
 			gametext.Text.hideCH(game.game_text)
@@ -24,7 +26,10 @@ class Level3():
 			game.camera.setHpr(270, 0, 0)
 			game.video_inst.playVid(game.video_inst, game, game.l3Video)
 			game.speed1 = 0.05
-			game.fog.setExpDensity(0.035)
+			if (game.debug):
+				game.fog.setExpDensity(0.0)
+			else:
+				game.fog.setExpDensity(0.035)
 			game.alight.setColor((.15, .25, .35, 1))
 		button_down = game.mouseWatcherNode.is_button_down
 
@@ -55,6 +60,28 @@ class Level3():
 		game.attachTextToHUD(self.hallTxtNode, self.hallText, (0, 0, 0), 0.15, game.font)
 		fadeout = Sequence(Wait(2.5), LerpColorScaleInterval(self.hallTxtNode, 2.5, (1, 1, 1, 0), blendType='easeIn')).start()
 		self.initItems(self, game)
+
+		ghostStartPos = Vec3(-21.93, -207.53, 0)
+		self.seeker = Actor("models/camera")
+		self.seeker.reparentTo(game.render)
+		self.seeker.setScale(0.5)
+		self.seeker.setPos(ghostStartPos)
+		self.seeker.setR(180)
+
+		self.AIworld = AIWorld(game.render)
+
+		self.AIchar = AICharacter("seeker", self.seeker, 100, 0.8, 13)
+		self.AIworld.addAiChar(self.AIchar)
+		self.AIbehaviors = self.AIchar.getAiBehaviors()
+
+		#AI World update
+		self.AIbehaviors.pursue(game.ppnp)
+		self.seeker.loop("run")
+
+	#to update the AIWorld
+	def AIUpdate(self, game, task):
+		self.AIworld.update()
+		return Task.cont
 	
 	def initItems(self, game):
 		game.scaleFactorItem = 4
@@ -121,6 +148,8 @@ class Level3():
 		i = 0
 		for itemPos in game.itemList:
 			if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
+				if (itemPos[i][0] == '1'):	
+					game.taskMgr.add(game.AIUpdate, "AIUpdate")
 				pickup = game.loader.loadSfx('assets/sound/pickup.wav')
 				pickup.setLoop(False)
 				pickup.setVolume(game.volume)
@@ -129,7 +158,9 @@ class Level3():
 				self.itemsGotten += 1
 				game.itemsImg[i].setColorScale(1, 1, 1, 1)
 				itemPos[2] = None
-				game.timeStart += 30
+				game.timeStart += 60
+				game.speed1 += 0.01
+				game.speed2 += 0.05
 			i += 1
 
 		if (self.itemsGotten >= 3 and not self.missionDone):
@@ -162,8 +193,8 @@ class Level3():
 				timeSeconds -= 60
 			while (timeSeconds < 0):
 				timeSeconds += 60
-			if (game.timeElapsed <= 120):
-				self.timeText.setText(str(1-timeMinutes) + ":" + f"{59-timeSeconds:02}")
+			if (game.timeElapsed <= 600):
+				self.timeText.setText(str(4-timeMinutes) + ":" + f"{59-timeSeconds:02}")
 			else:
 				self.timeText.setText("0:00")
 				props = WindowProperties()
@@ -175,7 +206,7 @@ class Level3():
 				game.unloadScene()
 				game.mainMenu()
 
-		if (posX >= 270 and posY >= -328 and posY <= -273 and game.isPlaying == False and self.missionDone):
+		if (posX >= 215 and posY >= -280 and posY <= -233 and game.isPlaying == False and self.missionDone):
 			crosshair.setTextColor(1, 0.5, 0, 1)
 			if (button_down(KB_BUTTON('e'))):
 				self.timeEnd = task.time

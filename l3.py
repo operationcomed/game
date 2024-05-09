@@ -23,8 +23,8 @@ class Level3():
 			game.fade.setColor(0, 0, 0, 0)
 			game.speedStop = True
 			game.music.stop()
-			game.camera.setHpr(270, 0, 0)
 			game.video_inst.playVid(game.video_inst, game, game.l3Video)
+			game.camera.setHpr(270, 0, 0)
 			game.speed1 = 0.05
 			game.fog.setExpDensity(0.035)
 			#if (game.debug):
@@ -172,6 +172,8 @@ class Level3():
 	monsterPursue = False
 	gameOver = False
 	gameOverDone = False
+	scene2Playing = False
+	scene2Done = False
 	def mission(self, game, task):
 		crosshair = game.game_text.itcText
 		button_down = game.mouseWatcherNode.is_button_down
@@ -225,12 +227,9 @@ class Level3():
 		if (self.gameOver and self.gameOverDone == False and (task.time - self.timeEnd) >= 2):
 			self.gameOverDone = True
 			game.video.removeNode()
-			gametext.Text.showCH(game.game_text)
 			game.speedStop = False
 			game.blackBg.destroy()
 			game.sound.stop()
-			game.setBarVisibility(True)
-			gametext.Text.showText(game.game_text, game)
 			for img in game.itemsImg:
 				img.setColorScale(1, 1, 1, 0)
 			props = WindowProperties()
@@ -242,14 +241,29 @@ class Level3():
 			game.unloadScene()
 			game.mainMenu()
 
+		if (self.scene2Playing and not self.scene2Done and (task.time - self.timeEnd) >= 5):
+			self.scene2Playing = False
+			self.scene2Done = True
+			game.video.removeNode()
+			gametext.Text.showCH(game.game_text)
+			game.speedStop = False
+			game.blackBg.destroy()
+			game.sound.stop()
+			game.setBarVisibility(True)
+			gametext.Text.showText(game.game_text, game)
+
 		i = 0
 		for itemPos in game.itemList:
 			if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
-				if (itemPos[i][0] == '1'):	
+				if (itemPos[i][0] == '1'):
+					self.scene2Playing = True
+					self.timeEnd = task.time
 					self.ghostSound.setLoop(True)
 					self.ghostSound.play()
 					self.monsterPursue = True
 					game.taskMgr.add(game.AIUpdate, "AIUpdate")
+					game.music.stop()
+					game.video_inst.playVid(game.video_inst, game, game.ghVideo)
 				self.itemsGotten += 1
 				if (not (self.itemsGotten >= len(game.itemList))):
 					self.showNote(self, game, itemPos[3])

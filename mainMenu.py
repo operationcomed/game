@@ -23,7 +23,7 @@ class MainMenu():
 		#game.tex = game.loader.loadTexture('assets/media/helloworld.avi')
 		#game.video.setTexture(game.tex)
 		
-		if (game.musicPlaying == False or game.level == 2):
+		if (game.musicPlaying == False or game.level == 2 or game.level == 3):
 			game.level = 0
 			game.music = game.loader.loadSfx("assets/sound/main_menu.mp3")
 			game.music.setVolume(game.volume)
@@ -43,7 +43,7 @@ class MainMenu():
 
 		game.tex = game.loader.loadTexture('assets/media/bkgnew.png')
 		game.card.setTexture(game.tex)
-		game.tex = game.loader.loadTexture('assets/media/logo1.png')
+		game.tex = game.loader.loadTexture('assets/media/logop.png')
 		game.logo.setTexture(game.tex)
 
 		# these are the centers of the images
@@ -153,7 +153,7 @@ class MainMenu():
 		game.taskMgr.remove("mainMenu")
 		game.taskMgr.add(game.moveBackground, "mainMenu")
 
-		backTexture = (game.loader.loadTexture("assets/buttons/exit_normal.png"), game.loader.loadTexture("assets/buttons/exit_normal.png"), game.loader.loadTexture("assets/buttons/exit_hover.png"), game.loader.loadTexture("assets/buttons/exit_normal.png"))
+		backTexture = (game.loader.loadTexture("assets/buttons/back_normal.png"), game.loader.loadTexture("assets/buttons/back_normal.png"), game.loader.loadTexture("assets/buttons/back_hover.png"), game.loader.loadTexture("assets/buttons/back_normal.png"))
 		game.backButton = DirectButton(command=backSettings, frameTexture=backTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1, 1))
 		game.backButton.setTransparency(True)
 		game.backButton.setSx(482/226)
@@ -268,7 +268,7 @@ class MainMenu():
 
 		game.settingsShow = True
 
-		backTexture = (game.loader.loadTexture("assets/buttons/exit_normal.png"), game.loader.loadTexture("assets/buttons/exit_normal.png"), game.loader.loadTexture("assets/buttons/exit_hover.png"), game.loader.loadTexture("assets/buttons/exit_normal.png"))
+		backTexture = (game.loader.loadTexture("assets/buttons/back_normal.png"), game.loader.loadTexture("assets/buttons/back_normal.png"), game.loader.loadTexture("assets/buttons/back_hover.png"), game.loader.loadTexture("assets/buttons/back_normal.png"))
 		game.backButton = DirectButton(command=backSettings, frameTexture=backTexture, relief='flat', pressEffect=0, frameSize=(-1, 1, -1,1))
 		game.backButton.setTransparency(True)
 		game.backButton.setSx(482/226)

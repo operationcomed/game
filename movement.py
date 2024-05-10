@@ -1,6 +1,9 @@
 from math import pi, sin, cos
 from panda3d.core import *
 from direct.gui.DirectGui import *
+from direct.task import Task
+import gametext
+
 
 KB_BUTTON = KeyboardButton.ascii_key
 KB = KeyboardButton
@@ -10,8 +13,9 @@ class Movement():
 	accelX = 0
 	accelY = 0
 	sprint = 0.1
+	timeEnd = 0
 
-	def movement(self, game):
+	def movement(self, game, task):
 		button_down = game.mouseWatcherNode.is_button_down
 
 		# print current position for debugging
@@ -163,19 +167,7 @@ class Movement():
 
 		game.staminaBar["value"] = game.stamina
 		game.healthBar["value"] = game.health
-
-		if (game.health <= 1):
-			pickup = game.loader.loadSfx('assets/sound/scream.mp3')
-			pickup.setLoop(False)
-			pickup.setVolume(game.volume)
-			pickup.play()
-			props = WindowProperties()
-			props.setCursorHidden(False)
-			game.win.requestProperties(props)
-			props = game.win.getProperties()
-			game.music.stop()
-			game.resetMinigames()
-			game.unloadScene()
-			game.mainMenu()
+		
+		return Task.cont
 
 movement = Movement

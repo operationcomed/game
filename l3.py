@@ -51,6 +51,8 @@ class Level3():
 		return Task.cont
 	
 	def showNote(self, game, note):
+		for img in game.itemsImg:
+			img["scale"] = 0
 		game.mouseLetGo = True
 		gametext.Text.hideText(game.game_text, game)
 		game.setBarVisibility(False)
@@ -80,11 +82,8 @@ class Level3():
 		game.noteImg.setScale(min(16/9*t*game.scaleFactorNote, 16/9*game.scaleFactorNote), min(t*game.scaleFactorNote, 1*game.scaleFactorNote), min(t*game.scaleFactorNote, 1*game.scaleFactorNote))
 
 	def hideNote(self, game):
-		if (self.note2 == True):
-			self.note2 = False
-			self.ghostSound.setLoop(True)
-			self.ghostSound.play()
-			self.monsterPursue = True
+		for img in game.itemsImg:
+			img["scale"] = 0.125
 		dismiss = game.loader.loadSfx("assets/sound/dismiss.mp3")
 		dismiss.setVolume(game.volume)
 		dismiss.play()
@@ -183,8 +182,6 @@ class Level3():
 	taskTime = 0
 	note1Showing = False
 	monsterPursue = False
-	gameOver = False
-	gameOverDone = False
 	scene2Playing = False
 	scene2Done = False
 	note2 = False
@@ -215,6 +212,26 @@ class Level3():
 		elif ((not self.undamager.isPlaying()) and ((1, round(game.render.getColorScale()[1], 2), round(game.render.getColorScale()[2], 2), 1) == (1, 0.1, 0, 1))):
 			self.undamager.start()
 
+		def jumpscare():
+			if (game.gameOver):
+				return
+			self.timeText.setText("")
+			self.ghostSound.stop()
+			self.monsterPursue = False
+			game.gameOver = True
+			self.timeEnd = task.time
+			scream = game.loader.loadSfx('assets/sound/scream.mp3')
+			scream.setLoop(False)
+			scream.setVolume(game.volume)
+			scream.play()
+			game.setBarVisibility(False)
+			gametext.Text.hideText(game.game_text, game)
+			gametext.Text.hideCH(game.game_text)
+			game.speedStop = True
+			game.video_inst.playVid(game.video_inst, game, 'assets/media/jumpscare1.avi')
+			game.video.setPos(0.5, 0, 0.1)
+			game.video.setScale(game.scaleFactorVid, 1, game.scaleFactorVid/1.8)
+			game.skipText.setText('')
 
 		if (self.monsterPursue == False):
 			pass
@@ -222,25 +239,11 @@ class Level3():
 			mPosX = self.seeker.getX()
 			mPosY = self.seeker.getY()
 			if (abs(mPosX - posX) <= 1 and abs(mPosY - posY) <= 1):
-				self.ghostSound.stop()
-				self.monsterPursue = False
-				self.gameOver = True
-				self.timeEnd = task.time
-				scream = game.loader.loadSfx('assets/sound/scream.mp3')
-				scream.setLoop(False)
-				scream.setVolume(game.volume)
-				scream.play()
-				game.setBarVisibility(False)
-				gametext.Text.hideText(game.game_text, game)
-				gametext.Text.hideCH(game.game_text)
-				game.speedStop = True
-				game.video_inst.playVid(game.video_inst, game, 'assets/media/jumpscare1.avi')
-				game.video.setPos(0.5, 0, 0.1)
-				game.video.setScale(game.scaleFactorVid, 1, game.scaleFactorVid/1.8)
-				game.skipText.setText('')
+				jumpscare()
 
-		if (self.gameOver and self.gameOverDone == False and (task.time - self.timeEnd) >= 2):
-			self.gameOverDone = True
+		if (game.gameOver and game.gameOverDone == False and (task.time - self.timeEnd) >= 2):
+			game.gameOverDone = True
+			game.isPlaying = False
 			game.video.removeNode()
 			game.speedStop = False
 			game.blackBg.destroy()
@@ -251,7 +254,6 @@ class Level3():
 			props.setCursorHidden(False)
 			game.win.requestProperties(props)
 			props = game.win.getProperties()
-			game.music.stop()
 			game.resetMinigames()
 			game.unloadScene()
 			game.mainMenu()
@@ -266,7 +268,7 @@ class Level3():
 			game.sound.stop()
 			game.setBarVisibility(True)
 			gametext.Text.showText(game.game_text, game)
-			self.showNote(self, game, 2)
+			game.isPlaying = False
 			game.skipText.setText('')
 
 		i = 0
@@ -275,6 +277,9 @@ class Level3():
 				self.itemsGotten += 1
 				print(itemPos)
 				if (itemPos[0] == '2'):
+					self.ghostSound.setLoop(True)
+					self.ghostSound.play()
+					self.monsterPursue = True
 					self.note2 = True
 					self.scene2Playing = True
 					self.timeEnd = task.time
@@ -329,15 +334,7 @@ class Level3():
 			if (game.timeElapsed <= 600):
 				self.timeText.setText(str(4-timeMinutes) + ":" + f"{59-timeSeconds:02}")
 			else:
-				self.timeText.setText("0:00")
-				props = WindowProperties()
-				props.setCursorHidden(False)
-				game.win.requestProperties(props)
-				props = game.win.getProperties()
-				game.music.stop()
-				game.resetMinigames()
-				game.unloadScene()
-				game.mainMenu()
+				jumpscare()
 
 		if (posX >= 215 and posY >= -280 and posY <= -233 and self.monsterPursue == True and self.missionDone):
 			crosshair.setTextColor(1, 0.5, 0, 1)
@@ -368,7 +365,6 @@ class Level3():
 				props.setCursorHidden(False)
 				game.win.requestProperties(props)
 				props = game.win.getProperties()
-				game.music.stop()
 				game.resetMinigames()
 				game.unloadScene()
 				game.mainMenu()

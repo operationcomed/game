@@ -79,6 +79,42 @@ class Level2():
 		button_down = game.mouseWatcherNode.is_button_down
 		posX = game.ppnp.getX()
 		posY = game.ppnp.getY()
+
+		def jumpscare():
+			if (game.gameOver):
+				return
+			self.timeText.setText("")
+			self.timeEnd = task.time
+			game.gameOver = True
+			scream = game.loader.loadSfx('assets/sound/scream.mp3')
+			scream.setLoop(False)
+			scream.setVolume(game.volume)
+			scream.play()
+			game.setBarVisibility(False)
+			gametext.Text.hideText(game.game_text, game)
+			gametext.Text.hideCH(game.game_text)
+			game.speedStop = True
+			game.video_inst.playVid(game.video_inst, game, 'assets/media/jumpscare1.avi')
+			game.video.setPos(0.5, 0, 0.1)
+			game.video.setScale(game.scaleFactorVid, 1, game.scaleFactorVid/1.8)
+			game.skipText.setText('')
+
+		if (game.gameOver and game.gameOverDone == False and (task.time - self.timeEnd) >= 2):
+			game.gameOverDone = True
+			game.isPlaying = False
+			game.video.removeNode()
+			game.speedStop = False
+			game.blackBg.destroy()
+			game.sound.stop()
+			for img in game.itemsImg:
+				img.setColorScale(1, 1, 1, 0)
+			props = WindowProperties()
+			props.setCursorHidden(False)
+			game.win.requestProperties(props)
+			props = game.win.getProperties()
+			game.resetMinigames()
+			game.unloadScene()
+			game.mainMenu()
 		
 		if (self.willProceed == False and self.missionDone == False):
 			proceed = True
@@ -216,7 +252,7 @@ class Level2():
 			game.textObjects.remove(self.timeTxtNode)
 			self.l2Init = True
 
-		if (self.l2Init and not game.ptRunning and not game.ptDone):
+		if (self.l2Init and not game.ptRunning and not game.ptDone and not game.gameOver):
 			game.timeElapsed = task.time - game.timeStart
 			timeMinutes = math.floor(game.timeElapsed/60)
 			timeSeconds = math.floor(game.timeElapsed)
@@ -227,15 +263,12 @@ class Level2():
 			if (game.timeElapsed <= 900):
 				self.timeText.setText(str(14-timeMinutes) + ":" + f"{59-timeSeconds:02}")
 			else:
-				self.timeText.setText("0:00")
-				props = WindowProperties()
-				props.setCursorHidden(False)
-				game.win.requestProperties(props)
-				props = game.win.getProperties()
-				game.music.stop()
-				game.resetMinigames()
-				game.unloadScene()
-				game.mainMenu()
+				jumpscare()
+
+			
+		if (game.health <= 1):
+			jumpscare()
+
 		return Task.cont
 
 	def nextLevel(self, game):

@@ -125,6 +125,9 @@ class Game(ShowBase):
 
 	sensitivity = 30
 
+	gameOver = False
+	gameOverDone = False
+
 	# minigame
 	anagramRunning = False
 	r1Running = False
@@ -490,8 +493,7 @@ class Game(ShowBase):
 	barColored = 0
 	# "basic" player movement
 	def moveTask(self, task):
-		mv.Movement.movement(self.movement_inst, self)
-		return Task.cont
+		return mv.Movement.movement(self.movement_inst, self, task)
 
 	musicPlaying = False
 	def mainMenu(self):

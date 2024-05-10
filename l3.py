@@ -32,7 +32,7 @@ class Level3():
 			game.alight.setColor((.1, .2, .3, 1))
 		button_down = game.mouseWatcherNode.is_button_down
 
-		if (task.time >= 36.55 or (button_down(KB_BUTTON('e')) and task.time >= 0.5)):
+		if (task.time >= 44.55 or (button_down(KB_BUTTON('e')) and task.time >= 0.5)):
 			game.health = 100
 			game.music.play()
 			game.video.removeNode()

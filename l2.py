@@ -224,8 +224,8 @@ class Level2():
 				timeSeconds -= 60
 			while (timeSeconds < 0):
 				timeSeconds += 60
-			if (game.timeElapsed <= 600):
-				self.timeText.setText(str(9-timeMinutes) + ":" + f"{59-timeSeconds:02}")
+			if (game.timeElapsed <= 900):
+				self.timeText.setText(str(14-timeMinutes) + ":" + f"{59-timeSeconds:02}")
 			else:
 				self.timeText.setText("0:00")
 				props = WindowProperties()

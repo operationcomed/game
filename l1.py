@@ -138,10 +138,10 @@ class Level1():
 			game.isPlaying = False
 			self.hallText = TextNode('hallucinate')
 			self.hallText.setAlign(TextNode.ACenter)
-			self.hallText.setText("HALLUCINATION\nMY HEAD HURTS!")
+			self.hallText.setText("WHAT WAS THAT?\nA HALLUCINATION!")
 			self.hallText.setShadow(0.07, 0.07)
 			self.hallTxtNode = game.aspect2d.attachNewNode(self.hallText)
-			game.attachTextToHUD(self.hallTxtNode, self.hallText, (0, 0, 0), 0.15, game.font)
+			game.attachTextToHUD(self.hallTxtNode, self.hallText, (0, 0, 0), 0.15, game.pfont)
 			fadeout = Sequence(Wait(2.5), LerpColorScaleInterval(self.hallTxtNode, 2.5, (1, 1, 1, 0), blendType='easeIn')).start()
 			self.jsCleanup = True
 

@@ -186,6 +186,10 @@ class Game(ShowBase):
 
 		self.font.setPixelsPerUnit(64)
 
+		self.pfont = self.loader.loadFont('assets/fonts/plunct.ttf')
+
+		self.pfont.setPixelsPerUnit(64)
+
 		# antialiasing
 		self.render.setAntialias(AntialiasAttrib.MAuto)
 		

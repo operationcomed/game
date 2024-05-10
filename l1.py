@@ -119,7 +119,7 @@ class Level1():
 			rotToScare = game.camera.hprInterval(0.75, (270, 0, 0), blendType='easeIn')
 			rotToScare.start()
 
-		if (task.time - self.timeEnd >= 0.15 and self.jumpscared and not game.isPlaying and self.jsCleanup == False):
+		if (task.time - self.timeEnd >= 0.1 and self.jumpscared and not game.isPlaying and self.jsCleanup == False):
 			game.video_inst.playVid(game.video_inst, game, 'assets/media/jumpscare1.avi')
 			game.video.setPos(0.5, 0, 0.1)
 			game.video.setScale(game.scaleFactorVid, 1, game.scaleFactorVid/1.8)

@@ -77,8 +77,8 @@ class CharSelect():
 			game.backstoryVideo = "assets/backstories/Girl.avi"
 			game.l2Video = "assets/media/l2_girl.avi"
 			game.l3Video = "assets/media/l3_girl.avi"
-			game.ghVideo = "assets/media/l2_girl.avi" 
-			game.esVideo = "assets/media/l2_girl.avi"
+			game.ghVideo = "assets/media/es.avi" 
+			game.esVideo = "assets/media/es_girl.avi"
 			self.setCharacter(game)
 
 		def setCharacterB():
@@ -86,8 +86,8 @@ class CharSelect():
 			game.backstoryVideo = "assets/backstories/Boy.avi"
 			game.l2Video = "assets/media/l2_boy.avi"
 			game.l3Video = "assets/media/l3_boy.avi"
-			game.ghVideo = "assets/media/l2_boy.avi"
-			game.esVideo = "assets/media/l2_girl.avi"
+			game.ghVideo = "assets/media/es.avi"
+			game.esVideo = "assets/media/es_boy.avi"
 			self.setCharacter(game)
 
 		game.girlSelect["command"] = setCharacterA

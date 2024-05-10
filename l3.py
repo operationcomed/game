@@ -256,7 +256,7 @@ class Level3():
 			game.unloadScene()
 			game.mainMenu()
 
-		if (self.scene2Playing and not self.scene2Done and ((task.time - self.timeEnd) >= 2 or button_down(KB_BUTTON('e')))):
+		if (self.scene2Playing and not self.scene2Done and ((task.time - self.timeEnd) >= 10.56 or button_down(KB_BUTTON('e')))):
 			self.scene2Playing = False
 			self.scene2Done = True
 			game.video.removeNode()
@@ -272,7 +272,7 @@ class Level3():
 		i = 0
 		for itemPos in game.itemList:
 			if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
-				
+				self.itemsGotten += 1
 				print(itemPos)
 				if (itemPos[0] == '2'):
 					self.note2 = True
@@ -362,7 +362,7 @@ class Level3():
 		if (game.isPlaying and self.missionDone and game.monsterPursue == False):
 			self.deltaTime = task.time - self.timeEnd
 			print('wow', self.deltaTime)
-			if (self.deltaTime >= 37):
+			if (self.deltaTime >= 24.66):
 				game.isPlaying == False
 				props = WindowProperties()
 				props.setCursorHidden(False)

@@ -296,7 +296,7 @@ class Level3():
 				game.speed2 += 0.05
 			i += 1
 
-		if (self.itemsGotten >= 3 and not self.missionDone):
+		if (self.itemsGotten >= len(game.itemList) and not self.missionDone):
 			doneSound = game.loader.loadSfx('assets/sound/done.mp3')
 			doneSound.setLoop(False)
 			doneSound.setVolume(game.volume)
@@ -339,7 +339,7 @@ class Level3():
 				game.unloadScene()
 				game.mainMenu()
 
-		if (posX >= 215 and posY >= -280 and posY <= -233 and game.isPlaying == False and self.missionDone):
+		if (posX >= 215 and posY >= -280 and posY <= -233 and self.monsterPursue == True and self.missionDone):
 			crosshair.setTextColor(1, 0.5, 0, 1)
 			if (button_down(KB_BUTTON('e'))):
 				self.timeEnd = task.time
@@ -359,7 +359,7 @@ class Level3():
 		elif (game.isPlaying == False and self.missionDone):
 			crosshair.setTextColor(1, 1, 1, 1)
 
-		if (game.isPlaying and self.missionDone and game.monsterPursue == False):
+		if (game.isPlaying and self.missionDone and self.monsterPursue == False):
 			self.deltaTime = task.time - self.timeEnd
 			print('wow', self.deltaTime)
 			if (self.deltaTime >= 24.66):

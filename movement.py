@@ -59,9 +59,9 @@ class Movement():
 		self.sprint = game.speed2
 		game.speed = game.speed1
 
-		#if (game.debug):
-		#	game.staminaDecay = 0.001
-		#	self.sprint = 1
+		if (game.debug):
+			game.staminaDecay = 0.001
+			self.sprint = 2
 		# sprinting and stamina
 		if (button_down(KB.shift()) and game.stamina >= 0 and game.sprintable):
 			game.speed = self.sprint

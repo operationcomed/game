@@ -16,7 +16,7 @@ class Level3():
 	cutsceneDone = False
 	def l3Cutscene(self, game, task):
 		if (not game.isPlaying):
-			game.itemList = [['1', (-32, -50, 0), 'Key 1', 2], ['2', (-50, -633, 0), 'Key 2', 1], ['3', (185, -64, 0), 'Key 3', 0]]
+			game.itemList = [['1', (-32, -50, 0), 'cr', 0], ['2', (-50, -633, 0), 'canteen', 1], ['3', (185, -64, 0), 'court', 1]]
 			game.level = 3
 			game.timeStart = 0
 			gametext.Text.hideCH(game.game_text)
@@ -112,13 +112,16 @@ class Level3():
 		#fadeout = Sequence(Wait(2.5), LerpColorScaleInterval(self.hallTxtNode, 2.5, (1, 1, 1, 0), blendType='easeIn')).start()
 		self.initItems(self, game)
 		self.note1Showing = True
-		self.showNote(self, game, 0)
+		self.showNote(self, game, 2)
 
 		self.ghostSound = game.audio3d.loadSfx('assets/sound/horror.mp3')
 		self.ghostSound.setVolume(game.volume)
 
 		ghostStartPos = Vec3(-23.93, -207.53, -0.5)
-		self.seeker = Actor("assets/models/girl.glb")
+		if (game.scene_rot == True):
+			self.seeker = Actor("assets/models/girl-rot.glb")
+		else:
+			self.seeker = Actor("assets/models/girl.glb")
 		self.seeker.reparentTo(game.render)
 		self.seeker.setPos(ghostStartPos)
 		game.sceneObjects.append(self.seeker)
@@ -269,7 +272,9 @@ class Level3():
 		i = 0
 		for itemPos in game.itemList:
 			if (abs(itemPos[1][0] - posX) <= 2 and abs(itemPos[1][1] - posY) <= 2 and itemPos[2] != None):
-				if (itemPos[i][0] == '1'):
+				
+				print(itemPos)
+				if (itemPos[0] == '2'):
 					self.note2 = True
 					self.scene2Playing = True
 					self.timeEnd = task.time
@@ -338,7 +343,7 @@ class Level3():
 			crosshair.setTextColor(1, 0.5, 0, 1)
 			if (button_down(KB_BUTTON('e'))):
 				self.timeEnd = task.time
-				self.monsterPursue == False
+				self.monsterPursue = False
 				game.taskMgr.remove("AIUpdate")
 				game.setBarVisibility(False)
 				game.level = 3
@@ -354,7 +359,7 @@ class Level3():
 		elif (game.isPlaying == False and self.missionDone):
 			crosshair.setTextColor(1, 1, 1, 1)
 
-		if (game.isPlaying):
+		if (game.isPlaying and self.missionDone and game.monsterPursue == False):
 			self.deltaTime = task.time - self.timeEnd
 			print('wow', self.deltaTime)
 			if (self.deltaTime >= 37):

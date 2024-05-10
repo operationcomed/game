@@ -8,7 +8,7 @@ from setuptools import setup
 # https://docs.panda3d.org/1.10/python/distribution/building-binaries
 setup(
     name='escapemsu',
-	version='0.0.3',
+	version='1.0.0',
     options={
         'build_apps': {
 			'platforms': ['win_amd64'],

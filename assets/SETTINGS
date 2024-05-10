@@ -1,5 +1,5 @@
 {
   "sensitivity": 40.0,
   "volume": 1.0,
-  "debug": true
+  "debug": false
 }

@@ -1,5 +1,8 @@
-# Escape from Mindanao State University College of Education Training Department
-A cool game.
+# Escape Mindanao State University College of Education Training Department (Post-Mortem Edition)
+A cool horror game.
+
+> [!NOTE]
+> If you have a problem with the scene, set the contents of `ROT_SCENE` in the `assets` folder from `True` to `False`
 
 Releases: https://github.com/operationcomed/game/releases
 
@@ -10,6 +13,7 @@ Work may not be done here.
 see:
  * [emman's branch](https://github.com/operationcomed/game/tree/emman)
  * [steph's branch](https://github.com/operationcomed/game/tree/steph)
+
 
 ## How to play without using the binaries
 For absolute beginners to programming and whatnot.
@@ -48,10 +52,3 @@ If it doesn't work try:
 * Installing python https://www.python.org/downloads/
 * If you already have python installed, try running this command in a terminal (look up a tutorial on how to open a terminal on your OS): `python -m pip install panda3d` or `python3 -m pip install panda3d`
   * If you get an error like `No module named pip`, try running this command then try the above again: `python -m ensurepip` or `python3 -m ensurepip`
-
-
-
-
-
-
-

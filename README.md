@@ -1,5 +1,7 @@
 # Escape Mindanao State University College of Education Training Department (Post-Mortem Edition)
-A cool horror game.
+A cool horror game for a school project.
+
+Check out the WIP Unity Edition: https://github.com/operationcomed/escapemsu-unity-builds/releases
 
 > [!NOTE]
 > If you have a problem with the scene, set the contents of `ROT_SCENE` in the `assets` folder from `True` to `False`
